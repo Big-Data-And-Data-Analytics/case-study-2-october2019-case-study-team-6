@@ -2,7 +2,7 @@
 
 # Package Setup
 
-# Python Development Framework
+# Development Framework
 
 
 * **python setup.py bdist_wheel**   
