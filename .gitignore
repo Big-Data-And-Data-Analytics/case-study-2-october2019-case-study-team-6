@@ -1,4 +1,6 @@
 build
 dist
 national_identity.egg-info
-
+.Rhistory
+.Rproj.user
+*.Rproj

@@ -1,0 +1,6 @@
+Data/
+pyenv/
+
+*.pyc
+.Rproj.user
+/Uefa2016Hastag.7z
