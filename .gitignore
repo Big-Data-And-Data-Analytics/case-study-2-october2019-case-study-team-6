@@ -4,3 +4,5 @@ national_identity.egg-info
 .Rhistory
 .Rproj.user
 *.Rproj
+scripts/03 Data Preparation/04 National Identity/__pycache__/mongoConnection.cpython-38.pyc
+scripts/03 Data Preparation/04 National Identity/__pycache__/

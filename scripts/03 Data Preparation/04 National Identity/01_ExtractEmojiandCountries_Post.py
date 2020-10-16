@@ -10,8 +10,7 @@ import langid
 from langdetect import detect
 import time
 import numpy as np
-from mongoConnection import connectMongo, getCollection
-start_time = time.time()
+from ..mongoConnection import connectMongo, getCollection
 
 
 def find_national_identity(df):
@@ -53,51 +52,21 @@ def remove_emojis_from_onlytext(df):
 
     print("Inside remove_emojis_from_onlytext")
     str2 = str(df['onlyText'])
-    print(f'Before: {str2}')
-    print(f'Emojis : {df["emojis"]}')
     emojis = df['emojis'].replace("{", "").replace("}", "").replace("'", "").replace(" ", "")
     list_emo = list(set(emojis.split(",")))
-    #emojis_in_df = list(set(list_emo))
 
-    print(list_emo)
     for x in list_emo:
-        print(x)
         str1 = str2.replace(x, '')
         str2 = str1
-    print(f'After: {str2}')
     return str2
 
 
-
-
 def extract_emojis(onlyText):
-    #print("Running Emojis")
     emojiList = emojis.get(onlyText)
     if (len(emojiList) == 0):
         return ' '
     else:
         return str(emojiList)
-
-
-def lang_detect(df):
-    try:
-        lang = detect(str(df['onlyText']))
-    except Exception:
-        print(Exception)
-    else:
-        return lang
-
-
-
-def lang_id(df):
-    try:
-        lang = langid.classify(str(df['onlyText']))[0]
-    except Exception:
-        print(Exception)
-    else:
-        return lang
-
-
 
 
 def postData(post, ni_col):
@@ -106,9 +75,6 @@ def postData(post, ni_col):
     # Initialisations
 
     global df
-    post['emojis'] = ' '
-    post['country'] = ' '
-    post['countryem'] = ' '
     post = post.fillna('0')
 
     # Dataframes
@@ -145,24 +111,28 @@ def postData(post, ni_col):
 
 
 # Source Collection
-sentiment_post = connectMongo('04_NationalIdentity_Sentiment', 'sentiment_post_Collection')
-sentiment_comment = connectMongo('04_NationalIdentity_Sentiment', 'sentiment_comment_Collection')
-sentiment_subcomment = connectMongo('04_NationalIdentity_Sentiment', 'sentiment_subcomment_Collection')
+if __name__ == "__main__":
+    start_time = time.time()
+    sentiment_post = connectMongo('04_NationalIdentity_Sentiment', 'sentiment_post_Collection')
+    df = getCollection(sentiment_post)
+    # Target Collection
+    ni_post = connectMongo('05_NationalIdentity', 'ni_post')     # 05_NationalIdentity Connection Object
+    postData(df, ni_post)
 
-df = getCollection(sentiment_post)
-# Target Collection
-ni_post = connectMongo('05_NationalIdentity', 'ni_post')     # 05_NationalIdentity Connection Object
-postData(df, ni_post)
+
+    sentiment_comment = connectMongo('04_NationalIdentity_Sentiment', 'sentiment_comment_Collection')
+    df = getCollection(sentiment_comment)
+    # Target Collection
+    ni_comment = connectMongo('05_NationalIdentity', 'ni_comment')
+    df.rename(columns={'Comment':'text'}, inplace=True)
+    postData(df, ni_comment)
 
 
-df = getCollection(sentiment_comment)
-# Target Collection
-ni_comment = connectMongo('05_NationalIdentity', 'ni_comment')
-postData(df, ni_comment)
+    sentiment_subcomment = connectMongo('04_NationalIdentity_Sentiment', 'sentiment_subcomment_Collection')
+    df = getCollection(sentiment_subcomment)
+    # Target Collection
+    ni_subcomment = connectMongo('05_NationalIdentity', 'ni_subcomment')
+    df.rename(columns={'Sub_Comment':'text'}, inplace=True)
+    postData(df, ni_subcomment)
 
-df = getCollection(sentiment_subcomment)
-# Target Collection
-ni_subcomment = connectMongo('05_NationalIdentity', 'ni_subcomment')
-postData(df, ni_subcomment)
-
-print("--- %s seconds ---" % (time.time() - start_time))
+    print("--- %s seconds ---" % (time.time() - start_time))
