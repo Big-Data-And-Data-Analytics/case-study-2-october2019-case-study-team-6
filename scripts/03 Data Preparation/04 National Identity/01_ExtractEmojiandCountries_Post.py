@@ -6,23 +6,12 @@ Created on Sat Feb 22 02:23:52 2020
 """
 import emojis
 import pandas as pd
-from pymongo import MongoClient
 import langid
 from langdetect import detect
 import time
 import numpy as np
+from mongoConnection import connectMongo, getCollection
 start_time = time.time()
-
-# Source Collection
-client = MongoClient('localhost', 27017)
-db = client['04_NationalIdentity_Sentiment'] # 04_NationalIdentity_Sentiment Connection Object
-sentiment_post = db.sentiment_post_Collection
-post = pd.DataFrame(list(sentiment_post.find({})))
-df = post.copy()
-
-# Target Collection
-db_ni = client['05_NationalIdentity']
-ni_post = db_ni.ni_post     # 05_NationalIdentity Connection Object
 
 
 def find_national_identity(df):
@@ -111,7 +100,7 @@ def lang_id(df):
 
 
 
-def postData(post):
+def postData(post, ni_col):
     print("Inside PostData")
 
     # Initialisations
@@ -137,7 +126,7 @@ def postData(post):
     df = post.copy()
 
     # Call Extract Country Emojis - extract_country_emojis()
-    flags = pd.read_csv("01 Setup/02 Input_Files/flags_smiley.csv", sep=":")
+    flags = pd.read_csv("flags_smiley.csv", sep=":")
     flags = flags['emoji'].str.strip()
     flags_set = set(flags)
 
@@ -148,13 +137,32 @@ def postData(post):
 
     # Call Find National Identity - find_national_identity()
     df['country'] = df.apply(find_national_identity, axis = 1)
-    ni_post.insert_many(df.to_dict('records'))
+    ni_col.insert_many(df.to_dict('records'))
 
     # Call Language Detection - langid and detectlang
     #df['langdetect'] = df.apply(lang_detect,axis = 1)
     #df['langid'] = df.apply(lang_id, axis=1)
 
 
-postData(df)
+# Source Collection
+sentiment_post = connectMongo('04_NationalIdentity_Sentiment', 'sentiment_post_Collection')
+sentiment_comment = connectMongo('04_NationalIdentity_Sentiment', 'sentiment_comment_Collection')
+sentiment_subcomment = connectMongo('04_NationalIdentity_Sentiment', 'sentiment_subcomment_Collection')
+
+df = getCollection(sentiment_post)
+# Target Collection
+ni_post = connectMongo('05_NationalIdentity', 'ni_post')     # 05_NationalIdentity Connection Object
+postData(df, ni_post)
+
+
+df = getCollection(sentiment_comment)
+# Target Collection
+ni_comment = connectMongo('05_NationalIdentity', 'ni_comment')
+postData(df, ni_comment)
+
+df = getCollection(sentiment_subcomment)
+# Target Collection
+ni_subcomment = connectMongo('05_NationalIdentity', 'ni_subcomment')
+postData(df, ni_subcomment)
 
 print("--- %s seconds ---" % (time.time() - start_time))
