@@ -26,7 +26,7 @@ client = MongoClient('localhost', 27017)
 db = client['09_TrainingData']
 
 # Filepath
-filepath = "04 Model/01 Models/Model_Input_Files/"
+filepath = "model/01 Models/Model_Input_Files/"
 
 # Get the Vocabulary
 col = db.CountVectorVocabulary
