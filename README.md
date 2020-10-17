@@ -43,7 +43,7 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.coverage', 'sphinx.ext.napoleon'
 
 **Extras:**<br>
 [Sphinx Configuration Documentation](https://www.sphinx-doc.org/en/master/usage/configuration.html)   
-[Youtube-DanSheffner-Sphinx-Tutorial](https://www.youtube.com/watch?v=qrcj7sVuvUA&ab_channel=DanSheffner)
+[Youtube-DanSheffner-Sphinx-Tutorial](https://www.youtube.com/watch?v=qrcj7sVuvUA&ab_channel=DanSheffner)     
 [Sphinx Docstrings Example](https://thomas-cokelaer.info/tutorials/sphinx/docstring_python.html)
 ## Pull Request Guidelines
 Once your code is tested, compile Sphinx and create a document. If documentation is created without any errors
