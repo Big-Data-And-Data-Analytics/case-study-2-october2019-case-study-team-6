@@ -1,6 +1,33 @@
 class Cleaning:
-    """
-    This class provides functions for cleaning the data.
+    """This class provides functions for cleaning the data.
+
+        :Example:
+
+            from pymongo import MongoClient
+            import pandas as pd
+            import numpy as np
+
+            client = MongoClient('localhost', 27017)
+            db = client['01_NationalIdentity_Crawled']
+            data = db.youTube_Video_Comments_Raw
+            data = data.find({})
+            data = list(data)
+            data = pd.DataFrame(data)
+
+            cleaner = Cleaning()
+
+            data = cleaner.removeDuplicates(data)
+            data = cleaner.removeWhiteSpaces(data, "textOriginal")
+            data = cleaner.changeEmptyToNA(data, "textOriginal")
+
+        .. note::
+            - **For the best results, apply the functions as follows:**
+                1 :func:`removeWhiteSpaces()`
+                2 :func:`changeEmptyToNA()`
+                3 :func:`removeDuplicates()`
+            
+                If the order changes, then duplicates might still be in the data
+        
     """
 
     version = "0.1"
