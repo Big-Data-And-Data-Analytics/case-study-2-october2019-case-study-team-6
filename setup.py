@@ -18,10 +18,10 @@ setup(name='national-identity',
       ],
       long_description=long_description,
       install_requires=[            # Production - Compatible Version i.e. Can be compatible with newer versions > sign
-          "blessings ~= 1.7",
-          "requests",
+          "pymongo",
           "pandas",
-          "numpy"
+          "numpy",
+          "nltk"
       ],
       extras_require={              # Requires to be more specific for the development purpose
           "dev": [
