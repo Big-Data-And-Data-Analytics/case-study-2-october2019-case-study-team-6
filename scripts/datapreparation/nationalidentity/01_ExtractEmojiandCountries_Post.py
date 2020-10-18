@@ -92,7 +92,7 @@ def postData(post, ni_col):
     df = post.copy()
 
     # Call Extract Country Emojis - extract_country_emojis()
-    flags = pd.read_csv("flags_smiley.csv", sep=":")
+    flags = pd.read_csv("setup/02 Input_Files/flags_smiley.csv", sep=":")
     flags = flags['emoji'].str.strip()
     flags_set = set(flags)
 

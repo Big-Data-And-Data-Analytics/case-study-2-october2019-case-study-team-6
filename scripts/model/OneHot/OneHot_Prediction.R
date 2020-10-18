@@ -21,7 +21,7 @@ ln <- function(){
   x_test <- "together we can do it! go germany!"
   x_test <- write.csv(x_test, paste(filepath, "/oneHotPreprocessing/X_test.csv", sep = ""), row.names = FALSE)
   
-  #setwd(dir = "04 Model/01 Models/OneHot/")
+  #setwd(dir = "model/01 Models/OneHot/")
   #py_run_file("oneHot_Preprocessing.py")
   
   #Loading Testing x

@@ -17,14 +17,13 @@ start_time = time.time()
 # Source Collection
 client = MongoClient('localhost', 27017)
 db = client['04_NationalIdentity_Sentiment'] # 04_NationalIdentity_Sentiment Connection Object
-sentiment_subcomment = db.sentiment_subcomment_Collection
-subcomment = pd.DataFrame(list(sentiment_subcomment.find({})))
-df = subcomment.copy()
+sentiment_comment = db.sentiment_comment_Collection
+comment = pd.DataFrame(list(sentiment_comment.find({})))
+df = comment.copy()
 
 # Target Collection
 db_ni = client['05_NationalIdentity']
-ni_subcomment = db_ni.ni_subcomment # 05_NationalIdentity Connection Object
-
+ni_comment = db_ni.ni_comment # 05_NationalIdentity Connection Object
 
 
 def find_national_identity(df):
@@ -34,11 +33,13 @@ def find_national_identity(df):
                     "Russia", "Slovakia", "Spain", "Sweden", "Switzerland ", "Turkey", "Ukraine", "Wales",
                     "Austria"]
 
-    comment = df['Sub_Comment'].upper()
+    comment = df['Comment'].upper()
     for country in country_list:
+        #print('Inside For loop',df.index)
         cntry = country.upper()
+        #print(country)
         if (cntry in comment):
-
+            #print('P')
             return str(cntry)
 
     print('Completed find_national_identity')
@@ -71,6 +72,7 @@ def remove_emojis_from_onlytext(df):
     print(f'Emojis : {df["emojis"]}')
     emojis = df['emojis'].replace("{", "").replace("}", "").replace("'", "").replace(" ", "")
     list_emo = list(set(emojis.split(",")))
+    #emojis_in_df = list(set(list_emo))
 
     print(list_emo)
     for x in list_emo:
@@ -112,8 +114,6 @@ def lang_id(df):
         return lang
 
 
-
-
 def commentData(post):
     print("Inside Comment Data")
 
@@ -132,13 +132,12 @@ def commentData(post):
     post['emojis'] = df.apply(extract_emojis, axis = 1)
     df = post.copy()
 
-
     # Call Remove Emojis from Text - remove_emojis_from_onlytext()
     post['onlyText'] = df.apply(remove_emojis_from_onlytext,axis = 1)
     df = post.copy()
 
     # Call Extract Country Emojis - extract_country_emojis()
-    flags = pd.read_csv("01 Setup/02 Input_Files/flags_smiley.csv", sep=":")
+    flags = pd.read_csv("setup/02 Input_Files/flags_smiley.csv", sep=":")
     flags = flags['emoji'].str.strip()
     flags_set = set(flags)
 
@@ -149,7 +148,7 @@ def commentData(post):
 
     # Call Find National Identity - find_national_identity()
     df['country'] = df.apply(find_national_identity, axis = 1)
-    ni_subcomment.insert_many(df.to_dict('records'))
+    ni_comment.insert_many(df.to_dict('records'))
 
     # Call Language Detection - langid and detectlang
     #df['langdetect'] = df.apply(lang_detect,axis = 1)
