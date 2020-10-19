@@ -1,6 +1,14 @@
 class Cleaning:
     """This class provides functions for cleaning the data.
 
+        :func:
+            - **For the best results, apply the functions as follows:**
+                1 :func:`removeWhiteSpaces()`
+                2 :func:`changeEmptyToNA()`
+                3 :func:`removeDuplicates()`
+            
+                If the order changes, then duplicates might still be in the data
+
         :Example:
 
             from pymongo import MongoClient
@@ -19,20 +27,12 @@ class Cleaning:
             data = cleaner.removeDuplicates(data)
             data = cleaner.removeWhiteSpaces(data, "textOriginal")
             data = cleaner.changeEmptyToNA(data, "textOriginal")
-
-        .. note::
-            - **For the best results, apply the functions as follows:**
-                1 :func:`removeWhiteSpaces()`
-                2 :func:`changeEmptyToNA()`
-                3 :func:`removeDuplicates()`
-            
-                If the order changes, then duplicates might still be in the data
         
     """
 
     version = "0.1"
 
-    def __init__(self):
+    def __init__(self):              
         pass
 
     def removeWhiteSpaces(self, data, column): # Remove whitepsaces in the given data-column
@@ -97,3 +97,4 @@ if __name__ == "__main__":
     data = cleaner.removeDuplicates(data)
     data = cleaner.removeWhiteSpaces(data, "textOriginal")
     data = cleaner.changeEmptyToNA(data, "textOriginal")
+
