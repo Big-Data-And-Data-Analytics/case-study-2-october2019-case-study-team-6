@@ -36,42 +36,43 @@ class Cleaning:
         pass
 
     def removeWhiteSpaces(self, data, column): # Remove whitepsaces in the given data-column
-        """
-        Removes all whitespaces before and after the text and multi whitespaces inside the text
+        """Removes all whitespaces before and after the text and multi whitespaces inside the text
 
-        :type data: pandas dataframe
         :param data: which dataframe should be used
-        
-        :type column: string
+        :type data: pandas dataframe
         :param column: the name of the column
-        """
-
+        :type column: string
+        :return: dataframe with removed whitespaces in the specified column
+        :rtype: pandas dataframe
+        """        
+        
         data[column] = data[column].str.strip()
         data[column] = data[column].str.replace("  +", " ")
         print("Whitespaces removed!")
         return data
 
     def changeEmptyToNA(self, data, column): # Change empty strings to NA in the given data-column
-        """
-        Changes all empty strings ("") to NA
+        """Changes all empty strings ("") to NA
 
-        :type data: pandas dataframe
         :param data: which dataframe should be used
-        
-        :type column: string
+        :type data: pandas dataframe
         :param column: the name of the column
+        :type column: string
+        :return: dataframe with NA instead of empty strings in the specified column
+        :rtype: pandas dataframe
         """
 
         data[column] = data[column].replace(r'^\s*$', np.nan, regex=True)
-        print("Empty strings chaned!")
+        print("Empty strings changed!")
         return data
 
     def removeDuplicates(self, data): # Remove duplicates
-        """
-        Removes duplicated rows
+        """Removes duplicated rows
 
-        :type data: pandas dataframe
         :param data: which dataframe should be used
+        :type data: pandas dataframe
+        :return: dataframe without duplicates
+        :rtype: pandas dataframe
         """
 
         data = data.drop(columns="_id")
@@ -97,4 +98,3 @@ if __name__ == "__main__":
     data = cleaner.removeDuplicates(data)
     data = cleaner.removeWhiteSpaces(data, "textOriginal")
     data = cleaner.changeEmptyToNA(data, "textOriginal")
-
