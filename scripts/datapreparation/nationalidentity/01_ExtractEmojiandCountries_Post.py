@@ -10,7 +10,7 @@ import langid
 from langdetect import detect
 import time
 import numpy as np
-from ..mongoConnection import connectMongo, getCollection
+from datapreparation.mongoConnection import connectMongo, getCollection
 
 
 def find_national_identity(df):
@@ -92,8 +92,9 @@ def postData(post, ni_col):
     df = post.copy()
 
     # Call Extract Country Emojis - extract_country_emojis()
-    flags = pd.read_csv("setup/02 Input_Files/flags_smiley.csv", sep=":")
-    flags = flags['emoji'].str.strip()
+    asset_connection = connectMongo('00_NationalIdentity_Assets', 'flag_emojis')
+    flags = getCollection(asset_connection)
+    flags = flags['flag_emoji'].str.strip()
     flags_set = set(flags)
 
     extract_country_emojis_function = np.vectorize(extract_country_emojis)
@@ -136,3 +137,4 @@ if __name__ == "__main__":
     postData(df, ni_subcomment)
 
     print("--- %s seconds ---" % (time.time() - start_time))
+
