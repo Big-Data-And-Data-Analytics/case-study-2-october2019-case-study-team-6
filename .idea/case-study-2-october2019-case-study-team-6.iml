@@ -7,7 +7,7 @@
       <excludeFolder url="file://$MODULE_DIR$/national_identity.egg-info" />
       <excludeFolder url="file://$MODULE_DIR$/scripts/national_identity.egg-info" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.8 (Github)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
