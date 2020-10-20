@@ -32,7 +32,14 @@ def find_national_identity(text):
 def extract_country_emojis(emojis):
     """returns the emojis which are flags of a country
     
-    
+    List of flag emojis is collected from the 00_NationalIdentity_Assets database. The list of emojis passed to this function 
+    is compared against the flag emojis from the database. All matching emojis are returned
+
+    :param emojis: emojis from the 'emojis' column of a dataframe
+    :type text: list
+
+    :return: country_flags- list of countries found in the text
+    :rtype: []
     """
 
     asset_connection = connectMongo('00_NationalIdentity_Assets', 'flag_emojis')
@@ -44,6 +51,19 @@ def extract_country_emojis(emojis):
 
 
 def remove_emojis_from_onlytext(onlyText):
+    """removes all the emojis from the given text
+
+    The text given to this function is passed to the 'get' function of emojis package. Which returns the set of found emojis
+    in the text. If the set is empty, the text received is returned as it is. If not, found emojis are removed from the text using
+    regex.
+    Finally text without emojis is returned
+
+    :param onlyText: text from the 'onlyText' column of a dataframe
+    :type text: String
+
+    :return: onlyText- Text without emojis
+    :rtype: String
+    """
     emojiList = emojis.get(onlyText)
     if (len(emojiList) == 0):
         return onlyText
@@ -54,6 +74,19 @@ def remove_emojis_from_onlytext(onlyText):
 
 
 def extract_emojis(onlyText):
+    """extract all the emojis from the given text
+
+    The text given to this function is passed to the 'get' function of emojis package. Which returns the set of found emojis
+    in the text. If the set is empty, the text received is returned as it is. If not, found emojis are removed from the text using
+    regex.
+    Finally text without emojis is returned
+
+    :param onlyText: text from the 'onlyText' column of a dataframe
+    :type text: String
+
+    :return: emojis- list of emojis
+    :rtype: List
+    """
     emojiList = emojis.get(onlyText)
     if (len(emojiList) == 0):
         return []
@@ -62,8 +95,18 @@ def extract_emojis(onlyText):
 
 
 def postData(post, ni_col):
-    print("Inside PostData")
+    """Extracts emojis and country from a dataframe and inserts cleaned data into the database
 
+    To extract emojis and countries from a dataframe given to this function, it applies extract_emojis,
+    remove_emojis_from_onlytext, extract_country_emojis and find_national_identity on the dataframe.
+    Finally the resultant dataframe is inserted back into database '05_NationalIdentity'
+    
+    :param1 post: dataframe of post/comment/subcomment
+    :param2 ni_col: collection object in which resultant dataframe will be inserted
+    :type1 post: pandas dataframe object
+    :type2 ni_col: pymongo connection object
+    
+    """
     # Initialisations
 
     global df
