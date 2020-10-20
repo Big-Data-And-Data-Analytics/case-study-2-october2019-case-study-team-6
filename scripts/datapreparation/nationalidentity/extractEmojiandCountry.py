@@ -1,17 +1,25 @@
 import re
-import time
 
 import emojis
-import langid
 import numpy as np
 import pandas as pd
-from langdetect import detect
 from datapreparation.mongoConnection import connectMongo, getCollection
-import csv
-
 
 
 def find_national_identity(text):
+    """ returns list of countries present in the text given to this function
+
+    The text passed to this function is converted to lowercase as the list of countries in this function
+    defined as country_list is in lowercase. Using list comprehension, it returns the list of
+    countries present in country_list that are present in the text given to this function.
+
+    :param text: text from the 'text' column of a dataframe
+    :type text: String
+
+    :return: country- list of countries found in the text
+    :rtype: [] 
+
+    """
     country_list = ["albania", "belgium", "croatia", "czech republic", "england", "france", "germany", "hungary",
                     "iceland", "italy", "northen ireland", "poland", "portugal", "republic of ireland", "romania",
                     "russia", "slovakia", "spain", "sweden", "switzerland ", "turkey", "ukraine", "wales",
@@ -22,7 +30,15 @@ def find_national_identity(text):
     return country
 
 def extract_country_emojis(emojis):
-    global flags_set
+    """returns the emojis which are flags of a country
+    
+    
+    """
+
+    asset_connection = connectMongo('00_NationalIdentity_Assets', 'flag_emojis')
+    flags = getCollection(asset_connection)
+    flags = flags['flag_emoji'].str.strip()
+    flags_set = list(flags)
     country_flags = [flag for flag in emojis if flag in flags_set]
     return country_flags
 
@@ -55,8 +71,8 @@ def postData(post, ni_col):
 
     # Call Extract Emojis - extract_emojis()
     post['emojis'] = post['onlyText'].apply(extract_emojis)
-    post['onlyText'] = post['onlyText'].apply(remove_emojis_from_onlytext)
 
+    post['onlyText'] = post['onlyText'].apply(remove_emojis_from_onlytext)
 
     post['countryem'] = post['emojis'].apply(extract_country_emojis)
 
@@ -67,16 +83,12 @@ def postData(post, ni_col):
 
 # Source Collection
 if __name__ == "__main__":
-    start_time = time.time()
+    
     sentiment_post = connectMongo('04_NationalIdentity_Sentiment', 'sentiment_post_Collection')
     df = getCollection(sentiment_post)
 
-    asset_connection = connectMongo('00_NationalIdentity_Assets', 'flag_emojis')
-    flags = getCollection(asset_connection)
-    flags = flags['flag_emoji'].str.strip()
-    flags_set = list(flags)
     # Target Collection
-    ni_post = connectMongo('05_NationalIdentity', 'ni_post')     # 05_NationalIdentity Connection Object
+    ni_post = connectMongo('05_NationalIdentity', 'ni_post')
     postData(df, ni_post)
 
     sentiment_comment = connectMongo('04_NationalIdentity_Sentiment', 'sentiment_comment_Collection')
@@ -93,5 +105,3 @@ if __name__ == "__main__":
     ni_subcomment = connectMongo('05_NationalIdentity', 'ni_subcomment')
     df.rename(columns={'Sub_Comment':'text'}, inplace=True)
     postData(df, ni_subcomment)
-
-    print("--- %s seconds ---" % (time.time() - start_time))
