@@ -3,7 +3,7 @@ import re
 import emojis
 import numpy as np
 import pandas as pd
-from datapreparation.mongoConnection import connectMongo, getCollection
+from datapreparation.mongoConnection import getCollection, insertCollection
 
 class nationalIdentityTagging:
     """This class represents a class for finding national identity in the text
@@ -53,8 +53,7 @@ class nationalIdentityTagging:
         :rtype: []
         """
 
-        asset_connection = connectMongo('00_NationalIdentity_Assets', 'flag_emojis')
-        flags = getCollection(asset_connection)
+        flags = getCollection('00_NationalIdentity_Assets', 'flag_emojis')
         flags = flags['flag_emoji'].str.strip()
         flags_set = list(flags)
         country_flags = [flag for flag in emojis if flag in flags_set]
@@ -105,7 +104,7 @@ class nationalIdentityTagging:
             return list(emojiList)
 
 
-    def postData(post, ni_col):
+    def postData(post):
         """Extracts emojis and country from a dataframe and inserts cleaned data into the database
 
         To extract emojis and countries from a dataframe given to this function, it applies extract_emojis,
@@ -131,30 +130,27 @@ class nationalIdentityTagging:
 
         post['country'] = post['text'].apply(find_national_identity)
 
-        ni_col.insert_many(post.to_dict('records'))
-
+        return post
 
 if __name__ == "__main__":
     
     findNationalIdentity = nationalIdentityTagging()
-    sentiment_post = connectMongo('04_NationalIdentity_Sentiment', 'sentiment_post_Collection')
-    df = getCollection(sentiment_post)
+    df = getCollection('04_NationalIdentity_Sentiment', 'sentiment_post_Collection')
 
     # Target Collection
-    ni_post = connectMongo('05_NationalIdentity', 'ni_post')
-    findNationalIdentity.postData(df, ni_post)
+    ni_post = findNationalIdentity.postData(df)
+    insertCollection('05_NationalIdentity', 'ni_post', ni_post)
 
-    sentiment_comment = connectMongo('04_NationalIdentity_Sentiment', 'sentiment_comment_Collection')
-    df = getCollection(sentiment_comment)
+    df = getCollection('04_NationalIdentity_Sentiment', 'sentiment_comment_Collection')
+
     # Target Collection
-    ni_comment = connectMongo('05_NationalIdentity', 'ni_comment')
     df.rename(columns={'Comment':'text'}, inplace=True)
-    findNationalIdentity.postData(df, ni_comment)
+    ni_comment = findNationalIdentity.postData(df)
+    insertCollection('05_NationalIdentity', 'ni_comment', ni_comment)
+    
+    df = getCollection('04_NationalIdentity_Sentiment', 'sentiment_subcomment_Collection')
 
-
-    sentiment_subcomment = connectMongo('04_NationalIdentity_Sentiment', 'sentiment_subcomment_Collection')
-    df = getCollection(sentiment_subcomment)
     # Target Collection
-    ni_subcomment = connectMongo('05_NationalIdentity', 'ni_subcomment')
     df.rename(columns={'Sub_Comment':'text'}, inplace=True)
-    findNationalIdentity.postData(df, ni_subcomment)
+    ni_subcomment = findNationalIdentity.postData(df)
+    insertCollection('05_NationalIdentity', 'ni_subcomment', ni_subcomment)
