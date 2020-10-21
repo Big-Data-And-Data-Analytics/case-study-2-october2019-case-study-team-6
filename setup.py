@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -18,10 +18,13 @@ setup(name='national-identity',
       ],
       long_description=long_description,
       install_requires=[            # Production - Compatible Version i.e. Can be compatible with newer versions > sign
-          "pymongo",
-          "pandas",
-          "numpy",
-          "nltk"
+        "emojis",
+        "nltk",
+        "numpy",
+        "pandas",
+        "pymongo",
+        "re"
+        
       ],
       extras_require={              # Requires to be more specific for the development purpose
           "dev": [
