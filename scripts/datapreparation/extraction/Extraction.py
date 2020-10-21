@@ -67,7 +67,7 @@ class ExtractTagHashtag:
 
         :param post: text from the text column of the dataframe
         """
-        return post
+        return self.post
 
 
 
