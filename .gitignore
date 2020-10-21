@@ -12,3 +12,5 @@ scripts/datapreparation/__pycache__/__init__.cpython-38.pyc
 scripts/datapreparation/__pycache__/mongoConnection.cpython-38.pyc
 scripts/datapreparation/nationalidentity/__pycache__/mongoConnection.cpython-38.pyc
 scripts/03 Data Preparation/04 National Identity/__pycache__/mongoConnection.cpython-38.pyc
+scripts/datapreparation/extraction/.vscode/settings.json
+.vscode/settings.json
