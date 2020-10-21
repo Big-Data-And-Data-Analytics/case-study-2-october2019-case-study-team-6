@@ -1,6 +1,6 @@
 import pymongo
 import pandas as pd
-from datapreparation.mongoConnection import connectMongo, getCollection, insertCollection
+from datapreparation.mongoConnection import getCollection, insertCollection
 
 class extractTagHashtag:
     """This class represents extraction of hashtags, taglists and text without hashtags, taglists i.e onlyText
@@ -73,9 +73,9 @@ class extractTagHashtag:
 
 if __name__ == "__main__":
 
-    df_post = connectMongo('03_NationalIdentity_Combined', 'common_post_Combined')
-    df_comment = connectMongo('03_NationalIdentity_Combined', 'common_comment_Combined')
-    df_subcomment = connectMongo('03_NationalIdentity_Combined', 'common_subcomment_Combined')
+    df_post = getCollection('03_NationalIdentity_Combined', 'common_post_Combined')
+    df_comment = getCollection('03_NationalIdentity_Combined', 'common_comment_Combined')
+    df_subcomment = getCollection('03_NationalIdentity_Combined', 'common_subcomment_Combined')
     df_comment.rename(columns={'Comment':'text'}, inplace=True)
     df_subcomment.rename(columns={'Sub_Comment':'text'}, inplace=True)
 
