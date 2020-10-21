@@ -6,8 +6,6 @@ for tech in balancing_technique:
     y = y.drop(["_id", "id"], axis=1)
     print(f'"y" loaded, {balancing_technique[counter]}')
 
-03 mongodump/09training data
-
 class sklearn.preprocessing.OneHotEncoder(*, categories='auto', drop=None, sparse=True, dtype=<class 'numpy.float64'>, handle_unknown='error')
 
 # Load "X"
