@@ -2,7 +2,7 @@ import pymongo
 import pandas as pd
 from datapreparation.mongoConnection import getCollection, insertCollection
 
-class extractTagHashtag:
+class ExtractTagHashtag:
     """This class represents extraction of hashtags, taglists and text without hashtags, taglists i.e onlyText
         from the text
         The sequentially used functions  are:
@@ -60,7 +60,7 @@ class extractTagHashtag:
 
     @decorator_taglist
     @decorator_hashtag
-    def extract(post):
+    def extract(self,post):
         """ Takes text as the input and as decorator_hashtag is present, the entire function 
         is passed to decorator_hashtag
         The value returned from the decorator_hashtag is passed to decorator_taglist
@@ -79,9 +79,9 @@ if __name__ == "__main__":
     df_comment.rename(columns={'Comment':'text'}, inplace=True)
     df_subcomment.rename(columns={'Sub_Comment':'text'}, inplace=True)
 
-    result_post = extractTagHashtag.extract(df_post)
-    result_comment = extractTagHashtag.extract(df_comment)
-    result_subcomment = extractTagHashtag.extract(df_subcomment)
+    result_post = ExtractTagHashtag.extract(df_post)
+    result_comment = ExtractTagHashtag.extract(df_comment)
+    result_subcomment = ExtractTagHashtag.extract(df_subcomment)
 
     result_post = result_post.fillna('0')
     result_comment = result_comment.fillna('0')
