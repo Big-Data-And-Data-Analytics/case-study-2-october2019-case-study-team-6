@@ -5,7 +5,6 @@ from datapreparation.mongoConnection import connectMongo, getCollection, insertC
 class extractTagHashtag:
     def decorator_taglist(func):
         def wrapper_function(value):
-            #taglist=value['Comment'].str.findall(r'@.*?(?=\s|$)')
             hashtag_removed = func(value)
             hashtag_removed['tagList'] = hashtag_removed['text'].str.findall(r'@.*?(?=\s|$)')
             hashtag_removed['tagList'] = pd.Series(hashtag_removed['tagList'], dtype="string")
@@ -31,21 +30,20 @@ class extractTagHashtag:
 
 
 if __name__ == "__main__":
-    collection_post = connectMongo('03_NationalIdentity_Combined', 'common_post_Combined')
-    collection_comment = connectMongo('03_NationalIdentity_Combined', 'common_comment_Combined')
-    collection_subcomment = connectMongo('03_NationalIdentity_Combined', 'common_subcomment_Combined')
-    df_post = pd.DataFrame(list(collection_post.find({})))
-    # df_comment = pd.DataFrame(list(collection_comment.find({})))
-    # df_subcomment = pd.DataFrame(list(collection_subcomment.find({})))
-    # df_comment.rename(columns={'Comment':'text'}, inplace=True)
-    # df_subcomment.rename(columns={'Sub_Comment':'text'}, inplace=True)
+
+    df_post = connectMongo('03_NationalIdentity_Combined', 'common_post_Combined')
+    df_comment = connectMongo('03_NationalIdentity_Combined', 'common_comment_Combined')
+    df_subcomment = connectMongo('03_NationalIdentity_Combined', 'common_subcomment_Combined')
+    df_comment.rename(columns={'Comment':'text'}, inplace=True)
+    df_subcomment.rename(columns={'Sub_Comment':'text'}, inplace=True)
+
     result_post = extractTagHashtag.hastag_taglist_onlytext_function(df_post)
-    # result_comment = extractTagHashtagObj.hastag_taglist_onlytext_function(df_comment)
-    # result_subcomment = extractTagHashtagObj.hastag_taglist_onlytext_function(df_subcomment)
+    result_comment = extractTagHashtag.hastag_taglist_onlytext_function(df_comment)
+    result_subcomment = extractTagHashtag.hastag_taglist_onlytext_function(df_subcomment)
 
     result_post = result_post.fillna('0')
+    result_comment = result_comment.fillna('0')
+    result_subcomment = result_subcomment.fillna('0')
     insertCollection('03_NationalIdentity_Combined', 'common_post_inserted', result_post)
-    #result_comment = result_comment.to_dict(orient = "records")
-    #collection_comment.insert_many(result_comment)
-    #result_subcomment = result_subcomment.to_dict(orient = "records")
-    #collection_subcomment.insert_many(result_subcomment)
+    insertCollection('03_NationalIdentity_Combined', 'common_comment_inserted', result_comment)
+    insertCollection('03_NationalIdentity_Combined', 'common_subcomment_inserted', result_subcomment)
