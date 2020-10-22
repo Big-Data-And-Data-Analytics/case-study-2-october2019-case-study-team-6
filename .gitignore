@@ -4,3 +4,7 @@ national_identity.egg-info
 .Rhistory
 .Rproj.user
 *.Rproj
+.vscode/settings.json
+scripts/datapreparation/__pycache__/__init__.cpython-38.pyc
+scripts/datapreparation/__pycache__/mongoConnection.cpython-38.pyc
+scripts/datapreparation/extraction/.vscode/settings.json
