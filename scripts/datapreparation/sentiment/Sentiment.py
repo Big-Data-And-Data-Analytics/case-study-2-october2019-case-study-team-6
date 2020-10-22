@@ -78,37 +78,12 @@ print(df2.dtypes, sentiment_Dictionary.dtypes)
 
 
 jn = df2.merge(sentiment_Dictionary, on = 'word', how = 'inner', suffixes = ['', '_1'])
-def sentiment_post(text):
-    split_text_frame = pd.DataFrame(columns=['onlyText', 'word'])
-
-    """
-    text = text.str.strip()
-    check = text != ''
-    text = text[check]
-    for eachText in text:
-        print(eachText)
-        # if eachText == '':
-        #     pass
-        # else:
-        split_text_frame = split_text_frame.append(pd.concat(
-                [pd.DataFrame({'onlyText': [eachText], 'word': [eachToken]}, columns=['onlyText', 'word']) for eachToken
-                 in word_tokenize(eachText)],
-                ignore_index=True))
-        # except Exception:
-        #     print(Exception)
-        #     print(eachText)
-        # finally:
-        #     pass
-    """
-    return split_text_frame
-sentiment_frame = sentiment_post(post['onlyText'])
-sentiment_frame['word'] = pd.Series(sentiment_frame['word'], dtype='string')
-sentiment_Dictionary['word'] = pd.Series(sentiment_Dictionary['word'], dtype='string')
-print(sentiment_Dictionary.dtypes)
-print(sentiment_frame.dtypes)
-
-sentiment_frame['word'] = sentiment_frame['word'].str.lower().str.strip()
-sentiment_frame1 = sentiment_frame.merge(sentiment_Dictionary, on = 'word', suffixes= ['','_sf'] ,how='inner')
+counts = jn.groupby(by=['onlyText', 'sentiment'], as_index=False).count() # Columns and the aggregation if agg() used
+counts['onlyText'] = counts['onlyText'].str.strip()
+counts = counts.sort_values('word').drop_duplicates(['onlyText'],keep='last')
+# counts = counts.drop(['index'], axis = 1)
+text = text.str.strip()
+data_sentiment_post = counts.merge(text, on = 'onlyText', how='right', suffixes=['_post',''])
 # sentiment_frame
 # sentiment_frame['word'].to_csv('C:/Users/shubh/Documents/sentiment_frame.csv')
 # sentiment_Dictionary['word'].to_csv('C:/Users/shubh/Documents/sentiment_dict.csv')
@@ -121,3 +96,13 @@ sentiment_frame1 = sentiment_frame.merge(sentiment_Dictionary, on = 'word', suff
 # sent_dict.word.astype(str)
 #
 # r = sent_frame.merge(sent_dict, on = 'word', suffixes=['','_1'], how='inner')
+
+
+
+
+
+
+
+
+
+
