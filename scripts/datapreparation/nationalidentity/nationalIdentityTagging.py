@@ -1,10 +1,10 @@
 import re
 
 import emojis
-from datapreparation.mongoConnection import getCollection, insertCollection
+from scripts.datapreparation.mongoConnection import getCollection, insertCollection
 
 class NationalIdentityTagging:
-    """This class represents a class for finding national identity in the text
+    """NationalIdentityTagging class represents a class for finding national identity in the text
 
     :func:
         The sequence of execution of functions in this class for extracting national identity from the text
@@ -112,7 +112,7 @@ class NationalIdentityTagging:
         :type1 post: pandas dataframe object
 
         :return: post- dataframe with extracted emojis, flags, national identity
-        :rtype: pandas
+        :rtype: pandas.dataframe
         
         """
         # Initialisations
@@ -120,11 +120,8 @@ class NationalIdentityTagging:
         post = post.fillna('0')
 
         post['emojis'] = post['onlyText'].apply(self.extract_emojis)
-
         post['onlyText'] = post['onlyText'].apply(self.remove_emojis_from_onlytext)
-
         post['countryem'] = post['emojis'].apply(self.extract_country_emojis)
-
         post['country'] = post['text'].apply(self.find_national_identity)
 
         return post
