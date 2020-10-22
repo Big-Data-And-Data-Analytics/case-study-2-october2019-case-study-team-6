@@ -1,12 +1,10 @@
 import re
 
 import emojis
-import numpy as np
-import pandas as pd
-from datapreparation.mongoConnection import getCollection, insertCollection
+from scripts.mongoConnection import getCollection, insertCollection
 
-class nationalIdentityTagging:
-    """This class represents a class for finding national identity in the text
+class NationalIdentityTagging:
+    """NationalIdentityTagging class represents a class for finding national identity in the text
 
     :func:
         The sequence of execution of functions in this class for extracting national identity from the text
@@ -17,7 +15,7 @@ class nationalIdentityTagging:
         4 :func: find_national_identity
     """
     
-    def find_national_identity(text):
+    def find_national_identity(self, text):
         """ returns list of countries present in the text given to this function
 
         The text passed to this function is converted to lowercase as the list of countries in this function
@@ -40,7 +38,8 @@ class nationalIdentityTagging:
         country = [country for country in country_list if country in comment]
         return country
 
-    def extract_country_emojis(emojis):
+
+    def extract_country_emojis(self, emojis):
         """returns the emojis which are flags of a country
         
         List of flag emojis is collected from the 00_NationalIdentity_Assets database. The list of emojis passed to 
@@ -53,14 +52,12 @@ class nationalIdentityTagging:
         :rtype: []
         """
 
-        flags = getCollection('00_NationalIdentity_Assets', 'flag_emojis')
-        flags = flags['flag_emoji'].str.strip()
-        flags_set = list(flags)
+        global flags_set
         country_flags = [flag for flag in emojis if flag in flags_set]
         return country_flags
 
 
-    def remove_emojis_from_onlytext(onlyText):
+    def remove_emojis_from_onlytext(self, onlyText):
         """removes all the emojis from the given text
 
         The text given to this function is passed to the 'get' function of emojis package. Which returns the set of 
@@ -83,7 +80,7 @@ class nationalIdentityTagging:
             return onlyText
 
 
-    def extract_emojis(onlyText):
+    def extract_emojis(self, onlyText):
         """extract all the emojis from the given text
 
         The text given to this function is passed to the 'get' function of emojis package. Which returns the set of 
@@ -104,53 +101,55 @@ class nationalIdentityTagging:
             return list(emojiList)
 
 
-    def postData(post):
-        """Extracts emojis and country from a dataframe and inserts cleaned data into the database
+    def postData(self, post):
+        """Extracts emojis and country from a dataframe and returns transformed dataframe
 
         To extract emojis and countries from a dataframe given to this function, it applies extract_emojis,
         remove_emojis_from_onlytext, extract_country_emojis and find_national_identity on the dataframe.
-        Finally the resultant dataframe is inserted back into database '05_NationalIdentity'
+        Finally the resultant dataframe is returned.
         
         :param1 post: dataframe of post/comment/subcomment
-        :param2 ni_col: collection object in which resultant dataframe will be inserted
         :type1 post: pandas dataframe object
-        :type2 ni_col: pymongo connection object
+
+        :return: post- dataframe with extracted emojis, flags, national identity
+        :rtype: pandas.dataframe
         
         """
         # Initialisations
 
-        global df
         post = post.fillna('0')
 
-        post['emojis'] = post['onlyText'].apply(extract_emojis)
-
-        post['onlyText'] = post['onlyText'].apply(remove_emojis_from_onlytext)
-
-        post['countryem'] = post['emojis'].apply(extract_country_emojis)
-
-        post['country'] = post['text'].apply(find_national_identity)
+        post['emojis'] = post['onlyText'].apply(self.extract_emojis)
+        post['onlyText'] = post['onlyText'].apply(self.remove_emojis_from_onlytext)
+        post['countryem'] = post['emojis'].apply(self.extract_country_emojis)
+        post['country'] = post['text'].apply(self.find_national_identity)
 
         return post
 
 if __name__ == "__main__":
     
-    findNationalIdentity = nationalIdentityTagging()
+    nationalIdentityTaggingObj = NationalIdentityTagging()
+
+    flags = getCollection('00_NationalIdentity_Assets', 'flag_emojis')
+    flags = flags['flag_emoji'].str.strip()
+    flags_set = list(flags)
+
     df = getCollection('04_NationalIdentity_Sentiment', 'sentiment_post_Collection')
 
     # Target Collection
-    ni_post = findNationalIdentity.postData(df)
+    ni_post = nationalIdentityTaggingObj.postData(df)
     insertCollection('05_NationalIdentity', 'ni_post', ni_post)
 
     df = getCollection('04_NationalIdentity_Sentiment', 'sentiment_comment_Collection')
 
     # Target Collection
     df.rename(columns={'Comment':'text'}, inplace=True)
-    ni_comment = findNationalIdentity.postData(df)
+    ni_comment = nationalIdentityTaggingObj.postData(df)
     insertCollection('05_NationalIdentity', 'ni_comment', ni_comment)
     
     df = getCollection('04_NationalIdentity_Sentiment', 'sentiment_subcomment_Collection')
 
     # Target Collection
     df.rename(columns={'Sub_Comment':'text'}, inplace=True)
-    ni_subcomment = findNationalIdentity.postData(df)
+    ni_subcomment = nationalIdentityTaggingObj.postData(df)
     insertCollection('05_NationalIdentity', 'ni_subcomment', ni_subcomment)
