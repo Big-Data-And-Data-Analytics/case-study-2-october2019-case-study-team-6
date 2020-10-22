@@ -5,6 +5,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 import yaml
 from pymongo import MongoClient
 from sklearn import metrics
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
@@ -17,7 +18,7 @@ import sys
 acc_thresh = 0.0
 use_fs_data = False
 score_function = "f_classif"
-modelName = "One Hot Encoding"
+modelName = "LogisticRegression"
 filepath = "/Users/Shared/Relocated Items/Security/Abhinav's Documents/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study I/02 Input_Data/03 Model"
 # filepath = '/home/shubham/PycharmProjects/Case Study 1  Extras'
 my_tags = ['belonging', 'meaning', 'efficacy', 'distinctivness', 'self esteem', 'continuity']
@@ -32,9 +33,15 @@ y_test = pd.DataFrame(list(y_test.find()))
 y_test = y_test.drop(["_id", "id"], axis=1)
 print(y_test)
 
+# Transforming data by Encoding
 onehotencoder = OneHotEncoder(sparse=False)
 y_test1 = onehotencoder.fit_transform(y_test[['identityMotive']])
-print(y_test1)
+yt1 = y_test1[:, 0].tolist()
+yt2 = y_test1[:,1].tolist()
+yt3 = y_test1[:,2].tolist()
+yt4 = y_test1[:,3].tolist()
+yt5 = y_test1[:,4].tolist()
+yt6 = y_test1[:, 5].tolist()
 
 # Balancing technique
 balancing_technique = [  # "ADASYN",
@@ -73,8 +80,15 @@ for tech in balancing_technique:
     y = y.drop(["_id", "id"], axis=1)
     print(f'"y" loaded, {balancing_technique[counter]}')
     print(y)
+
     y1 = onehotencoder.fit_transform(y[['identityMotive']])
-    print(y1)
+    y_1 = y1[:, 0].tolist()
+    y_2 = y1[:, 1].tolist()
+    y_3 = y1[:, 2].tolist()
+    y_4 = y1[:, 3].tolist()
+    y_5 = y1[:, 4].tolist()
+    y_6 = y1[:, 5].tolist()
+
 
     # Load "X"
     if not use_fs_data:
@@ -100,12 +114,13 @@ for tech in balancing_technique:
             fs = pi.load(open(filepath + '/Models/Feature_' + balancing_technique[counter] + 'fs_f_classif.tchq', 'rb'))
             X_test_f_classif = fs.transform(X_test)
             x_pred = X_test_f_classif
-
+    print(X)
     #### LOGISTIC REGRESSION ####
+
     logreg = LogisticRegression(n_jobs=6, max_iter=100)
 
     print("Started fitting model with " + balancing_technique[counter])
-    logreg.fit(X, y1)
+    logreg.fit(X, y)
     print("Finished fitting model")
 
     print("Started predicting")
