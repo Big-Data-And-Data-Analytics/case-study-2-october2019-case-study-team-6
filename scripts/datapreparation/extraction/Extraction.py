@@ -3,7 +3,7 @@ import pandas as pd
 from datapreparation.mongoConnection import getCollection, insertCollection
 
 class ExtractTagHashtag:
-    """This class represents extraction of hashtags, taglists and text without hashtags, taglists i.e onlyText
+    """ExtractTagHashtag class represents extraction of hashtags, taglists and text without hashtags, taglists i.e onlyText
         from the text
         The sequentially used functions  are:
         1) :func : extract
@@ -67,7 +67,7 @@ class ExtractTagHashtag:
 
         :param post: text from the text column of the dataframe
         """
-        return self.post
+        return post
 
 
 
