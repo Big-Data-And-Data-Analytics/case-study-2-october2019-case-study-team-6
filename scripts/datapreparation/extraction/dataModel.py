@@ -1,5 +1,5 @@
-class Data_Model_Applier:
-    """[summary]
+class DataModel:
+    """DataModel class provides
     """
 
     def __init__(self):

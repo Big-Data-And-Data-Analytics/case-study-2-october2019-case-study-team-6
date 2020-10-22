@@ -1,5 +1,5 @@
 class Cleaning:
-    """This class provides functions for cleaning the data.
+    """Cleaning class provides functions for cleaning the data.
 
         :func:
             - **For the best results, apply the functions as follows:**
