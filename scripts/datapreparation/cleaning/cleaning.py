@@ -1,3 +1,8 @@
+from pymongo import MongoClient
+import pandas as pd
+import numpy as np
+from scripts.mongoConnection import getCollection, insertCollection
+
 class Cleaning:
     """Cleaning class provides functions for cleaning the data.
 
@@ -35,6 +40,7 @@ class Cleaning:
     def __init__(self):              
         pass
 
+    # TODO Change the function name add underscores
     def removeWhiteSpaces(self, data, column): # Remove whitepsaces in the given data-column
         """Removes all whitespaces before and after the text and multi whitespaces inside the text
 
@@ -51,6 +57,7 @@ class Cleaning:
         print("Whitespaces removed!")
         return data
 
+    # TODO Change the function name add underscores
     def changeEmptyToNA(self, data, column): # Change empty strings to NA in the given data-column
         """Changes all empty strings ("") to NA
 
@@ -66,6 +73,7 @@ class Cleaning:
         print("Empty strings changed!")
         return data
 
+    #TODO Change the function name add underscores
     def removeDuplicates(self, data): # Remove duplicates
         """Removes duplicated rows
 
@@ -82,10 +90,8 @@ class Cleaning:
 
 
 if __name__ == "__main__":
-    from pymongo import MongoClient
-    import pandas as pd
-    import numpy as np
 
+    #TODO Connection using mongoConnection.py
     client = MongoClient('localhost', 27017)
     db = client['01_NationalIdentity_Crawled']
     data = db.youTube_Video_Comments_Raw
@@ -98,3 +104,5 @@ if __name__ == "__main__":
     data = cleaner.removeDuplicates(data)
     data = cleaner.removeWhiteSpaces(data, "textOriginal")
     data = cleaner.changeEmptyToNA(data, "textOriginal")
+
+    insertCollection('01_NationalIdentity_Crawled', 'cleaned_data', data)
