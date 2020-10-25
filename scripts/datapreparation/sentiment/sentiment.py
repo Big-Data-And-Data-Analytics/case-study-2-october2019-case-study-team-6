@@ -1,5 +1,4 @@
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-analyser = SentimentIntensityAnalyzer()
 from scripts.mongoConnection import getCollection, insertCollection
 
 
@@ -27,21 +26,21 @@ class Sentiment:
 
     """
     def __init__(self, new_data=None, col_name=None):
+        self.analyser = SentimentIntensityAnalyzer()
         print('Inside Init')
         if new_data is not None:
             # new_data['sentiment'] = new_data['onlyText'].apply(sentiment_analyzer_scores)
-            Sentiment.apply_load_sentiment(new_data, col_name)
+            self.apply_load_sentiment(new_data, col_name)
         else:
             post = getCollection('03_NationalIdentity_Combined', 'common_post_Combined')
             comment = getCollection('03_NationalIdentity_Combined', 'common_comment_Combined')
             sub_comment = getCollection('03_NationalIdentity_Combined', 'common_subcomment_Combined')
-            Sentiment.apply_load_sentiment(post, 'sentiment_post_Collection')
-            Sentiment.apply_load_sentiment(comment, 'sentiment_comment_Collection')
-            Sentiment.apply_load_sentiment(sub_comment, 'sentiment_subcomment_Collection')
+            self.apply_load_sentiment(post, 'sentiment_post_Collection2')
+            self.apply_load_sentiment(comment, 'sentiment_comment_Collection2')
+            self.apply_load_sentiment(sub_comment, 'sentiment_subcomment_Collection2')
 
 
-    @staticmethod
-    def sentiment_analyzer_scores(sentence):
+    def sentiment_analyzer_scores(self, sentence):
         """
         This method returns sentiment value for each sentence i.e. text passed to it.
 
@@ -50,7 +49,7 @@ class Sentiment:
         :return str
 
         """
-        score = analyser.polarity_scores(sentence)
+        score = self.analyser.polarity_scores(sentence)
         sentiment = score['compound']
         if sentiment >= 0.05:
             return 'positive'
@@ -59,8 +58,7 @@ class Sentiment:
         else:
             return 'negative'
 
-    @staticmethod
-    def apply_load_sentiment(data, col_name):
+    def apply_load_sentiment(self, data, col_name):
         """
         This method retrieves sentiment from sentiment_analyser_scores and loads into appropriate database collection
 
@@ -71,7 +69,7 @@ class Sentiment:
         """
 
         data['onlyText'] = data['onlyText'].str.strip()
-        data['sentiment'] = data['onlyText'].apply(Sentiment.sentiment_analyzer_scores)
+        data['sentiment'] = data['onlyText'].apply(self.sentiment_analyzer_scores)
         insertCollection('04_NationalIdentity_Sentiment', col_name, data)
 
 
