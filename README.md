@@ -1,5 +1,23 @@
 # National Identity Case Study
 
+#### Sprint 1 Status
+
+**Highlights:**
+1. 60% R Scripts are migrated to Python
+2. Hold on Data Crawling
+3. OneHot & Sentiment Analysis Task Differed to Sprint 2 
+
+|#|Sprint|Start Date|End Date|Title|Feature Type|Owner|Status|Continued|Comments
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | 
+|1|1|15-Oct|22-Oct|New Data Crawling|Old|Shubham|`On Hold`|0|Instagram
+|2|1|15-Oct|22-Oct|Hashtags, TagList, onlyText|Old|Mavis|`Done`|0|To be migrated
+|3|1|15-Oct|22-Oct|National Identity Tagging |Old|Varad|`Done`|0|Find country names in different languages
+|4|1|15-Oct|22-Oct|One Hot Encoding|Old|Abhinav|`Differ`|1|To be migrated
+|5|1|15-Oct|22-Oct|Components/Class formation for all the steps|Old|Max & Shubham|`Done`|0|OOP
+|6|1|15-Oct|22-Oct|Documentation of the functions|Old|Team|`Done`|0|Need to be added
+|7|1|15-Oct|22-Oct|Sentiment Analysis Code|Old|Shubham|`Differ`|1|To be migrated
+
+
 # Package Setup
 
 # Development Framework
