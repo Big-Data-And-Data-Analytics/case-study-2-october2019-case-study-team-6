@@ -47,7 +47,7 @@ class NationalIdentityTagging:
         this function is compared against the flag emojis from the database. All matching emojis are returned
 
         :param emojis: emojis from the 'emojis' column of a dataframe
-        :type text: list
+        :type emojis: list
 
         :return: country_flags- list of countries found in the text
         :rtype: []
@@ -66,7 +66,7 @@ class NationalIdentityTagging:
         Finally text without emojis is returned.
 
         :param onlyText: text from the 'onlyText' column of a dataframe
-        :type text: String
+        :type onlyText: String
 
         :return: onlyText- Text without emojis
         :rtype: String
@@ -89,7 +89,7 @@ class NationalIdentityTagging:
         Finally text without emojis is returned.
 
         :param onlyText: text from the 'onlyText' column of a dataframe
-        :type text: String
+        :type onlyText: String
 
         :return: emojis- list of emojis
         :rtype: List
