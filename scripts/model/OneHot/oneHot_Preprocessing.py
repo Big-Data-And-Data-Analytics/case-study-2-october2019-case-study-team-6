@@ -20,3 +20,5 @@ vocab = yaml.load(l1[0]) # Get first element
 cv_pred = CountVectorizer(vocabulary=vocab)
 x_pred = cv_pred.transform(d['x'])
 scipy.sparse.save_npz(filepath + '/OneHotPredictionTest.npz', x_pred)
+
+#Continuing work
