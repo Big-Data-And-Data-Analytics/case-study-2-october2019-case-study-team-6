@@ -51,7 +51,7 @@ class IdentityMotiveTagging:
         df['selfEsteem'] = df['onlyText'].str.contains(rf'\b{self.selfEsteem}\b',regex=True, case=False).astype(int)
 
         df = self.unpivot(df)
-        insertCollection('08_PreTrain', 'train_data_new', df)
+        insertCollection('08_PreTrain', 'train_data', df)
     
 
     def unpivot(self, df):
