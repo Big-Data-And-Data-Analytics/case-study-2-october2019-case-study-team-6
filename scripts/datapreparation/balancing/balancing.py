@@ -1,149 +1,195 @@
+import os
+import sys
+import threading
+from collections import Counter
+
 import pandas as pd
 import scipy
-from imblearn.combine import SMOTEENN
-from imblearn.combine import SMOTETomek
-from imblearn.over_sampling import ADASYN
-from imblearn.over_sampling import SMOTE
-from imblearn.under_sampling import NearMiss
-from imblearn.under_sampling import TomekLinks
+from imblearn.combine import SMOTEENN, SMOTETomek
+from imblearn.over_sampling import ADASYN, SMOTE
+from imblearn.under_sampling import NearMiss, TomekLinks
+from mongoConnection import getCollection, insertCollection
 from pymongo import MongoClient
-from sklearn.preprocessing import Binarizer
 from sklearn.feature_extraction.text import CountVectorizer
-from collections import Counter
 from sklearn.model_selection import train_test_split
-import threading
-from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import Binarizer
+
 
 class BalancingData:
-  
+    """BalancingData class represents performance of different balancing data on 'X' and 'y' train data.
+        The sequentially used functions  are:
+        1) :func : split_train_test
+        2) :func : thread1_ADASYN
+        3) :func : thread2_SMOTE
+        4) :func : thread3_SMOTEENN
+        5) :func : thread4_SMOTETomek
+        6) :func : thread5_NearMiss
+        7) :func : thread6_TomekLinks
+    """
+    
+    
+    def __init__(self, filepath, new_data):
+        self.filepath = filepath
+        self.new_data = new_data
+
+    def split_train_test(self):
+
+        X = self.new_data[['onlyText']]
+        y = self.new_data[['identityMotive']]
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=69)
+
+        cv = CountVectorizer()
+        cv.fit(X_train['onlyText'])
+        self.X_train = cv.transform(X_train['onlyText'])
+        self.y_train = y_train
+
+        vocab = dict()
+        vocab['dict'] = str(cv.vocabulary_)
+        vocab = pd.DataFrame(vocab, index=['vocab',])
+        insertCollection('09_TrainingData', 'CountVectorVocabulary', vocab)
+
+        vocab = cv.vocabulary_
+        cv_test = CountVectorizer(vocabulary=vocab)
+        cv_test.fit(X_test['onlyText'])
+        X_test = cv_test.transform(X_test['onlyText'])
+
+        scipy.sparse.save_npz(self.filepath + 'X_test.npz', X_test)
+        y_test.insert(0, 'id', range(0, len(y_test)))
+        insertCollection('09_TrainingData', 'y_test', y_test)
+
     #### FIT BALANCING #### Multi Threading Part
     # Thread1 # ADASYN
-    def thread1_ADASYN(x, y):
+    def thread1_ADASYN(self, x, y):
         ada = ADASYN()
         print("ADASYN started")
         X_res, y_res = ada.fit_resample(x, y)
         print('ADASYN target variable distribution:', Counter(y_res))
         print("ADASYN fitting done")
         ## Save X_res
-        scipy.sparse.save_npz(filepath + 'ADASYN_x_matrix.npz', X_res)
+        scipy.sparse.save_npz(self.filepath + 'ADASYN_x_matrix.npz', X_res)
         ## Save y_res
-        y_res = y_res.to_frame()
         y_res.insert(0, 'id', range(0, len(y_res)))
-        coll = db.ADASYN_y
-        coll.delete_many({})
-        coll.insert_many(y_res.to_dict("records"))
+        insertCollection('09_TrainingData', 'ADASYN_y', y_res)
+        
         print("ADASYN saved and done")
 
 
     # Thread 2 # SMOTE
-    def thread2_SMOTE(x, y):
+    def thread2_SMOTE(self, x, y):
         sm = SMOTE()
         print("SMOTE started")
         X_sm, y_sm = sm.fit_resample(x, y)
         print('SMOTE target variable distribution:', Counter(y_sm))
         print("SMOTE fitting done")
         ## Save X_sm
-        scipy.sparse.save_npz(filepath + 'SMOTE_x_matrix.npz', X_sm)
+        scipy.sparse.save_npz(self.filepath + 'SMOTE_x_matrix.npz', X_sm)
         ## Save y_sm
-        y_sm = y_sm.to_frame()
         y_sm.insert(0, 'id', range(0, len(y_sm)))
-        coll = db.SMOTE_y
-        coll.delete_many({})
-        coll.insert_many(y_sm.to_dict("records"))
+        insertCollection('09_TrainingData', 'SMOTE_y', y_sm)
+
         print("SMOTE saved and done")
 
 
     # Thread 3 # SMOTEENN
-    def thread3_SMOTEENN(x, y):
+    def thread3_SMOTEENN(self, x, y):
         se = SMOTEENN()
         print("SMOTEENN started")
         X_se, y_se = se.fit_resample(x, y)
         print('Combined sample(SMOTEENN) target variable distribution:', Counter(y_se))
         print("SMOTEENN fitting done")
         ## Save X_se
-        scipy.sparse.save_npz(filepath + 'SMOTEENN_x_matrix.npz', X_se)
+        scipy.sparse.save_npz(self.filepath + 'SMOTEENN_x_matrix.npz', X_se)
         ## Save y_se
-        y_se = y_se.to_frame()
         y_se.insert(0, 'id', range(0, len(y_se)))
-        coll = db.SMOTEENN_y
-        coll.delete_many({})
-        coll.insert_many(y_se.to_dict("records"))
+        insertCollection('09_TrainingData', 'SMOTEENN_y', y_se)
+
         print("SMOTEENN saved and done")
 
 
     # Thread 4 # SMOTETomek
-    def thread4_SMOTETomek(x, y):
+    def thread4_SMOTETomek(self, x, y):
         st = SMOTETomek()
         print("SMOTETomek started")
         X_st, y_st = st.fit_resample(x, y)
         print('Combined sample(SMOTETomek) target variable distribution:', Counter(y_st))
         print("SMOTETomek fitting done")
         ## Save X_st
-        scipy.sparse.save_npz(filepath + 'SMOTETomek_x_matrix.npz', X_st)
+        scipy.sparse.save_npz(self.filepath + 'SMOTETomek_x_matrix.npz', X_st)
         ## Save y_st
-        y_st = y_st.to_frame()
         y_st.insert(0, 'id', range(0, len(y_st)))
-        coll = db.SMOTETomek_y
-        coll.delete_many({})
-        coll.insert_many(y_st.to_dict("records"))
+        insertCollection('09_TrainingData', 'SMOTETomek_y', y_st)
+
         print("SMOTETomek saved and done")
 
 
     # Thread 5 # NearMiss
-    def thread5_NearMiss(x, y):
+    def thread5_NearMiss(self, x, y):
         nm = NearMiss()
         print("NearMiss started")
         X_nm, y_nm = nm.fit_resample(x, y)
         print('Undersampled near miss target variable distribution:', Counter(y_nm))
         print("NearMiss fitting done")
         ## Save X_nm
-        scipy.sparse.save_npz(filepath + 'NearMiss_x_matrix.npz', X_nm)
+        scipy.sparse.save_npz(self.filepath + 'NearMiss_x_matrix.npz', X_nm)
         ## Save y_nm
-        y_nm = y_nm.to_frame()
         y_nm.insert(0, 'id', range(0, len(y_nm)))
-        coll = db.NearMiss_y
-        coll.delete_many({})
-        coll.insert_many(y_nm.to_dict("records"))
+        insertCollection('09_TrainingData', 'NearMiss_y', y_nm)
+
         print("NearMiss saved and done")
 
 
     # Thread 6 # TomekLinks
-    def thread6_TomekLinks(x, y):
+    def thread6_TomekLinks(self, x, y):
         tl = TomekLinks()
         print("TomekLinks started")
         X_tl, y_tl = tl.fit_resample(x, y)
         print('Undersampled TomekLinks target variable distribution:', Counter(y_tl))
         print("TomekLinks fitting done")
         ## Save X_tl
-        scipy.sparse.save_npz(filepath + 'TomekLinks_x_matrix.npz', X_tl)
+        scipy.sparse.save_npz(self.filepath + 'TomekLinks_x_matrix.npz', X_tl)
         ## Save y_tl
-        y_tl = y_tl.to_frame()
         y_tl.insert(0, 'id', range(0, len(y_tl)))
-        coll = db.TomekLinks_y
-        coll.delete_many({})
-        coll.insert_many(y_tl.to_dict("records"))
+        insertCollection('09_TrainingData', 'TomekLinks_y', y_tl)
+
         print("TomekLinks saved and done")
 
+    def threading_function(self):
+        t1 = threading.Thread(name="thread1_ADASYN", target=self.thread1_ADASYN, args=(self.X_train, self.y_train))
+        t2 = threading.Thread(name="thread2_SMOTE", target=self.thread2_SMOTE, args=(self.X_train, self.y_train))
+        t3 = threading.Thread(name="thread3_SMOTEENN", target=self.thread3_SMOTEENN, args=(self.X_train, self.y_train))
+        t4 = threading.Thread(name="thread4_SMOTETomek", target=self.thread4_SMOTETomek, args=(self.X_train, self.y_train))
+        t5 = threading.Thread(name="thread5_NearMiss", target=self.thread5_NearMiss, args=(self.X_train, self.y_train))
+        t6 = threading.Thread(name="thread6_TomekLinks", target=self.thread6_TomekLinks, args=(self.X_train, self.y_train))
+   
+        t1.start()
+        t2.start()
+        t3.start()
+        t4.start()
+        t5.start()
+        t6.start() 
 
-    t1 = threading.Thread(name="thread1_ADASYN", target=thread1_ADASYN, args=(X_train, y_train))
-    t2 = threading.Thread(name="thread2_SMOTE", target=thread2_SMOTE, args=(X_train, y_train))
-    t3 = threading.Thread(name="thread3_SMOTEENN", target=thread3_SMOTEENN, args=(X_train, y_train))
-    t4 = threading.Thread(name="thread4_SMOTETomek", target=thread4_SMOTETomek, args=(X_train, y_train))
-    t5 = threading.Thread(name="thread5_NearMiss", target=thread5_NearMiss, args=(X_train, y_train))
-    t6 = threading.Thread(name="thread6_TomekLinks", target=thread6_TomekLinks, args=(X_train, y_train))
+        print("Balancing Done!")
 
-    t1.start()
-    t2.start()
-    t3.start()
-    t4.start()
-    t5.start()
-    t6.start()
 
-    t1.join()
-    t2.join()
-    t3.join()
-    t4.join()
-    t5.join()
-    t6.join()
 
-    print("Balancing Done!")
+
+
+if __name__ == "__main__":
+
+    df_source_collection = getCollection('08_PreTrain', 'train_data')
+
+
+    
+    filepath=input("Enter the path of your file with '/': ")
+    
+    if os.path.isdir(filepath):
+        f = open(r"filepath", "w")
+    else:
+        print ("Directory does not exist.")
+
+    balancing_input= BalancingData(filepath,df_source_collection)
+    balancing_input.split_train_test()
+    balancing_input.threading_function()
+
+
+
