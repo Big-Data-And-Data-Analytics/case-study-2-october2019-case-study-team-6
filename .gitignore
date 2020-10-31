@@ -18,5 +18,8 @@ scripts/datapreparation/nationalidentity/__pycache__/mongoConnection.cpython-38.
 scripts/03 Data Preparation/04 National Identity/__pycache__/mongoConnection.cpython-38.pyc
 scripts/datapreparation/extraction/.vscode/settings.json
 .vscode
+.idea/
+.idea
+.idea/*
 .vscode/settings.json
 /scripts/datapreparation/sentiment/test.R

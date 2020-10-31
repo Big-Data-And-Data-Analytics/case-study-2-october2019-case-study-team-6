@@ -78,19 +78,19 @@ print(df2.dtypes, sentiment_Dictionary.dtypes)
 
 
 jn = df2.merge(sentiment_Dictionary, on = 'word', how = 'inner', suffixes = ['', '_1'])
-del df2
+# del df2
 sentimentFrame = jn.groupby(by=['onlyText', 'sentiment'], as_index=False).count() # Columns and the aggregation if agg() used
 # r = sentimentFrame.groupby(by=['onlyText', 'sentiment'])['word'].max()
-del jn
+# del jn
 sentimentFrame['onlyText'] = sentimentFrame['onlyText'].str.strip()
-sentimentFrame = sentimentFrame.sort_values('word').drop_duplicates(['onlyText'], keep='last')
+sentimentFrame = sentimentFrame.sort_values('word').drop_duplicates(['onlyText', 'sentiment'], keep='last')
 # sentimentFrame = sentimentFrame.sort_values('word').drop_duplicates(['onlyText'], keep='last')
 # counts = counts.drop(['index'], axis = 1)
 post['onlyText'] = post['onlyText'].str.strip()
 data_sentiment_post = post.merge(sentimentFrame, on = 'onlyText', how='left', suffixes=['_post',''])
 # Done till here
 # data_sentiment_post < - left_join(data_sentiment, sentimentFrame, by="onlyText")
-del sentimentFrame
+# del sentimentFrame
 data_sentiment_test_noDupl = post.groupby(['Id', 'source_Type', 'username', 'text', 'likes', 'timestamp',
        'hashtags', 'owner_id', 'url', 'TagList', 'onlyText', 'data_Type'])['_id'].count().reset_index(name='count')
 
@@ -100,4 +100,4 @@ data_sentiment_test_noDupl = data_sentiment_test_noDupl[filter_1]
 
 # Memory Issues
 test = data_sentiment_test_noDupl.merge(data_sentiment_post, on='onlyText', how='left', suffixes=['_noDup',''])
-del data_sentiment_test_noDupl
+# del data_sentiment_test_noDupl
