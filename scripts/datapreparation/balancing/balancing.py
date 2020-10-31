@@ -34,10 +34,21 @@ class BalancingData:
 
     def split_train_test(self):
 
+        """ 'X' variable is assigned 'onlyText' column and 'y' variable has the 'identityMotive'.  The 'X' and 'y' are 
+        then divided into test and train data.
+        The input for different balancing techniques must be in vectorised form. Thus, count vectoriser is applied on
+        'X'. 
+        The vocabulary is saved into CountVectorVocabulary. The results of 'X_test' is saved in the provided filepath 
+        and 'y_test' is inserted into the database.
+
+        :param : complete collection
+        :type : dataframe
+        """
         X = self.new_data[['onlyText']]
         y = self.new_data[['identityMotive']]
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=69)
 
+        print(type(X_train))
         cv = CountVectorizer()
         cv.fit(X_train['onlyText'])
         self.X_train = cv.transform(X_train['onlyText'])
@@ -60,6 +71,16 @@ class BalancingData:
     #### FIT BALANCING #### Multi Threading Part
     # Thread1 # ADASYN
     def thread1_ADASYN(self, x, y):
+
+        """An object of the class ADASYN is created and the dataset is resampled using 'fit_resample'. The output
+        'X_res'  of the resampling is saved in the provided path and the output of 'y_res' is stored into the database.
+
+        :param : X_train
+        :param : y_train
+
+        :return : X_res
+        :return : y_res
+        """
         ada = ADASYN()
         print("ADASYN started")
         X_res, y_res = ada.fit_resample(x, y)
@@ -76,6 +97,16 @@ class BalancingData:
 
     # Thread 2 # SMOTE
     def thread2_SMOTE(self, x, y):
+
+        """An object of the class SMOTE is created and the dataset is resampled using 'fit_resample'. The output
+        'X_sm'  of the resampling is saved in the provided path and the output of 'y_sm' is stored into the database.
+
+        :param : X_train
+        :param : y_train
+
+        :return : X_sm
+        :return : y_sm
+        """
         sm = SMOTE()
         print("SMOTE started")
         X_sm, y_sm = sm.fit_resample(x, y)
@@ -92,6 +123,16 @@ class BalancingData:
 
     # Thread 3 # SMOTEENN
     def thread3_SMOTEENN(self, x, y):
+
+        """An object of the class SMOTEENN is created and the dataset is resampled using 'fit_resample'. The output
+        'X_se'  of the resampling is saved in the provided path and the output of 'y_se' is stored into the database.
+
+        :param : X_train
+        :param : y_train
+
+        :return : X_se
+        :return : y_se
+        """
         se = SMOTEENN()
         print("SMOTEENN started")
         X_se, y_se = se.fit_resample(x, y)
@@ -108,6 +149,17 @@ class BalancingData:
 
     # Thread 4 # SMOTETomek
     def thread4_SMOTETomek(self, x, y):
+
+        """An object of the class SMOTETomek is created and the dataset is resampled using 'fit_resample'. The output
+        'X_st'  of the resampling is saved in the provided path and the output of 'y_st' is stored into the database.
+
+        :param : X_train
+        :param : y_train
+
+        :return : X_st
+        :return : y_st
+        """
+
         st = SMOTETomek()
         print("SMOTETomek started")
         X_st, y_st = st.fit_resample(x, y)
@@ -124,6 +176,17 @@ class BalancingData:
 
     # Thread 5 # NearMiss
     def thread5_NearMiss(self, x, y):
+
+        """An object of the class NearMiss is created and the dataset is resampled using 'fit_resample'. The output
+        'X_nm'  of the resampling is saved in the provided path and the output of 'y_nm' is stored into the database.
+
+        :param : X_train
+        :param : y_train
+
+        :return : X_nm
+        :return : y_nm
+        """
+
         nm = NearMiss()
         print("NearMiss started")
         X_nm, y_nm = nm.fit_resample(x, y)
@@ -140,6 +203,18 @@ class BalancingData:
 
     # Thread 6 # TomekLinks
     def thread6_TomekLinks(self, x, y):
+
+        
+        """An object of the class TomekLinks is created and the dataset is resampled using 'fit_resample'. The output
+        'X_tl'  of the resampling is saved in the provided path and the output of 'y_tl' is stored into the database.
+
+        :param : X_train
+        :param : y_train
+
+        :return : X_tl
+        :return : y_tl
+        """
+
         tl = TomekLinks()
         print("TomekLinks started")
         X_tl, y_tl = tl.fit_resample(x, y)
@@ -154,12 +229,17 @@ class BalancingData:
         print("TomekLinks saved and done")
 
     def threading_function(self):
-        t1 = threading.Thread(name="thread1_ADASYN", target=self.thread1_ADASYN, args=(self.X_train, self.y_train))
-        t2 = threading.Thread(name="thread2_SMOTE", target=self.thread2_SMOTE, args=(self.X_train, self.y_train))
-        t3 = threading.Thread(name="thread3_SMOTEENN", target=self.thread3_SMOTEENN, args=(self.X_train, self.y_train))
-        t4 = threading.Thread(name="thread4_SMOTETomek", target=self.thread4_SMOTETomek, args=(self.X_train, self.y_train))
-        t5 = threading.Thread(name="thread5_NearMiss", target=self.thread5_NearMiss, args=(self.X_train, self.y_train))
-        t6 = threading.Thread(name="thread6_TomekLinks", target=self.thread6_TomekLinks, args=(self.X_train, self.y_train))
+
+        """Different threads are created for each balancing technique having the target as the functions of 
+        balancing techniques and arguments are the inputs i.e 'X_train' and 'y_train'. After the creation of threads,
+        the threads are executed.
+        """
+        t1 = threading.Thread(name = "thread1_ADASYN",      target = self.thread1_ADASYN,       args = (self.X_train, self.y_train))
+        t2 = threading.Thread(name = "thread2_SMOTE",       target = self.thread2_SMOTE,        args = (self.X_train, self.y_train))
+        t3 = threading.Thread(name = "thread3_SMOTEENN",    target = self.thread3_SMOTEENN,     args = (self.X_train, self.y_train))
+        t4 = threading.Thread(name = "thread4_SMOTETomek",  target = self.thread4_SMOTETomek,   args = (self.X_train, self.y_train))
+        t5 = threading.Thread(name = "thread5_NearMiss",    target = self.thread5_NearMiss,     args = (self.X_train, self.y_train))
+        t6 = threading.Thread(name = "thread6_TomekLinks",  target = self.thread6_TomekLinks,   args = (self.X_train, self.y_train))
    
         t1.start()
         t2.start()
