@@ -14,9 +14,15 @@ from sklearn.model_selection import train_test_split
 import threading
 from sklearn.model_selection import train_test_split
 
+#TODO Class
+#TODO Create instance variable for file path
+#TODO Create instance variable for file path
+#TODO Call all the methods inside __init__ check the init of cleaning.py
+#TODO Use self object in such a way, it should carry data. Do not make the methods static
+
 # Filepath
 #filepath = '/home/shubham/PycharmProjects/Case Study 1  Extras/NPZs/'
-filepath = "D:/OneDrive - SRH IT/Case Study 1/02 Input_Data/03 Model/NPZs/"
+filepath = "E:/Case Study I Data/Models/NPZs/"
 
 # Source Collection
 client = MongoClient('localhost', 27017)
@@ -79,6 +85,7 @@ coll.delete_many({})
 coll.insert_many(y_test.to_dict("records"))
 
 #### INSTATIATE BALANCING TECHNIQUES
+#TODO Place them into respective Methods eg. ada in thread1_ADASYN
 ada = ADASYN()
 sm = SMOTE()
 se = SMOTEENN()
