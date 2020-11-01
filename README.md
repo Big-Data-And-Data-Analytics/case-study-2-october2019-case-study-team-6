@@ -1,5 +1,52 @@
 # National Identity Case Study
 
+
+#### Sprint 2 Status [23-Oct to 28-Oct]
+
+**Highlights:**
+1. Critical Pending Tasks: 
+	1. ***One Hot Encoding Migration (Differed twice)***
+    2. ***Manuscript Changes***
+		1. Evaluation  #current_owner - Max
+		2. Related Work Changes  #current_owner - Mavis, Shubham
+		3. Diagrams for Internal processes #current_owner - None
+		4. Intro and Limitation additions #current_owner - Abhinav
+		5. Citations #current_owner - Shubham
+		6. Conclusion #current_owner - None
+
+#|Sprint|Start Date|End Date|Title|Feature Type|Owner|Status|Continues|Comments|
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | 
+8|2|23-Oct|28-Oct|One Hot Encoding|Old|`Abhinav`|`Differ`|2|To be migrated|
+9|2|23-Oct|28-Oct|Sentiment Analysis Code|Old|`Shubham`|`Done`|0|To be migrated|
+10|2|23-Oct|28-Oct|Combined Data Model |Old|`Max`|`Differ`|1|Combining all the columns into a datamodel, renaming columns to bind|
+11|2|23-Oct|28-Oct|Balancing|Old|`Mavis`|`Differ`|1|Converted to OOPs|
+12|2|23-Oct|28-Oct|Feature Selection|Old|Unassigned|`Differ`|0|Converted to OOPs, Find optimal Evaluation metric(framework)|
+13|2|23-Oct|28-Oct|Identity Motive Taggings|Old|`Varad`|`Done`|0|Move code to tagging, convert to oops, move the lemmtization code to cleaning, etc|
+14|2|23-Oct|28-Oct|Filtering |Old|`Varad`|`Done`|0|Convert to OOPs, create a new class|
+15|2|23-Oct|28-Oct|Lemmitization Remove Stop Words|Old|`Varad`|`Done`|0|Move code to cleaning, convert to oops, move the lemmtization code to cleaning, etc|
+16|2|23-Oct|28-Oct|Translation |Old|Unassigned|`Differ`|0|Convert to OOPs, create a new class|
+17|2|23-Oct|28-Oct|Model|Old|Unassigned|`Differ`|0|Move all models into one class, change the code for reusability, similar codes break into `Differ`ent functions|
+18|2|23-Oct|28-Oct|Main Test Script|New|`Shubham`|`Differ`|1||
+
+
+#### Sprint 1 Status [15-Oct to 22-Oct]
+
+**Highlights:**
+1. 60% R Scripts are migrated to Python
+2. Hold on Data Crawling
+3. OneHot & Sentiment Analysis Task Differed to Sprint 2 
+
+|#|Sprint|Start Date|End Date|Title|Feature Type|Owner|Status|Continued|Comments
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | 
+|1|1|15-Oct|22-Oct|New Data Crawling|Old|`Shubham`|`On Hold`|0|Instagram
+|2|1|15-Oct|22-Oct|Hashtags, TagList, onlyText|Old|`Mavis`|`Done`|0|To be migrated
+|3|1|15-Oct|22-Oct|National Identity Tagging |Old|`Varad`|`Done`|0|Find country names in different languages
+|4|1|15-Oct|22-Oct|One Hot Encoding|Old|`Abhinav`|`Differ`|1|To be migrated
+|5|1|15-Oct|22-Oct|Components/Class formation for all the steps|Old|`Max` & `Shubham`|`Done`|0|OOP
+|6|1|15-Oct|22-Oct|Documentation of the functions|Old|Team|`Done`|0|Need to be added
+|7|1|15-Oct|22-Oct|Sentiment Analysis Code|Old|`Shubham`|`Differ`|1|To be migrated
+
+
 # Package Setup
 
 # Development Framework

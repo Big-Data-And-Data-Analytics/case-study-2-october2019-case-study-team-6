@@ -1,3 +1,8 @@
+from pymongo import MongoClient
+import pandas as pd
+import numpy as np
+from scripts.mongoConnection import getCollection, insertCollection
+
 class Cleaning:
     """Cleaning class provides functions for cleaning the data.
 
@@ -32,10 +37,27 @@ class Cleaning:
 
     version = "0.1"
 
-    def __init__(self):              
-        pass
+    def __init__(self, new_data=None):
 
-    def removeWhiteSpaces(self, data, column): # Remove whitepsaces in the given data-column
+        if new_data is not None:
+            self.data = new_data
+            self.execute_and_load()
+        else:
+            col_list = ['youTube_Video_Comments_Raw']
+            for each_col in col_list:
+                self.data = getCollection('01_NationalIdentity_Crawled',each_col)
+                self.execute_and_load()
+
+        # db = client['01_NationalIdentity_Crawled']
+        # data = db.youTube_Video_Comments_Raw
+
+    def execute_and_load(self):
+        self.data = self.remove_duplicates()
+        self.data = self.remove_white_spaces("textOriginal")
+        self.data = self.change_empty_tona("textOriginal")
+        insertCollection('01_NationalIdentity_Crawled', 'cleaned_data', self.data)
+
+    def remove_white_spaces(self, column): # Remove whitepsaces in the given data-column
         """Removes all whitespaces before and after the text and multi whitespaces inside the text
 
         :param data: which dataframe should be used
@@ -46,12 +68,12 @@ class Cleaning:
         :rtype: pandas dataframe
         """        
         
-        data[column] = data[column].str.strip()
-        data[column] = data[column].str.replace("  +", " ")
+        self.data[column] = self.data[column].str.strip()
+        self.data[column] = self.data[column].str.replace("  +", " ")
         print("Whitespaces removed!")
-        return data
+        return self.data
 
-    def changeEmptyToNA(self, data, column): # Change empty strings to NA in the given data-column
+    def change_empty_tona(self, column): # Change empty strings to NA in the given data-column
         """Changes all empty strings ("") to NA
 
         :param data: which dataframe should be used
@@ -62,11 +84,11 @@ class Cleaning:
         :rtype: pandas dataframe
         """
 
-        data[column] = data[column].replace(r'^\s*$', np.nan, regex=True)
+        self.data[column] = self.data[column].replace(r'^\s*$', np.nan, regex=True)
         print("Empty strings changed!")
-        return data
+        return self.data
 
-    def removeDuplicates(self, data): # Remove duplicates
+    def remove_duplicates(self): # Remove duplicates
         """Removes duplicated rows
 
         :param data: which dataframe should be used
@@ -75,26 +97,22 @@ class Cleaning:
         :rtype: pandas dataframe
         """
 
-        data = data.drop(columns="_id")
-        data = data.drop_duplicates()
+        self.data = self.data.drop(columns="_id")
+        self.data = self.data.drop_duplicates()
         print("Duplicates removed!")
-        return data
+        return self.data
 
 
 if __name__ == "__main__":
-    from pymongo import MongoClient
-    import pandas as pd
-    import numpy as np
 
-    client = MongoClient('localhost', 27017)
-    db = client['01_NationalIdentity_Crawled']
-    data = db.youTube_Video_Comments_Raw
-    data = data.find({})
-    data = list(data)
-    data = pd.DataFrame(data)
 
-    cleaner = Cleaning()
+    # client = MongoClient('localhost', 27017)
+    # db = client['01_NationalIdentity_Crawled']
+    # self.data = db.youTube_Video_Comments_Raw
+    # self.data = data.find({})
+    # data = list(data)
+    # data = pd.DataFrame(data)
 
-    data = cleaner.removeDuplicates(data)
-    data = cleaner.removeWhiteSpaces(data, "textOriginal")
-    data = cleaner.changeEmptyToNA(data, "textOriginal")
+    Cleaning()
+
+

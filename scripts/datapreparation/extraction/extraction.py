@@ -1,6 +1,5 @@
-import pymongo
 import pandas as pd
-from datapreparation.mongoConnection import getCollection, insertCollection
+from scripts.mongoConnection import getCollection, insertCollection
 
 class ExtractTagHashtag:
     """ExtractTagHashtag class represents extraction of hashtags, taglists and text without hashtags and taglists i.e onlyText
@@ -73,6 +72,7 @@ class ExtractTagHashtag:
 
 if __name__ == "__main__":
 
+    #TODO Change the name of the Combined DB Remove Numbering
     df_post = getCollection('03_NationalIdentity_Combined', 'common_post_Combined')
     df_comment = getCollection('03_NationalIdentity_Combined', 'common_comment_Combined')
     df_subcomment = getCollection('03_NationalIdentity_Combined', 'common_subcomment_Combined')
@@ -83,9 +83,12 @@ if __name__ == "__main__":
     result_comment = ExtractTagHashtag.extract(df_comment)
     result_subcomment = ExtractTagHashtag.extract(df_subcomment)
 
+    # TODO Move the insert statements to decorator and fillna()
     result_post = result_post.fillna('0')
     result_comment = result_comment.fillna('0')
     result_subcomment = result_subcomment.fillna('0')
+
+    #TODO Change the name of the Combined DB Remove Numbering, Collection name
     insertCollection('03_NationalIdentity_Combined', 'common_post_inserted', result_post)
     insertCollection('03_NationalIdentity_Combined', 'common_comment_inserted', result_comment)
     insertCollection('03_NationalIdentity_Combined', 'common_subcomment_inserted', result_subcomment)
