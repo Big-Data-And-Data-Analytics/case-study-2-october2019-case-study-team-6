@@ -25,19 +25,8 @@ class Sentiment:
     data_type [post, comment or subcomment].
 
     """
-    def __init__(self, new_data=None, col_name=None):
+    def __init__(self):
         self.analyser = SentimentIntensityAnalyzer()
-        print('Inside Init')
-        if new_data is not None:
-            # new_data['sentiment'] = new_data['onlyText'].apply(sentiment_analyzer_scores)
-            self.apply_load_sentiment(new_data, col_name)
-        else:
-            post = getCollection('03_NationalIdentity_Combined', 'common_post_Combined')
-            comment = getCollection('03_NationalIdentity_Combined', 'common_comment_Combined')
-            sub_comment = getCollection('03_NationalIdentity_Combined', 'common_subcomment_Combined')
-            self.apply_load_sentiment(post, 'sentiment_post_Collection2')
-            self.apply_load_sentiment(comment, 'sentiment_comment_Collection2')
-            self.apply_load_sentiment(sub_comment, 'sentiment_subcomment_Collection2')
 
 
     def sentiment_analyzer_scores(self, sentence):
@@ -77,5 +66,12 @@ class Sentiment:
 
 if __name__ == '__main__':
 
-    Sentiment()
+    post = getCollection('03_NationalIdentity_Combined', 'common_post_Combined')
+    comment = getCollection('03_NationalIdentity_Combined', 'common_comment_Combined')
+    sub_comment = getCollection('03_NationalIdentity_Combined', 'common_subcomment_Combined')
+
+    sentiment = Sentiment()
+    sentiment.apply_load_sentiment(post, 'sentiment_post_Collection3')
+    sentiment.apply_load_sentiment(comment, 'sentiment_comment_Collection2')
+    sentiment.apply_load_sentiment(sub_comment, 'sentiment_subcomment_Collection2')
 
