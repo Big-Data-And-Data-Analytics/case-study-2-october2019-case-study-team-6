@@ -12,6 +12,11 @@ class TextCleaning:
     where stop words will be removed and text will be lemmatized
 
     """
+
+    def __init__(self):
+        self.lemmatizer = WordNetLemmatizer()
+        self.stop_words = set(stopwords.words('english'))
+
     def remove_stop_words(self, listOfWords):
         """removes stop words from the list of words, lemmatizes the words and returns the final output
 
@@ -22,8 +27,8 @@ class TextCleaning:
         :rtype: List
         """
 
-        filtered_list = [w for w in listOfWords if not w in stop_words]
-        lemmatized_output = ' '.join([lemmatizer.lemmatize(w) for w in filtered_list])
+        filtered_list = [w for w in listOfWords if not w in self.stop_words]
+        lemmatized_output = ' '.join([self.lemmatizer.lemmatize(w) for w in filtered_list])
         return lemmatized_output
 
     def get_clean_df(self, df, collection):
@@ -53,9 +58,6 @@ class TextCleaning:
         insertCollection('07_PreProcessing', collection, df)
 
 if __name__ == '__main__':
-
-    lemmatizer = WordNetLemmatizer()
-    stop_words = set(stopwords.words('english'))
 
     textCleaning = TextCleaning()
 
