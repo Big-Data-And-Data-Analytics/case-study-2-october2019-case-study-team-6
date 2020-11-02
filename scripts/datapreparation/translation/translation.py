@@ -45,13 +45,13 @@ if __name__ == '__main__':
     translate = Translation()
 
     df_post = getCollection('05_NationalIdentity', 'ni_post')
-    translate.detect_language(df_post, 'ni_post_translated')
+    translate.detect_translate(df_post, 'ni_post_translated')
 
     df_comment = getCollection('05_NationalIdentity', 'ni_comment')
-    translate.detect_language(df_comment, 'ni_comment_translated')
+    translate.detect_translate(df_comment, 'ni_comment_translated')
 
     df_subcomment = getCollection('05_NationalIdentity', 'ni_subcomment')
-    translate.detect_language(df_subcomment, 'ni_subcomment_translated')
+    translate.detect_translate(df_subcomment, 'ni_subcomment_translated')
 
 
 
