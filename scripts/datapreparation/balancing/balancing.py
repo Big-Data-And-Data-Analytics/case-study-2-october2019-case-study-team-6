@@ -8,7 +8,7 @@ import scipy
 from imblearn.combine import SMOTEENN, SMOTETomek
 from imblearn.over_sampling import ADASYN, SMOTE
 from imblearn.under_sampling import NearMiss, TomekLinks
-from mongoConnection import getCollection, insertCollection
+from scripts.mongoConnection import getCollection, insertCollection
 from pymongo import MongoClient
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
@@ -260,14 +260,14 @@ if __name__ == "__main__":
 
 
     
-    filepath=input("Enter the path of your file with '/': ")
+    filepath = input("Enter the path of your file with '/': ")
     
     if os.path.isdir(filepath):
         f = open(r"filepath", "w")
     else:
         print ("Directory does not exist.")
 
-    balancing_input= BalancingData(filepath,df_source_collection)
+    balancing_input = BalancingData(filepath,df_source_collection)
     balancing_input.split_train_test()
     balancing_input.threading_function()
 
