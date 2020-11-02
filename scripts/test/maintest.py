@@ -15,7 +15,7 @@ data = cleaner.remove_white_spaces("textOriginal")
 cleaned_data = cleaner.change_empty_tona("textOriginal")
 del data
 insertCollection('01_NationalIdentity_Crawled', 'cleaned_data', cleaned_data)
-
+del cleaned_data
 
 """
 02. Combined Step: Data Model Creation
@@ -44,6 +44,14 @@ insertCollection('03_NationalIdentity_Combined', 'common_post_inserted', result_
 insertCollection('03_NationalIdentity_Combined', 'common_comment_inserted', result_comment)
 insertCollection('03_NationalIdentity_Combined', 'common_subcomment_inserted', result_subcomment)
 
+del df_post
+del df_comment
+del df_subcomment
+
+del result_post
+del result_comment
+del result_subcomment
+
 """
 04. Translation
 """
@@ -62,6 +70,11 @@ sentiment = Sentiment()
 sentiment.apply_load_sentiment(post, 'sentiment_post_Collection')
 sentiment.apply_load_sentiment(comment, 'sentiment_comment_Collection')
 sentiment.apply_load_sentiment(sub_comment, 'sentiment_subcomment_Collection')
+
+del post
+del comment
+del sub_comment
+
 
 """
 06. Lemmitization
