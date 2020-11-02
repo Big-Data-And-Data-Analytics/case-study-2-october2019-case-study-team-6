@@ -23,8 +23,8 @@ setup(name='national-identity',
         "numpy",
         "pandas",
         "pymongo",
-        "re"
-        
+        "re",
+        "vaderSentiment",
       ],
       extras_require={              # Requires to be more specific for the development purpose
           "dev": [

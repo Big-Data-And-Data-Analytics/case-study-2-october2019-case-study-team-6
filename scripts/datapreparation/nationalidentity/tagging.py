@@ -1,5 +1,4 @@
 import re
-
 import emojis
 from scripts.mongoConnection import getCollection, insertCollection
 
@@ -14,7 +13,7 @@ class NationalIdentityTagging:
         3 :func: extract_country_emojis
         4 :func: find_national_identity
     """
-    
+
     def find_national_identity(self, text):
         """ returns list of countries present in the text given to this function
 
@@ -26,7 +25,7 @@ class NationalIdentityTagging:
         :type text: String
 
         :return: country- list of countries found in the text
-        :rtype: [] 
+        :rtype: []
 
         """
         country_list = ["albania", "belgium", "croatia", "czech republic", "england", "france", "germany", "hungary",
@@ -130,7 +129,9 @@ if __name__ == "__main__":
     
     nationalIdentityTaggingObj = NationalIdentityTagging()
 
+
     flags = getCollection('00_NationalIdentity_Assets', 'flag_emojis')
+    # TODO Add inside a static function
     flags = flags['flag_emoji'].str.strip()
     flags_set = list(flags)
 
@@ -138,6 +139,7 @@ if __name__ == "__main__":
 
     # Target Collection
     ni_post = nationalIdentityTaggingObj.postData(df)
+    # TODO Move the insert statements to functions
     insertCollection('05_NationalIdentity', 'ni_post', ni_post)
 
     df = getCollection('04_NationalIdentity_Sentiment', 'sentiment_comment_Collection')
@@ -145,6 +147,7 @@ if __name__ == "__main__":
     # Target Collection
     df.rename(columns={'Comment':'text'}, inplace=True)
     ni_comment = nationalIdentityTaggingObj.postData(df)
+    # TODO Move the insert statements to functions
     insertCollection('05_NationalIdentity', 'ni_comment', ni_comment)
     
     df = getCollection('04_NationalIdentity_Sentiment', 'sentiment_subcomment_Collection')
@@ -152,4 +155,5 @@ if __name__ == "__main__":
     # Target Collection
     df.rename(columns={'Sub_Comment':'text'}, inplace=True)
     ni_subcomment = nationalIdentityTaggingObj.postData(df)
+    # TODO Move the insert statements to functions
     insertCollection('05_NationalIdentity', 'ni_subcomment', ni_subcomment)
