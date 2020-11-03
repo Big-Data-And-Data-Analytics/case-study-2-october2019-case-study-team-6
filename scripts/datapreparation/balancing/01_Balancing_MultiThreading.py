@@ -16,7 +16,7 @@ from sklearn.model_selection import train_test_split
 
 # Filepath
 #filepath = '/home/shubham/PycharmProjects/Case Study 1  Extras/NPZs/'
-filepath = "D:/OneDrive - SRH IT/Case Study 1/02 Input_Data/03 Model/NPZs/"
+filepath = "/Users/Shared/Relocated Items/Security/Abhinav's Documents/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study I/02 Input_Data/03 Model/NPZs/"
 
 # Source Collection
 client = MongoClient('localhost', 27017)
