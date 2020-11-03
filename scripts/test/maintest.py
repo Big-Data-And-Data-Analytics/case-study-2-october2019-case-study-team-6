@@ -3,6 +3,7 @@ from scripts.mongoConnection import getCollection, insertCollection
 from scripts.datapreparation.extraction.extraction import ExtractTagHashtag
 from scripts.datapreparation.sentiment.sentiment import Sentiment
 from scripts.datapreparation.balancing.balancing import BalancingData
+from scripts.datapreparation.cleaning.lemmatizing_remove_stop_words import TextCleaning
 import os
 
 """
@@ -79,9 +80,16 @@ del sub_comment
 """
 06. Lemmitization
 """
+textCleaning = TextCleaning()
 
+df_post = getCollection('06_NationalIdentity_Translated', 'ni_post_translated')
+textCleaning.get_clean_df(df_post, 'ni_post_preprocessed')
 
+df_comment = getCollection('06_NationalIdentity_Translated', 'ni_comment_translated')
+textCleaning.get_clean_df(df_comment, 'ni_comment_preprocessed')
 
+df_subcomment = getCollection('06_NationalIdentity_Translated', 'ni_subcomment_translated')
+textCleaning.get_clean_df(df_subcomment, 'ni_subcomment_preprocessed')
 
 """
 07. Tagging
@@ -109,7 +117,6 @@ else:
 balancing_input = BalancingData(filepath, df_source_collection)
 balancing_input.split_train_test()
 balancing_input.threading_function()
-
 """
  
 """
