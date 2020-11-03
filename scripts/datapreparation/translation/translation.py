@@ -15,18 +15,19 @@ class Translation:
 
         self.translator = Translator()
 
-    def detect_translate(self, df, collection):
+    def detect_translate(self, df):
         """detect_translate function detects the language of each row from onlyText column of a dataframe,
         if the language is not english then translates that text into english and finally insert the dataframe
         into the database
 
         :param1 df: dataframe on which detect_translate is to be applied
-        :param2 collection: collection in which dataframe with translated onlyText column is to be inserted
-
         :type1 df: Pandas Dataframe
-        :type2 collection: String
 
+        :return df: Translated dataframe
+        :rtype df: Pandas Dataframe
+        
         """
+
         for index, row in df['onlyText'].iteritems():
             try:
                 lang = detect(row)
@@ -37,21 +38,23 @@ class Translation:
                 df.loc[index, 'detectLang'] = lang
             except:
                 pass
-        insertCollection('06_NationalIdentity_Translated', collection, df)
-
+        return df
 
 if __name__ == '__main__':
 
     translate = Translation()
 
-    df_post = getCollection('05_NationalIdentity', 'ni_post')
-    translate.detect_translate(df_post, 'ni_post_translated')
+    df = getCollection('05_NationalIdentity', 'ni_post')
+    df = translate.detect_translate(df)
+    insertCollection('06_NationalIdentity_Translated', 'ni_post_translated', df)
 
-    df_comment = getCollection('05_NationalIdentity', 'ni_comment')
-    translate.detect_translate(df_comment, 'ni_comment_translated')
+    df = getCollection('05_NationalIdentity', 'ni_comment')
+    df = translate.detect_translate(df)
+    insertCollection('06_NationalIdentity_Translated', 'ni_comment_translated', df)
 
-    df_subcomment = getCollection('05_NationalIdentity', 'ni_subcomment')
-    translate.detect_translate(df_subcomment, 'ni_subcomment_translated')
+    df = getCollection('05_NationalIdentity', 'ni_subcomment')
+    df = translate.detect_translate(df)
+    insertCollection('06_NationalIdentity_Translated', 'ni_subcomment_translated', df)
 
 
 
