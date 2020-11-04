@@ -42,21 +42,23 @@ class IdentityMotiveTagging:
 
         :param df: DataFrame in which the identity motives are to be searched
         :type df: Pandas Dataframe
+
+        :return df: Dataframe with identity motive tagged
+        :rtype df: Pandas DataFrame
         """
-        df = df[['Id', 'source_Type', 'data_Type', 'onlyText', 'sentiments', 'country', 'countryem']]
-
-        df['meaning'] = df['onlyText'].str.contains(rf'\b{self.meaning}\b',regex=True, case=False).astype(int)
-        df['belonging'] = df['onlyText'].str.contains(rf'\b{self.belonging}\b',regex=True, case=False).astype(int)
-        df['continuity'] = df['onlyText'].str.contains(rf'\b{self.continuity}\b',regex=True, case=False).astype(int)
-        df['distinctiveness'] = df['onlyText'].str.contains(rf'\b{self.distinctiveness}\b',regex=True, case=False).astype(int)
-        df['efficacy'] = df['onlyText'].str.contains(rf'\b{self.efficacy}\b',regex=True, case=False).astype(int)
-        df['selfEsteem'] = df['onlyText'].str.contains(rf'\b{self.selfEsteem}\b',regex=True, case=False).astype(int)
-
+        df = df.loc[:, ['Id', 'source_Type', 'data_Type', 'onlyText', 'sentiments', 'country', 'countryem']]
+        df.loc[df['onlyText'].str.contains(rf'\b{self.meaning}\b',regex=True, case=False), 'meaning'] = 1
+        df.loc[df['onlyText'].str.contains(rf'\b{self.belonging}\b',regex=True, case=False), 'belonging'] = 1
+        df.loc[df['onlyText'].str.contains(rf'\b{self.continuity}\b',regex=True, case=False), 'continuity'] = 1
+        df.loc[df['onlyText'].str.contains(rf'\b{self.distinctiveness}\b',regex=True, case=False), 'distinctiveness'] = 1
+        df.loc[df['onlyText'].str.contains(rf'\b{self.efficacy}\b',regex=True, case=False), 'efficacy'] = 1
+        df.loc[df['onlyText'].str.contains(rf'\b{self.selfEsteem}\b',regex=True, case=False), 'selfEsteem'] = 1
+        df.fillna(0, inplace=True)
         df = self.unpivot(df)
         return df
 
-
-    def unpivot(self, df):
+    @staticmethod
+    def unpivot(df):
         """Unpivot function splits the dataframe in list of dataframes having 50000 rows each, then unpivots each 
         dataframe on identity motives columns.
         Finally, it filteres the records which are having a value either in country or countryem column, removes
@@ -119,14 +121,13 @@ if __name__ == '__main__':
     identityMotiveTagging = IdentityMotiveTagging()
     identityMotiveTagging.get_synonyms()
 
-    # df = getCollection('07_PreProcessing', 'ni_post_preprocessed')
-    # df = identityMotiveTagging.tagging(df)
-    # insertCollection('08_PreTrain', 'train_data', df)
+    df = getCollection('07_PreProcessing', 'ni_post_preprocessed')
+    df = identityMotiveTagging.tagging(df)
+    insertCollection('08_PreTrain', 'train_data', df)
 
-
-    # df = getCollection('07_PreProcessing', 'ni_comment_preprocessed')
-    # df = identityMotiveTagging.tagging(df)
-    # insertCollection('08_PreTrain', 'train_data', df)
+    df = getCollection('07_PreProcessing', 'ni_comment_preprocessed')
+    df = identityMotiveTagging.tagging(df)
+    insertCollection('08_PreTrain', 'train_data', df)
 
 
     df = getCollection('07_PreProcessing', 'ni_subcomment_preprocessed')
