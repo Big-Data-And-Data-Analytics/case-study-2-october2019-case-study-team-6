@@ -166,8 +166,9 @@ class DataModel:
         youTube_Video_Comments_Cleaned = data.copy()
         youTube_Video_Comments_Cleaned = youTube_Video_Comments_Cleaned.drop(columns="_id")
         youTube_Video_Comments_Cleaned["parentId_check"] = youTube_Video_Comments_Cleaned.parentId.isnull()
-
-        youTube_Video_Comments = youTube_Video_Comments_Cleaned[youTube_Video_Comments_Cleaned.parentId_check.eq(True)]
+        youTube_Video_Comments_Cleaned = youTube_Video_Comments_Cleaned[youTube_Video_Comments_Cleaned.parentId_check.eq(True)]
+        youTube_Video_Comments = youTube_Video_Comments_Cleaned.copy()
+        del youTube_Video_Comments_Cleaned
         youTube_Video_Comments_added = self.add_data_and_source_type(youTube_Video_Comments, "comment", "YouTube")
         youTube_Video_Comments = youTube_Video_Comments_added.copy()
         youTube_Video_Comments = self.select_and_rename_columns_comment(data=youTube_Video_Comments, source_col_names=[
@@ -182,6 +183,7 @@ class DataModel:
         ])
 
         youTube_Video_Comments.drop_duplicates(inplace=True)
+
         return youTube_Video_Comments
 
     def run_youtube_subcomment(self, data):
