@@ -140,8 +140,8 @@ class DataModel:
         youTube_Videos_Cleaned = data2.drop(columns="_id")
 
         youTube_Videos_Data = pd.merge(youTube_Videos_Cleaned, youTube_Video_Stats_Cleaned, how="left", on=["video_id"])
-        youTube_Videos_Data = apply_model.add_data_and_source_type(youTube_Videos_Data, "post", "YouTube")
-        youTube_Videos_Data = apply_model.select_and_rename_columns_post(data=youTube_Videos_Data, source_col_names=[
+        youTube_Videos_Data = self.add_data_and_source_type(youTube_Videos_Data, "post", "YouTube")
+        youTube_Videos_Data = self.select_and_rename_columns_post(data=youTube_Videos_Data, source_col_names=[
             "video_id",
             "channel",
             "description",
@@ -167,8 +167,8 @@ class DataModel:
         youTube_Video_Comments_Cleaned["parentId_check"] = youTube_Video_Comments_Cleaned.parentId.isnull()
 
         youTube_Video_Comments = youTube_Video_Comments_Cleaned[youTube_Video_Comments_Cleaned.parentId_check.eq(True)]
-        youTube_Video_Comments = apply_model.add_data_and_source_type(youTube_Video_Comments, "comment", "YouTube")
-        youTube_Video_Comments = apply_model.select_and_rename_columns_comment(data=youTube_Video_Comments, source_col_names=[
+        youTube_Video_Comments = self.add_data_and_source_type(youTube_Video_Comments, "comment", "YouTube")
+        youTube_Video_Comments = self.select_and_rename_columns_comment(data=youTube_Video_Comments, source_col_names=[
             "videoId",
             "id",
             "authorDisplayName",
@@ -195,8 +195,8 @@ class DataModel:
         youTube_Video_Comments_Cleaned["parentId_check"] = youTube_Video_Comments_Cleaned.parentId.notnull()
 
         youTube_Video_SubComments = youTube_Video_Comments_Cleaned[youTube_Video_Comments_Cleaned.parentId_check.eq(True)]
-        youTube_Video_SubComments = apply_model.add_data_and_source_type(youTube_Video_SubComments, "subcomment", "YouTube")
-        youTube_Video_SubComments = apply_model.select_and_rename_columns_subcomment(data=youTube_Video_SubComments, source_col_names=[
+        youTube_Video_SubComments = self.add_data_and_source_type(youTube_Video_SubComments, "subcomment", "YouTube")
+        youTube_Video_SubComments = self.select_and_rename_columns_subcomment(data=youTube_Video_SubComments, source_col_names=[
             "videoId",
             "id",
             "parentId",
@@ -219,8 +219,8 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """        
-        reddit_Data_Post = apply_model.add_data_and_source_type(data, "post", "Reddit")
-        reddit_Data_Post = apply_model.select_and_rename_columns_post(data=reddit_Data_Post, source_col_names=[
+        reddit_Data_Post = self.add_data_and_source_type(data, "post", "Reddit")
+        reddit_Data_Post = self.select_and_rename_columns_post(data=reddit_Data_Post, source_col_names=[
             "post_id",
             "author",
             "post_text",
@@ -242,9 +242,9 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """        
-        reddit_Data_Comment = apply_model.add_data_and_source_type(data, "comment", "Reddit")
+        reddit_Data_Comment = self.add_data_and_source_type(data, "comment", "Reddit")
         reddit_Data_Comment = reddit_Data_Comment[~reddit_Data_Comment["structure"].str.contains("_")]
-        reddit_Data_Comment = apply_model.select_and_rename_columns_comment(data=reddit_Data_Comment, source_col_names=[
+        reddit_Data_Comment = self.select_and_rename_columns_comment(data=reddit_Data_Comment, source_col_names=[
             "post_id",
             "structure",
             "user",
@@ -266,9 +266,9 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """        
-        reddit_Data_Subcomment = apply_model.add_data_and_source_type(data, "subcomment", "Reddit")
+        reddit_Data_Subcomment = self.add_data_and_source_type(data, "subcomment", "Reddit")
         reddit_Data_Subcomment = reddit_Data_Subcomment[reddit_Data_Subcomment["structure"].str.contains("_")]
-        reddit_Data_Subcomment = apply_model.select_and_rename_columns_subcomment(data=reddit_Data_Subcomment, source_col_names=[
+        reddit_Data_Subcomment = self.select_and_rename_columns_subcomment(data=reddit_Data_Subcomment, source_col_names=[
             "post_id",
             "structure",
             "structure",
@@ -291,8 +291,8 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """        
-        twitter_post = apply_model.add_data_and_source_type(data, "post", "Twitter")
-        twitter_post = apply_model.select_and_rename_columns_post(data=twitter_post, source_col_names=[
+        twitter_post = self.add_data_and_source_type(data, "post", "Twitter")
+        twitter_post = self.select_and_rename_columns_post(data=twitter_post, source_col_names=[
             "tweet_id",
             "screen_name",
             "text",
@@ -314,8 +314,8 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """        
-        instagram_post = apply_model.add_data_and_source_type(data, "post", "Instagram")
-        instagram_post = apply_model.select_and_rename_columns_post(data=instagram_post, source_col_names=[
+        instagram_post = self.add_data_and_source_type(data, "post", "Instagram")
+        instagram_post = self.select_and_rename_columns_post(data=instagram_post, source_col_names=[
             "post_Id",
             "owner_username",
             "post_Caption",
@@ -337,8 +337,8 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """        
-        instagram_comment = apply_model.add_data_and_source_type(data, "comment", "Instagram")
-        instagram_comment = apply_model.select_and_rename_columns_comment(data=instagram_comment, source_col_names=[
+        instagram_comment = self.add_data_and_source_type(data, "comment", "Instagram")
+        instagram_comment = self.select_and_rename_columns_comment(data=instagram_comment, source_col_names=[
             "post_Id",
             "comment_id",
             "comment_owner_username",
@@ -364,9 +364,9 @@ class DataModel:
 
         instagram_comment_Cleaned = data[comment_comment_id_check==True]
         instagram_subcomment = instagram_comment_Cleaned.copy()
-        instagram_subcomment = apply_model.add_data_and_source_type(instagram_comment_Cleaned, "subcomment", "Instagram")
+        instagram_subcomment = self.add_data_and_source_type(instagram_comment_Cleaned, "subcomment", "Instagram")
 
-        instagram_subcomment = apply_model.select_and_rename_columns_subcomment(data=instagram_subcomment, source_col_names=[
+        instagram_subcomment = self.select_and_rename_columns_subcomment(data=instagram_subcomment, source_col_names=[
             "post_Id",
             "comment_comment_id",
             "comment_id",
