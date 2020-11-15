@@ -3,22 +3,12 @@ import sys
 import pickle as pi
 import pandas as pd
 import scipy as sc
-from sklearn.feature_extraction.text import CountVectorizer
-import yaml
-from pymongo import MongoClient
 from sklearn import metrics
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix
-from sklearn.metrics import classification_report
-from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.preprocessing import OneHotEncoder
 from pymongo import MongoClient
-#from scripts.mongoConnection import
-#import matplotlib.pyplot as plt
-from scripts.model.Decision_Tree import filepath
-from scripts.model.OneHot.test import onehotencoder, X_test, y_test
-
+from scripts.mongoConnection import getCollection, insertCollection
+from sklearn.preprocessing import OneHotEncoder
 
 class one_hot:
     """One Hot class provides function to apply OneHot encoding using logistic regression on the given training and testing data to
@@ -29,10 +19,10 @@ class one_hot:
         self.score_function = score_function
         self.my_tags = ['belonging', 'meaning', 'efficacy', 'distinctivness', 'self esteem', 'continuity']
         self.balancing_technique = [  # "ADASYN",
+             "SMOTE",
             "SMOTEENN",
             "NearMiss",
             "SMOTETomek",
-            "SMOTE",
             "TomekLinks"]
         self.use_fs_data = False
         self.modelName = "LogisticRegression"
@@ -41,10 +31,13 @@ class one_hot:
         self.client = MongoClient('localhost', 27017)
         self.db = self.client['09_TrainingData']
 
-    def training_model(self):
-
+    def training_model(self,y_test, X_test):
+        counter = 0
+        x_pred = X_test
         for tech in self.balancing_technique:
 
+            # One Hot Encoder
+            onehotencoder = OneHotEncoder(sparse=False)
             # Logging
             if self.use_fs_data:
                 sys.stdout = open(
@@ -81,19 +74,19 @@ class one_hot:
                     X = sc.sparse.load_npz(self.filepath + '/NPZs/' +
                                            self.balancing_technique[counter] + '_x_matrix_fs_chi2.npz')
                     print(f'"x" feature selected with chi2 loaded, {self.balancing_technique[counter]}')
-                    fs = pi.load(open(filepath + '/Models/Feature_'
+                    fs = pi.load(open(self.filepath + '/Models/Feature_'
                                       + self.balancing_technique[counter] + 'fs_chi2.tchq', 'rb'))
                     print(self.balancing_technique[counter])
                     X_test_chi2 = fs.transform(X_test)
                     x_pred = X_test_chi2
                 else:
-                    X = sc.sparse.load_npz(filepath + '/NPZs/' + self.balancing_technique[counter]
+                    X = sc.sparse.load_npz(self.filepath + '/NPZs/' + self.balancing_technique[counter]
                                            + '_x_matrix_fs_f_classif.npz')
                     print(f'"x" feature selected with f_classif loaded, {self.balancing_technique[counter]}')
                     print(self.balancing_technique[counter])
 
                     fs = pi.load(
-                        open(filepath + '/Models/Feature_' + self.balancing_technique[counter] + 'fs_f_classif.tchq', 'rb'))
+                        open(self.filepath + '/Models/Feature_' + self.balancing_technique[counter] + 'fs_f_classif.tchq', 'rb'))
                     X_test_f_classif = fs.transform(X_test)
                     x_pred = X_test_f_classif
             print(X)
@@ -157,7 +150,7 @@ class one_hot:
             # Create filename and dump model
             if not self.use_fs_data:
                 if accuracy_score(y_pred, y_test) > self.acc_thresh:
-                    filename = filepath + "/Models/Logistic_Regression_" + self.balancing_technique[counter] \
+                    filename = self.filepath + "/Models/Logistic_Regression_" + self.balancing_technique[counter] \
                                + "_" + str(acc) + ".model"
                     pi.dump(logreg, open(filename, 'wb'))
                 else:
@@ -181,9 +174,11 @@ class one_hot:
 
 if __name__ == '__main__':
 
-    one_hot()
-    getCollection('')
-    training(y_test, X_test)
 
-
-    pass
+    fp = "/Users/Shared/Relocated Items/Security/Abhinav's Documents/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study I/02 Input_Data/03 Model"
+    oh = one_hot(fp, None)
+    X_test = sc.sparse.load_npz(fp + '/NPZs/X_test.npz')
+    # X
+    SMOTE_y = getCollection('09_TrainingData','SMOTE_y')
+    y_test = getCollection('09_TrainingData','y_test')
+    oh.training_model(y_test, X_test)
