@@ -7,10 +7,11 @@ from scripts.mongoConnection import getCollection, insertCollection
 from sklearn.feature_selection import (SelectFromModel, SelectKBest, chi2,
                                        f_classif)
 
-
+##TODO Rework naming convention to something more appealing and easier to work with
 class FeatureSelection():
 
     def __init__(self):
+        ## TODO remove hardcoded variables
         self.balancing_technique = ["NearMiss", "SMOTEENN", "SMOTETomek", "SMOTE", "TomekLinks"]  # "ADASYN",
         self.counter = 0
         self.number_of_features = 1000
