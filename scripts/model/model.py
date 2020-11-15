@@ -15,7 +15,8 @@ class Model:
     my_tags = ['belonging', 'meaning', 'efficacy', 'distinctivness', 'self esteem', 'continuity']
 
     def __init__(self):
-        pass
+        self.X = None
+        self.y = None
 
     def load_X(self, filepath, balancing, balancing_tech):
         if balancing==True:
