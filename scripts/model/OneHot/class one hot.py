@@ -22,10 +22,10 @@ class one_hot:
         self.score_function = score_function
         self.my_tags = ['belonging', 'meaning', 'efficacy', 'distinctivness', 'self esteem', 'continuity']
         self.balancing_technique = [  # "ADASYN",
+             "SMOTE",
             "SMOTEENN",
             "NearMiss",
             "SMOTETomek",
-            "SMOTE",
             "TomekLinks"]
         self.use_fs_data = False
         self.modelName = "LogisticRegression"
@@ -35,7 +35,7 @@ class one_hot:
         self.db = self.client['09_TrainingData']
 
     def training_model(self):
-
+        counter = 0
         for tech in self.balancing_technique:
 
             # One Hot Encoder
@@ -179,9 +179,9 @@ if __name__ == '__main__':
 
     fp = "C:/Users/shubh/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study I/02 Input_Data/0" \
          "3 Model"
-    oh = one_hot(fp, "chi2")
+    oh = one_hot(fp, None)
     X_test = sc.sparse.load_npz(fp + '/NPZs/X_test.npz')
+    # X
     SMOTE_y = getCollection('09_TrainingData','SMOTE_y')
     y_test = getCollection('09_TrainingData','y_test')
     oh.training(y_test, X_test)
-
