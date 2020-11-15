@@ -42,9 +42,9 @@ common_post = db.common_post_Combined
 post = pd.DataFrame(list(common_post.find({})))
 # post = pd.DataFrame(list(common_post.find({})))
 common_comment = db.common_comment_Combined
-comment = pd.DataFrame(list(common_comment.find({})))
+# comment = pd.DataFrame(list(common_comment.find({})))
 common_sub_comment = db.common_subcomment_Combined
-sub_comment = pd.DataFrame(list(common_sub_comment.find({})))
+# sub_comment = pd.DataFrame(list(common_sub_comment.find({})))
 
 # Sentiment Dictionary
 client = MongoClient('localhost', 27017)
@@ -78,31 +78,26 @@ print(df2.dtypes, sentiment_Dictionary.dtypes)
 
 
 jn = df2.merge(sentiment_Dictionary, on = 'word', how = 'inner', suffixes = ['', '_1'])
-counts = jn.groupby(by=['onlyText', 'sentiment'], as_index=False).count() # Columns and the aggregation if agg() used
-counts['onlyText'] = counts['onlyText'].str.strip()
-counts = counts.sort_values('word').drop_duplicates(['onlyText'],keep='last')
+# del df2
+sentimentFrame = jn.groupby(by=['onlyText', 'sentiment'], as_index=False).count() # Columns and the aggregation if agg() used
+# r = sentimentFrame.groupby(by=['onlyText', 'sentiment'])['word'].max()
+# del jn
+sentimentFrame['onlyText'] = sentimentFrame['onlyText'].str.strip()
+sentimentFrame = sentimentFrame.sort_values('word').drop_duplicates(['onlyText', 'sentiment'], keep='last')
+# sentimentFrame = sentimentFrame.sort_values('word').drop_duplicates(['onlyText'], keep='last')
 # counts = counts.drop(['index'], axis = 1)
-text = text.str.strip()
-data_sentiment_post = counts.merge(text, on = 'onlyText', how='right', suffixes=['_post',''])
-# sentiment_frame
-# sentiment_frame['word'].to_csv('C:/Users/shubh/Documents/sentiment_frame.csv')
-# sentiment_Dictionary['word'].to_csv('C:/Users/shubh/Documents/sentiment_dict.csv')
-#
-#
-# sent_dict = pd.read_csv('C:/Users/shubh/Documents/sentiment_dict.csv')
-# sent_frame = pd.read_csv('C:/Users/shubh/Documents/sentiment_frame.csv')
-#
-# sent_frame.word.astype(str)
-# sent_dict.word.astype(str)
-#
-# r = sent_frame.merge(sent_dict, on = 'word', suffixes=['','_1'], how='inner')
+post['onlyText'] = post['onlyText'].str.strip()
+data_sentiment_post = post.merge(sentimentFrame, on = 'onlyText', how='left', suffixes=['_post',''])
+# Done till here
+# data_sentiment_post < - left_join(data_sentiment, sentimentFrame, by="onlyText")
+# del sentimentFrame
+data_sentiment_test_noDupl = post.groupby(['Id', 'source_Type', 'username', 'text', 'likes', 'timestamp',
+       'hashtags', 'owner_id', 'url', 'TagList', 'onlyText', 'data_Type'])['_id'].count().reset_index(name='count')
 
+# Filter Data
+filter_1 = data_sentiment_test_noDupl['count']==1
+data_sentiment_test_noDupl = data_sentiment_test_noDupl[filter_1]
 
-
-
-
-
-
-
-
-
+# Memory Issues
+test = data_sentiment_test_noDupl.merge(data_sentiment_post, on='onlyText', how='left', suffixes=['_noDup',''])
+# del data_sentiment_test_noDupl
