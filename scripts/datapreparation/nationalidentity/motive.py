@@ -1,5 +1,5 @@
 import pandas as pd
-from mongoConnection import getCollection, insertCollection
+from scripts.mongoConnection import getCollection, insertCollection
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
@@ -19,6 +19,8 @@ class IdentityMotiveTagging:
         self.continuity = []
         self.distinctiveness = []
         self.selfEsteem = []
+        self.lemmatizer = WordNetLemmatizer()
+        self.stop_words = set(stopwords.words('english'))
 
     def remove_stop_words(self, listOfWords):
         """removes stop words from the list of words, lemmatizes the words and returns the final output
@@ -29,8 +31,8 @@ class IdentityMotiveTagging:
         :return: list of words after lemmatization and removing stop words
         :rtype: List
         """
-        filtered_list = [w for w in listOfWords if not w in stop_words]
-        lemmatized_output = ' | '.join([lemmatizer.lemmatize(w) for w in filtered_list])
+        filtered_list = [w for w in listOfWords if not w in self.stop_words]
+        lemmatized_output = ' | '.join([self.lemmatizer.lemmatize(w) for w in filtered_list])
         return lemmatized_output
 
 
@@ -40,21 +42,23 @@ class IdentityMotiveTagging:
 
         :param df: DataFrame in which the identity motives are to be searched
         :type df: Pandas Dataframe
+
+        :return df: Dataframe with identity motive tagged
+        :rtype df: Pandas DataFrame
         """
-        df = df[['Id', 'source_Type', 'data_Type', 'onlyText', 'sentiments', 'country', 'countryem']]
-
-        df['meaning'] = df['onlyText'].str.contains(rf'\b{self.meaning}\b',regex=True, case=False).astype(int)
-        df['belonging'] = df['onlyText'].str.contains(rf'\b{self.belonging}\b',regex=True, case=False).astype(int)
-        df['continuity'] = df['onlyText'].str.contains(rf'\b{self.continuity}\b',regex=True, case=False).astype(int)
-        df['distinctiveness'] = df['onlyText'].str.contains(rf'\b{self.distinctiveness}\b',regex=True, case=False).astype(int)
-        df['efficacy'] = df['onlyText'].str.contains(rf'\b{self.efficacy}\b',regex=True, case=False).astype(int)
-        df['selfEsteem'] = df['onlyText'].str.contains(rf'\b{self.selfEsteem}\b',regex=True, case=False).astype(int)
-
+        df = df.loc[:, ['Id', 'source_Type', 'data_Type', 'onlyText', 'sentiments', 'country', 'countryem']]
+        df.loc[df['onlyText'].str.contains(rf'\b{self.meaning}\b',regex=True, case=False), 'meaning'] = 1
+        df.loc[df['onlyText'].str.contains(rf'\b{self.belonging}\b',regex=True, case=False), 'belonging'] = 1
+        df.loc[df['onlyText'].str.contains(rf'\b{self.continuity}\b',regex=True, case=False), 'continuity'] = 1
+        df.loc[df['onlyText'].str.contains(rf'\b{self.distinctiveness}\b',regex=True, case=False), 'distinctiveness'] = 1
+        df.loc[df['onlyText'].str.contains(rf'\b{self.efficacy}\b',regex=True, case=False), 'efficacy'] = 1
+        df.loc[df['onlyText'].str.contains(rf'\b{self.selfEsteem}\b',regex=True, case=False), 'selfEsteem'] = 1
+        df.fillna(0, inplace=True)
         df = self.unpivot(df)
-        insertCollection('08_PreTrain', 'train_data', df)
-    
+        return df
 
-    def unpivot(self, df):
+    @staticmethod
+    def unpivot(df):
         """Unpivot function splits the dataframe in list of dataframes having 50000 rows each, then unpivots each 
         dataframe on identity motives columns.
         Finally, it filteres the records which are having a value either in country or countryem column, removes
@@ -68,18 +72,18 @@ class IdentityMotiveTagging:
         """
         n = 50000
         df_list = [df[i:i+n] for i in range(0, df.shape[0], n)]
-        df_unpivoted = pd.concat([i.melt(id_vars=(['Id', 'source_Type', 'data_Type', 'onlyText', 'sentiments',
+        df = pd.concat([i.melt(id_vars=(['Id', 'source_Type', 'data_Type', 'onlyText', 'sentiments',
                                                    'country', 'countryem']),
                                          value_vars=(['meaning', 'belonging', 'continuity', 'distinctiveness',
                                                       'efficacy', 'selfEsteem']),
                                          var_name='identityMotive',
                                          value_name='flag') for i in df_list], ignore_index=True)
 
-        df_unpivoted = df_unpivoted[df_unpivoted['flag']!=0]
-        Country_Filter = ((df_unpivoted['country'] != "") | (df_unpivoted['countryem'] != ""))
-        df_unpivoted = df_unpivoted[Country_Filter]
-        del df_unpivoted['flag']
-        return df_unpivoted
+        df = df[df['flag']!=0]
+        Country_Filter = ((df['country'] != "") | (df['countryem'] != ""))
+        df = df[Country_Filter]
+        del df['flag']
+        return df
 
 
     def get_clean_motives(self, motive):
@@ -113,16 +117,20 @@ class IdentityMotiveTagging:
 
 
 if __name__ == '__main__':
-    lemmatizer = WordNetLemmatizer()
-    stop_words = set(stopwords.words('english'))
+    
     identityMotiveTagging = IdentityMotiveTagging()
     identityMotiveTagging.get_synonyms()
 
-    df_post = getCollection('07_PreProcessing', 'ni_post_preprocessed')
-    identityMotiveTagging.tagging(df_post)
+    df = getCollection('07_PreProcessing', 'ni_post_preprocessed')
+    df = identityMotiveTagging.tagging(df)
+    insertCollection('08_PreTrain', 'train_data', df)
 
-    df_comment = getCollection('07_PreProcessing', 'ni_comment_preprocessed')
-    identityMotiveTagging.tagging(df_comment)
+    df = getCollection('07_PreProcessing', 'ni_comment_preprocessed')
+    df = identityMotiveTagging.tagging(df)
+    insertCollection('08_PreTrain', 'train_data', df)
 
-    df_subcomment = getCollection('07_PreProcessing', 'ni_subcomment_preprocessed')
-    identityMotiveTagging.tagging(df_subcomment)
+
+    df = getCollection('07_PreProcessing', 'ni_subcomment_preprocessed')
+    df = identityMotiveTagging.tagging(df)
+    insertCollection('08_PreTrain', 'train_data', df)
+
