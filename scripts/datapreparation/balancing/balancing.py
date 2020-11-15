@@ -260,14 +260,14 @@ if __name__ == "__main__":
 
 
     
-    filepath=input("Enter the path of your file with '/': ")
+    filepath = input("Enter the path of your file with '/': ")
     
     if os.path.isdir(filepath):
         f = open(r"filepath", "w")
     else:
         print ("Directory does not exist.")
 
-    balancing_input= BalancingData(filepath,df_source_collection)
+    balancing_input = BalancingData(filepath,df_source_collection)
     balancing_input.split_train_test()
     balancing_input.threading_function()
 
