@@ -93,6 +93,7 @@ st = SMOTETomek()
 nm = NearMiss()
 tl = TomekLinks()
 
+##TODO Rework naming convention to something more appealing and easier to work with
 
 #### FIT BALANCING #### Multi Threading Part
 # Thread1 # ADASYN

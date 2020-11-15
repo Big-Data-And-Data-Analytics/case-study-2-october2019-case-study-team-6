@@ -68,7 +68,7 @@ class Model:
         disp.ax_.set_title("Normalized confusion matrix")
         plt.xticks(rotation=90)
 
-    def predict_model(def):
+    def predict_model(self):
         pass
 
 #if __name__ == "__main__":
@@ -90,14 +90,18 @@ rf = RandomForestClassifier(n_jobs=n_cores, n_estimators=estimators, random_stat
 svm = SGDClassifier(n_jobs=n_cores, loss='hinge', penalty='l2', alpha=iterations, random_state=seed, max_iter=iterations, tol=None)
 
 # Get y_test from MongoDB
-y = mc.getCollection("09_TrainingData", "y_test")
-y = y.drop(["_id", "id"], axis=1)
+y_test = mc.getCollection("09_TrainingData", "y_test")
+y_test = y_test.drop(["_id", "id"], axis=1)
 
+# Get _y
+y = mc.getCollection("09_TrainingData", "TomekLinks_y")
+y = y.drop(["_id", "id"], axis=1)
 
 # Load x.npz with balancing
 X = modeller.load_X(filepath=filepath_NPZ, balancing=True, balancing_tech="TomekLinks")
 
 model = modeller.train_model(model=logreg, X=X, y=y)
+
 modeller.save_model(model=model, filepath=filepath_Model + "Logistic_Regression.model")
 
 X_test = modeller.import_X_test(filepath=filepath_NPZ + "X_test.npz")
@@ -109,3 +113,12 @@ features = modeller.load_features(
     fs_tech="chi2",
     X_test=X_test
     )
+
+
+#######
+## Wir machen das so:
+# Egal welche Balancing Technique ausgewählt wird, wir laden X und Y entsprechend gleich mit
+#   - Aber wie kann ich Y mitladen? ich glaube wir sollen keine Funktion so innerhalb der Funktion nutzen
+# Dann wird das model trainiert
+# Dann kann man das model evaluieren
+# Dann kann man das model speichern bzw. predicts drauf ausführen
