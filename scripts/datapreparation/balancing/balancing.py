@@ -14,7 +14,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import Binarizer
 
-
+##TODO Currently we are using test_train_split function from sklearn, the model shows that 2 classes are not present in the traindata. We should try StratifiedShuffleSplit, as far as i understood it, keep percentage of each class. Implement besides train_test_split
 class BalancingData:
     """BalancingData class represents performance of different balancing data on 'X' and 'y' train data.
         The sequentially used functions  are:
@@ -32,7 +32,7 @@ class BalancingData:
         self.filepath = filepath
         self.new_data = new_data
 
-    def split_train_test(self):
+    def split_train_test(self, test_size, random_state):
 
         """ 'X' variable is assigned 'onlyText' column and 'y' variable has the 'identityMotive'.  The 'X' and 'y' are 
         then divided into test and train data.
@@ -46,7 +46,7 @@ class BalancingData:
         """
         X = self.new_data[['onlyText']]
         y = self.new_data[['identityMotive']]
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=69)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
 
         print(type(X_train))
         cv = CountVectorizer()
@@ -269,7 +269,4 @@ if __name__ == "__main__":
 
     balancing_input = BalancingData(filepath,df_source_collection)
     balancing_input.split_train_test()
-    balancing_input.threading_function()
-
-
-
+    balancing_input.threading_function(test_size=0.3, random_state=69)

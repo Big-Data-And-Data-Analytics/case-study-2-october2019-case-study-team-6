@@ -1,5 +1,4 @@
 import pickle as pi
-from pymongo import collection
 import scipy as sc
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,6 +10,17 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, f1_score, precision_score, recall_score, plot_confusion_matrix
 
+import yaml
+from os import listdir
+from os.path import isfile, join
+from sklearn.feature_extraction.text import CountVectorizer
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import wordnet
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+import nltk
+
+##TODO Add to the evaluation function something that creates a dataframe where all necessary data for evaluation (accuracy, f1, recall, ...) is stored for easier overview
 class Model:
 
     my_tags = ['belonging', 'meaning', 'efficacy', 'distinctivness', 'self esteem', 'continuity']
@@ -92,8 +102,142 @@ class Model:
         if save_cm == True:
             plt.savefig(filepath, bbox_inches='tight', dpi=199)
 
-    def predict_model(self):
-        pass
+    def predict_model(self, filepath_model, balancing_techniques):
+        vocab_collection = mc.getCollection(db="09_TrainingData", col="CountVectorVocabulary")
+        vocab_list = vocab_collection['dict'].to_list()
+        vocab = yaml.load(vocab_list[0])
+
+        modelFiles = [f for f in listdir(filepath_model) if isfile(join(filepath_model, f))]
+
+        # Filter FileNamesList for Models
+        def features_files(model):
+            return '.tchq' not in model
+        
+        # Filtering Data using features_files
+        exclude_tchq = filter(features_files, modelFiles)
+        modelFiles = list(exclude_tchq)
+        modelFiles.sort()
+        modelCounter = 0
+
+        nltk.download('punkt')
+        nltk.download('wordnet')
+
+        lemmatizer = WordNetLemmatizer()
+        stop_words = set(stopwords.words('english'))
+
+        def removeStopWords(listOfWords):
+            filtered_list = [w for w in listOfWords if not w in stop_words]
+            lemmatized_output = ' '.join([lemmatizer.lemmatize(w) for w in filtered_list])
+            return lemmatized_output
+        def lemmatizeRemoveStopWords(df):
+            df = df.str.lower()
+            df=df.replace(r'@', '', regex=True)
+            df=df.replace(r'http\S+', '', regex=True).replace(r'http \S+', '', regex=True).replace(r'www\S+', '', regex=True)
+            df=df.str.replace('[^\w\s]','')
+            df=df.str.replace('\s\s+',' ')
+            df = df.str.strip()
+            df=df.apply(word_tokenize)
+            df=df.apply(removeStopWords)
+            return df
+
+        # Load Vocab for Non Feature Selected Models
+        def loadNewDataForPrediction(vocab):
+            validation_set = list()
+            while True:
+                val = input('Enter n number of validation texts, type "EXIT" to exit\n')
+                if val.lower() == 'exit':
+                    break
+                else:
+                    validation_set.append(val)
+            valid = pd.Series(validation_set)
+            valid = lemmatizeRemoveStopWords(valid)
+            return valid
+        
+        #post = mc.getCollection(db="06_NationalIdentity_Translated", col="ni_post_translated")
+        #comment = mc.getCollection(db="06_NationalIdentity_Translated", col="ni_comment_translated")
+        #subcomment = mc.getCollection(db="06_NationalIdentity_Translated", col="ni_subcomment_translated")
+
+        continueFlag = False
+        while True:
+            if continueFlag:
+                print('\n \n \n \n \n')
+                q = input('~ Do you want to continue, type J/N~\n')
+                if q.lower() == 'j':
+                    pass
+                else:
+                    break
+
+            modelCounter = 0
+            for model in modelFiles:
+                if '.tchq' not in model:
+                    print(modelCounter, model)
+                modelCounter += 1
+            val = input('~ Enter Model Number, type "EXIT/exit" to Exit ~\n')
+            if val.lower() == 'exit':
+                break
+            else:
+                # Load Model
+                val = int(val)
+                mdl = pi.load(open(filepath_model + modelFiles[val], 'rb'))
+                print('Model Loaded')
+                # Load Feature Data / Normal Data
+                if 'fs' in modelFiles[val]:
+                    print('Feature Data')
+                    cnt = 0
+                    for tech in balancing_techniques:
+                        print(f'Balancing Technique: {tech}')
+                        if tech in modelFiles[val]:
+                            if 'chi2' in modelFiles[val]:
+                                # Load Feature Selection Object
+                                fs = pi.load(open(filepath_model + 'Feature_' + balancing_techniques[cnt] + 'fs_chi2.tchq', 'rb'))
+                                print(filepath_model + 'Feature_' + balancing_techniques[cnt] + 'fs_chi2.tchq')
+                                # Get New Data
+                                newData = loadNewDataForPrediction(vocab)
+
+                                # Transform using Count Vectorizer and Entire Vocab
+                                cv_pred = CountVectorizer(vocabulary=vocab)
+                                x_pred = cv_pred.transform(newData)
+
+                                # Transform to Feature Selected Data
+                                X_test_chi2 = fs.transform(x_pred)
+                                x_pred = X_test_chi2
+
+                                # Predict
+                                y_pred_validation = mdl.predict(x_pred)
+                                print(y_pred_validation)
+                            else:
+                                # Load Feature Selection Object
+                                fs = pi.load(open(filepath_model + 'Feature_' + balancing_techniques[cnt] + 'fs_chi2.tchq', 'rb'))
+                                print(filepath_model + 'Feature_' + balancing_techniques[cnt] + 'fs_chi2.tchq')
+                                # Get New Data
+                                newData = loadNewDataForPrediction(vocab)
+
+                                # Transform using Count Vectorizer and Entire Vocab
+                                cv_pred = CountVectorizer(vocabulary=vocab)
+                                x_pred = cv_pred.transform(newData)
+
+                                # Transform to Feature Selected Data
+                                X_test_chi2 = fs.transform(x_pred)
+                                x_pred = X_test_chi2
+
+                                # Predict
+                                y_pred_validation = mdl.predict(x_pred)
+                                print(y_pred_validation)
+                            break
+                        cnt += 1
+                else:
+                    print('Normal Data')
+                    print(modelFiles[val])
+
+                    newData = loadNewDataForPrediction(vocab)
+                    cv_pred = CountVectorizer(vocabulary=vocab)
+                    x_pred = cv_pred.transform(newData)
+                    y_pred_validation = mdl.predict(x_pred)
+                    print(y_pred_validation)
+                    ## TODO See if text can be shown as with the predicted value
+
+            continueFlag = True
+
 
 #if __name__ == "__main__":
 
@@ -107,59 +251,59 @@ seed = 69
 n_cores = 6
 iterations = 100
 estimators = 100
+alpha = 0.1
+learning_rate = "optimal"
 
 # Istanciate classes
 modeller = Model()
 dt = DecisionTreeClassifier(random_state=seed)
-logreg = LogisticRegression(n_jobs=n_cores, max_iter=seed)
+logreg = LogisticRegression(n_jobs=n_cores, max_iter=iterations)
 nb = MultinomialNB()
 rf = RandomForestClassifier(n_jobs=n_cores, n_estimators=estimators, random_state=seed)
-svm = SGDClassifier(n_jobs=n_cores, loss='hinge', penalty='l2', alpha=iterations, random_state=seed, max_iter=iterations, tol=None)
+svm = SGDClassifier(  # New parameters added -> experimental
+    n_jobs=n_cores,
+    loss='hinge',
+    penalty='l2',
+    alpha=alpha,
+    random_state=seed,
+    max_iter=iterations,
+    learning_rate=learning_rate,
+    tol=None)
 
 # Model selection parameters
 models = [dt, logreg, nb, rf, svm]
 balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
 featureSelections = ["None", "chi2", "f_classif"]
 
-for model in models:
-    for balancingTechnique in balancingTechniques:
-        for featureSelection in featureSelections:
-            print("Model: " + str(model) + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection + " started!")
-            # import train and test data
-            X, X_test, y, y_test = modeller.import_train_test_data(
-                filepath=filepath_NPZ,
-                database="09_TrainingData",
-                balancing_technique=balancingTechnique,
-                feature_selection=False,
-                fs_function=featureSelections)
+# for model in models:
+#     for balancingTechnique in balancingTechniques:
+#         for featureSelection in featureSelections:
+#             print("Model: " + str(model) + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection + " started!")
+#             # import train and test data
+#             X, X_test, y, y_test = modeller.import_train_test_data(
+#                 filepath=filepath_NPZ,
+#                 database="09_TrainingData",
+#                 balancing_technique=balancingTechnique,
+#                 feature_selection=False,
+#                 fs_function=featureSelections)
 
-            trained_model = modeller.train_model(model=model, X=X, y=y)
+#             trained_model = modeller.train_model(model=model, X=X, y=y)
 
-            modeller.evaluate(
-                model=trained_model,
-                x_pred=X_test,
-                y_test=y_test,
-                average="macro",
-                normalize_cm="true",
-                save_cm=True,
-                filepath=filepath_Eval + str(model) + "_" + balancingTechnique + "_" + featureSelection + ".png")
+#             modeller.evaluate(
+#                 model=trained_model,
+#                 x_pred=X_test,
+#                 y_test=y_test,
+#                 average="macro",
+#                 normalize_cm="true",
+#                 save_cm=True,
+#                 filepath=filepath_Eval + str(model) + "_" + balancingTechnique + "_" + featureSelection + ".png")
 
-            modeller.save_model(
-                model=trained_model,
-                filepath=filepath_Model + str(model) + "_" + balancingTechnique + "_" + featureSelection + ".model")
+#             modeller.save_model(
+#                 model=trained_model,
+#                 filepath=filepath_Model + str(model) + "_" + balancingTechnique + "_" + featureSelection + ".model")
 
-            print("Model: " + str(model) + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection + " done!")
+#             print("Model: " + str(model) + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection + " done!")
 
-#### Keine Ahnung was das macht
-# features = modeller.load_features(
-#     filepath=filepath_Model,
-#     balancing=True,
-#     balancing_tech="TomekLinks",
-#     fs_tech="chi2",
-#     X_test=X_test
-#     )
-
-
-#######
-# Dataframe anlegen das und da alle codes und parameter reinschreiben?
-# - Erleichtert die Evaluierung enorm
+modeller.predict_model(
+    filepath_model=filepath_Model,
+    balancing_techniques=balancingTechniques)
