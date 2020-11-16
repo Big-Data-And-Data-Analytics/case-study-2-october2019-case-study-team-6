@@ -23,3 +23,5 @@ scripts/datapreparation/extraction/.vscode/settings.json
 .idea/*
 .vscode/settings.json
 /scripts/datapreparation/sentiment/test.R
+scripts/model/__pycache__/Prediction.cpython-38.pyc
+scripts/model/__pycache__/*
