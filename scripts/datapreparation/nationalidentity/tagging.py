@@ -13,6 +13,8 @@ class NationalIdentityTagging:
         3 :func: extract_country_emojis
         4 :func: find_national_identity
     """
+    def __init__(self):
+        self.flags = []
 
     def find_national_identity(self, text):
         """ returns list of countries present in the text given to this function
@@ -41,18 +43,17 @@ class NationalIdentityTagging:
     def extract_country_emojis(self, emojis):
         """returns the emojis which are flags of a country
         
-        List of flag emojis is collected from the 00_NationalIdentity_Assets database. The list of emojis passed to 
+        List of flag emojis is collected from the 00_Assets database. The list of emojis passed to 
         this function is compared against the flag emojis from the database. All matching emojis are returned
 
         :param emojis: emojis from the 'emojis' column of a dataframe
-        :type text: list
+        :type emojis: list
 
         :return: country_flags- list of countries found in the text
         :rtype: []
         """
 
-        global flags_set
-        country_flags = [flag for flag in emojis if flag in flags_set]
+        country_flags = [flag for flag in emojis if flag in self.flags]
         return country_flags
 
 
@@ -65,7 +66,7 @@ class NationalIdentityTagging:
         Finally text without emojis is returned.
 
         :param onlyText: text from the 'onlyText' column of a dataframe
-        :type text: String
+        :type onlyText: String
 
         :return: onlyText- Text without emojis
         :rtype: String
@@ -88,7 +89,7 @@ class NationalIdentityTagging:
         Finally text without emojis is returned.
 
         :param onlyText: text from the 'onlyText' column of a dataframe
-        :type text: String
+        :type onlyText: String
 
         :return: emojis- list of emojis
         :rtype: List
@@ -100,18 +101,29 @@ class NationalIdentityTagging:
             return list(emojiList)
 
 
-    def postData(self, post):
+
+    def get_flags(self):
+        """Fetches flag_emojis from the database '00_Assets' and returns list of flags
+
+        :return: list of flags
+        :rtype: List
+        """
+        flags = getCollection('00_Assets', 'flag_emojis')
+        flags = flags['flag_emoji'].str.strip()
+        self.flags = list(flags)
+
+
+    def postData(self, post, collection):
         """Extracts emojis and country from a dataframe and returns transformed dataframe
 
         To extract emojis and countries from a dataframe given to this function, it applies extract_emojis,
         remove_emojis_from_onlytext, extract_country_emojis and find_national_identity on the dataframe.
-        Finally the resultant dataframe is returned.
+        Finally the resultant dataframe is inserted into the database.
         
         :param1 post: dataframe of post/comment/subcomment
+        :param2 collection: Collection name in which the result is to be inserted
         :type1 post: pandas dataframe object
-
-        :return: post- dataframe with extracted emojis, flags, national identity
-        :rtype: pandas.dataframe
+        :type2 collection: String
         
         """
         # Initialisations
@@ -123,37 +135,21 @@ class NationalIdentityTagging:
         post['countryem'] = post['emojis'].apply(self.extract_country_emojis)
         post['country'] = post['text'].apply(self.find_national_identity)
 
-        return post
+        insertCollection('05_NationalIdentity', collection, post)
 
 if __name__ == "__main__":
     
     nationalIdentityTaggingObj = NationalIdentityTagging()
-
-
-    flags = getCollection('00_NationalIdentity_Assets', 'flag_emojis')
-    # TODO Add inside a static function
-    flags = flags['flag_emoji'].str.strip()
-    flags_set = list(flags)
+    nationalIdentityTaggingObj.get_flags()
 
     df = getCollection('04_NationalIdentity_Sentiment', 'sentiment_post_Collection')
-
-    # Target Collection
-    ni_post = nationalIdentityTaggingObj.postData(df)
-    # TODO Move the insert statements to functions
-    insertCollection('05_NationalIdentity', 'ni_post', ni_post)
+    nationalIdentityTaggingObj.postData(df, 'ni_post')
 
     df = getCollection('04_NationalIdentity_Sentiment', 'sentiment_comment_Collection')
-
-    # Target Collection
     df.rename(columns={'Comment':'text'}, inplace=True)
-    ni_comment = nationalIdentityTaggingObj.postData(df)
-    # TODO Move the insert statements to functions
-    insertCollection('05_NationalIdentity', 'ni_comment', ni_comment)
+    nationalIdentityTaggingObj.postData(df, 'ni_comment')
     
     df = getCollection('04_NationalIdentity_Sentiment', 'sentiment_subcomment_Collection')
-
-    # Target Collection
     df.rename(columns={'Sub_Comment':'text'}, inplace=True)
-    ni_subcomment = nationalIdentityTaggingObj.postData(df)
-    # TODO Move the insert statements to functions
-    insertCollection('05_NationalIdentity', 'ni_subcomment', ni_subcomment)
+    nationalIdentityTaggingObj.postData(df, 'ni_subcomment')
+
