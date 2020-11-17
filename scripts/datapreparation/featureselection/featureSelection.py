@@ -4,7 +4,7 @@ import scipy as sci
 from scripts.mongoConnection import getCollection
 from sklearn.feature_selection import SelectKBest, chi2, f_classif
 
-
+##TODO Rework naming convention to something more appealing and easier to work with
 class FeatureSelection():
     '''FeatureSelection class is used for initializing number of features, path of the file from where the balanced
         data is fetched and selection features from the data  '''

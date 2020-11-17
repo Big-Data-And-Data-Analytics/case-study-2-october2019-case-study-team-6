@@ -1,5 +1,43 @@
 # National Identity Case Study
 
+#### Sprint 5 Status [18-Nov to 25-Nov]
+
+#### Sprint 4 Status [05-Nov to 18-Nov]
+**Highlights:**
+1. Critical Pending Tasks: 
+	1. ***One Hot Encoding Migration (Differed thrice)***
+    2. ***Manuscript Changes***
+          1. Total rework needed, all will read papers again
+
+#|Sprint|Start Date|End Date|Title|Feature Type|Owner|Status|Continues|Comments|
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | 
+27|4|05-Nov|11-Nov|One Hot Encoding|Old|`Abhinav`|`Differ`|3|To be migrated
+28|4|05-Nov|11-Nov|Feature Selection|Old|`Varad`|`Differ`|0|Converted to OOPs, Find optimal Evaluation metric(framework)
+29|4|05-Nov|11-Nov|Model|Old|`Max`|`Differ`|0|Move all models into one class, change the code for reusability, similar codes break into `Differ`ent functions
+30|4|05-Nov|11-Nov|Final Main Test Script|New|`Shubham`|`Differ`|0|
+
+#### Sprint 3 Status [29-Oct to 04-Nov]
+**Highlights:**
+1. Critical Pending Tasks: 
+	1. ***One Hot Encoding Migration (Differed thrice)***
+    2. ***Manuscript Changes***
+		1. Evaluation  #current_owner - Max
+		2. Related Work Changes  #current_owner - Mavis, Shubham
+		3. Diagrams for Internal processes #current_owner - None
+		4. Intro and Limitation additions #current_owner - Abhinav
+		5. Citations #current_owner - Shubham
+		6. Conclusion #current_owner - None
+
+#|Sprint|Start Date|End Date|Title|Feature Type|Owner|Status|Continues|Comments|
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | 
+19|3|29-Oct|04-Nov|One Hot Encoding|Old|`Abhinav`|`Differ`|2|To be migrated
+20|3|29-Oct|04-Nov|Combined Data Model |Old|`Max`|`Done`|1|Combining all the columns into a datamodel, renaming columns to bind
+21|3|29-Oct|04-Nov|Balancing|Old|`Mavis`|`Done`|0|Converted to OOPs
+22|3|29-Oct|04-Nov|Feature Selection|Old|`Unassigned`|`Differ`|0|Converted to OOPs, Find optimal Evaluation metric(framework)
+23|3|29-Oct|04-Nov|Translation |Old|`Varad`|`Done`|0|Convert to OOPs, create a new class
+24|3|29-Oct|04-Nov|Model|Old|`Unassigned`|`Differ`|0|Move all models into one class, change the code for reusability, similar codes break into `Differ`ent functions
+25|3|29-Oct|04-Nov|Main Test Script|New|`Shubham`|`Done`|1|
+26|3|29-Oct|04-Nov|Related Work|Paper|`Mavis`|`Done`|0|
 
 #### Sprint 2 Status [23-Oct to 28-Oct]
 
