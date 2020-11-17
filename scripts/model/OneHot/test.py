@@ -10,12 +10,14 @@ from pymongo import MongoClient
 from scripts.mongoConnection import getCollection, insertCollection
 from sklearn.preprocessing import OneHotEncoder
 
-class one_hot:
-    """One Hot class provides function to apply OneHot encoding using logistic regression on the given training and testing data to
-    generate prediction with accuracy functions
+class one_hot: #TODO Capital name OneHot
+    """One Hot class provides function to apply OneHot encoding using logistic regression on the given training and
+    testing data to generate prediction with accuracy functions
         """
     def __init__(self, filepath, score_function):
-        self.filepath = "/Users/Shared/Relocated Items/Security/Abhinav's Documents/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study I/02 Input_Data/03 Model"
+        #TODO Hardcoded change to variable
+        self.filepath = "/Users/Shared/Relocated Items/Security/Abhinav's Documents/SRH IT/Kinner, Maximilian (SRH Hochs" \
+                        "chule Heidelberg Student) - 06 Case Study I/02 Input_Data/03 Model"
         self.X_test = sc.sparse.load_npz(filepath + '/NPZs/X_test.npz')
         self.onehotencoder = OneHotEncoder(sparse=False)
         self.modelName = "LogisticRegression"
@@ -26,18 +28,20 @@ class one_hot:
                                     "SMOTE",
                                     "TomekLinks"]
         self.score_function = 'chi2'
-        self.client = MongoClient('localhost', 27017)
-        self.db = self.client['09_TrainingData']
-        self.use_fs_data = False
-        self.acc_thresh = 0.0
-        self.SMOTE_y = getCollection('09_TrainingData', 'SMOTE_y')
+        self.client = MongoClient('localhost', 27017) #TODO Remove
+        self.db = self.client['09_TrainingData'] #TODO Remove
+        self.use_fs_data = False #TODO Parameterized
+        self.acc_thresh = 0.0 #TODO Parameterized
+        self.SMOTE_y = getCollection('09_TrainingData', 'SMOTE_y') #TODO Remove
 
     def training_model(self,y_test, X_test):
         counter = 0
-
+        """
         #Loading y_test and X_test
         y_test = getCollection('09_TrainingData', 'y_test')
+        """
         y_test = y_test.drop(["_id", "id"], axis=1)
+
         y_t = self.onehotencoder.fit_transform(y_test[['identityMotive']])
         y_t1 = pd.DataFrame(y_t[:, 0].tolist()).astype(str)
 
@@ -66,11 +70,13 @@ class one_hot:
 
                 y1 = self.onehotencoder.fit_transform(y[['identityMotive']])
                 y_1 = pd.DataFrame(y1[:, 0].tolist()).astype(str)
+            """
                 y_2 = y1[:, 1].tolist()
                 y_3 = y1[:, 2].tolist()
                 y_4 = y1[:, 3].tolist()
                 y_5 = y1[:, 4].tolist()
                 y_6 = y1[:, 5].tolist()
+            """
 
                 # Load "X"
             if not self.use_fs_data:
@@ -101,6 +107,7 @@ class one_hot:
                     x_pred = X_test_f_classif
                     print(X)
                     #### LOGISTIC REGRESSION ####
+            counter += 1
 
             logreg = LogisticRegression(n_jobs=2, max_iter=1000)
             print("Started fitting model with " + self.balancing_technique[counter])
@@ -129,7 +136,8 @@ class one_hot:
 
         if __name__ == '__main__':
             fp = "/Users/Shared/Relocated Items/Security/Abhinav's Documents/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study I/02 Input_Data/03 Model"
-            oh = one_hot(fp, None)
+            # TODO Extract Train y here, pass to class
+            oh = one_hot(fp, None) #TODO as a variable
             X_test = sc.sparse.load_npz(fp + '/NPZs/X_test.npz')
             # X
             #SMOTE_y = getCollection('09_TrainingData', 'SMOTE_y')
