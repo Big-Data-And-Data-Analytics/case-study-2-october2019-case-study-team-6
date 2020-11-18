@@ -1,4 +1,5 @@
 import pickle as pi
+from pandas.core.indexes.range import RangeIndex
 import scipy as sc
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -94,6 +95,11 @@ class Model:
         print('precision_score\n %s' % precision_score(y_true, y_pred, average=average))
         print('recall_score\n %s' % recall_score(y_true, y_pred, average=average))
         #print('confusion matrix\n %s' % confusion_matrix(y_true, y_pred, labels=self.my_tags))
+        
+        accuracy = accuracy_score(y_true, y_pred)
+        f1 = f1_score(y_true, y_pred, average=average)
+        precision = precision_score(y_true, y_pred, average=average)
+        recall = recall_score(y_true, y_pred, average=average)
 
         disp = plot_confusion_matrix(model, x_pred, y_true, display_labels=self.my_tags, cmap=plt.cm.Blues, normalize=normalize_cm)
         disp.ax_.set_title("Normalized confusion matrix")
@@ -102,10 +108,12 @@ class Model:
         if save_cm == True:
             plt.savefig(filepath, bbox_inches='tight', dpi=199)
 
+        return accuracy, f1, precision, recall
+
     def predict_model(self, filepath_model, balancing_techniques):
         vocab_collection = mc.getCollection(db="09_TrainingData", col="CountVectorVocabulary")
         vocab_list = vocab_collection['dict'].to_list()
-        vocab = yaml.load(vocab_list[0])
+        vocab = yaml.safe_load(vocab_list[0])
 
         modelFiles = [f for f in listdir(filepath_model) if isfile(join(filepath_model, f))]
 
@@ -152,10 +160,6 @@ class Model:
             valid = pd.Series(validation_set)
             valid = lemmatizeRemoveStopWords(valid)
             return valid
-        
-        #post = mc.getCollection(db="06_NationalIdentity_Translated", col="ni_post_translated")
-        #comment = mc.getCollection(db="06_NationalIdentity_Translated", col="ni_comment_translated")
-        #subcomment = mc.getCollection(db="06_NationalIdentity_Translated", col="ni_subcomment_translated")
 
         continueFlag = False
         while True:
@@ -246,11 +250,14 @@ filepath_NPZ = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs
 filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test/"
 filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test/"
 
+# Create empty evaluation dataframe
+eval_frame = pd.DataFrame(columns=["model", "Balancing", "Features", "Accuracy", "F1-Score", "Precision", "Recall"])
+
 # Model input parameters
 seed = 69
 n_cores = 6
-iterations = 100
-estimators = 100
+iterations = 1000 # Logistic Regression, SVM: Higher value means longer running
+estimators = 10 # Random Forest: Higher value means longer running
 alpha = 0.1
 learning_rate = "optimal"
 
@@ -275,35 +282,52 @@ models = [dt, logreg, nb, rf, svm]
 balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
 featureSelections = ["None", "chi2", "f_classif"]
 
-# for model in models:
-#     for balancingTechnique in balancingTechniques:
-#         for featureSelection in featureSelections:
-#             print("Model: " + str(model) + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection + " started!")
-#             # import train and test data
-#             X, X_test, y, y_test = modeller.import_train_test_data(
-#                 filepath=filepath_NPZ,
-#                 database="09_TrainingData",
-#                 balancing_technique=balancingTechnique,
-#                 feature_selection=False,
-#                 fs_function=featureSelections)
+for model in models:
+    for balancingTechnique in balancingTechniques:
+        for featureSelection in featureSelections:
+            print("Model: " + str(model) + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection + " started!")
+            # import train and test data
+            X, X_test, y, y_test = modeller.import_train_test_data(
+                filepath=filepath_NPZ,
+                database="09_TrainingData",
+                balancing_technique=balancingTechnique,
+                feature_selection=False,
+                fs_function=featureSelections)
 
-#             trained_model = modeller.train_model(model=model, X=X, y=y)
+            trained_model = modeller.train_model(model=model, X=X, y=y)
 
-#             modeller.evaluate(
-#                 model=trained_model,
-#                 x_pred=X_test,
-#                 y_test=y_test,
-#                 average="macro",
-#                 normalize_cm="true",
-#                 save_cm=True,
-#                 filepath=filepath_Eval + str(model) + "_" + balancingTechnique + "_" + featureSelection + ".png")
+            accuracy, f1, precision, recall = modeller.evaluate(
+                model=trained_model,
+                x_pred=X_test,
+                y_test=y_test,
+                average="macro",
+                normalize_cm="true",
+                save_cm=True,
+                filepath=filepath_Eval + str(model) + "_" + balancingTechnique + "_" + featureSelection + ".png")
+            
+            temp_d = {
+                "Model": str(model),
+                "Balancing": balancingTechnique,
+                "Features": featureSelection,
+                "Accuracy": accuracy,
+                "F1-Score": f1,
+                "Precision": precision,
+                "Recall": recall}
 
-#             modeller.save_model(
-#                 model=trained_model,
-#                 filepath=filepath_Model + str(model) + "_" + balancingTechnique + "_" + featureSelection + ".model")
+            temp = pd.DataFrame(data=temp_d, index=[0])
+            eval_frame = pd.concat([eval_frame, temp])
 
-#             print("Model: " + str(model) + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection + " done!")
+            modeller.save_model(
+                model=trained_model,
+                filepath=filepath_Model + str(model) + "_" + balancingTechnique + "_" + featureSelection + ".model")
 
-modeller.predict_model(
-    filepath_model=filepath_Model,
-    balancing_techniques=balancingTechniques)
+            print("Model: " + str(model) + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection + " done!")
+
+print("Modelling done")
+
+eval_frame.reset_index(inplace=True)
+eval_frame.to_csv(filepath_Eval + "Eval_Overview.csv")
+
+# modeller.predict_model(
+#     filepath_model=filepath_Model,
+#     balancing_techniques=balancingTechniques)
