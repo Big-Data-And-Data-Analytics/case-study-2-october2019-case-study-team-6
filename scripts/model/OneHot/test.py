@@ -14,10 +14,9 @@ class one_hot: #TODO Capital name OneHot
     """One Hot class provides function to apply OneHot encoding using logistic regression on the given training and
     testing data to generate prediction with accuracy functions
         """
-    def __init__(self, filepath, score_function):
-        #TODO Hardcoded change to variable
-        self.filepath = "/Users/Shared/Relocated Items/Security/Abhinav's Documents/SRH IT/Kinner, Maximilian (SRH Hochs" \
-                        "chule Heidelberg Student) - 06 Case Study I/02 Input_Data/03 Model"
+    def __init__(self, filepath, score_function, use_fs_data, acc_thresh):
+
+        self.filepath = filepath
         self.X_test = sc.sparse.load_npz(filepath + '/NPZs/X_test.npz')
         self.onehotencoder = OneHotEncoder(sparse=False)
         self.modelName = "LogisticRegression"
@@ -27,11 +26,11 @@ class one_hot: #TODO Capital name OneHot
                                     "SMOTETomek",
                                     "SMOTE",
                                     "TomekLinks"]
-        self.score_function = 'chi2'
-        self.client = MongoClient('localhost', 27017) #TODO Remove
-        self.db = self.client['09_TrainingData'] #TODO Remove
-        self.use_fs_data = False #TODO Parameterized
-        self.acc_thresh = 0.0 #TODO Parameterized
+        self.score_function = score_function
+        self.client = MongoClient('localhost', 27017)
+        self.db = self.client['09_TrainingData']
+        self.use_fs_data = use_fs_data
+        self.acc_thresh = acc_thresh
         self.SMOTE_y = getCollection('09_TrainingData', 'SMOTE_y') #TODO Remove
 
     def training_model(self,y_test, X_test):
@@ -135,12 +134,16 @@ class one_hot: #TODO Capital name OneHot
             print("Logistic Regression Done with One hot Done")
 
         if __name__ == '__main__':
+
             fp = "/Users/Shared/Relocated Items/Security/Abhinav's Documents/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study I/02 Input_Data/03 Model"
-            # TODO Extract Train y here, pass to class
-            oh = one_hot(fp, None) #TODO as a variable
+            score_function = 'chi2'
+            use_fs_data = False
+            acc_thresh = 0.0
+
+            oh = one_hot(fp, score_function,use_fs_data,acc_thresh)
+
             X_test = sc.sparse.load_npz(fp + '/NPZs/X_test.npz')
-            # X
-            #SMOTE_y = getCollection('09_TrainingData', 'SMOTE_y')
+
             y_test = getCollection('09_TrainingData', 'y_test')
             oh.training_model(y_test, X_test)
 
