@@ -107,7 +107,7 @@ class IdentityMotiveTagging:
         """get_synonyms extracts synonyms of six identity motives from the database and assigns them to the
         lists initialized by IdentityMotiveTagging class
         """
-        synonyms = getCollection('00_Assets', 'identity_motives')
+        synonyms = getCollection('00_Assets', 'IdentityMotives')
         self.meaning = self.get_clean_motives(synonyms.Synonyms[0])
         self.efficacy = self.get_clean_motives(synonyms.Synonyms[1])
         self.belonging = self.get_clean_motives(synonyms.Synonyms[2])
