@@ -1,5 +1,4 @@
 import pickle as pi
-from pandas.core.indexes.range import RangeIndex
 import scipy as sc
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -16,7 +15,6 @@ from os import listdir
 from os.path import isfile, join
 from sklearn.feature_extraction.text import CountVectorizer
 from nltk.stem import WordNetLemmatizer
-from nltk.corpus import wordnet
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import nltk
@@ -89,17 +87,17 @@ class Model:
         y_pred = model.predict(x_pred)
         y_true = y_test
 
-        print('classification_report\n %s' % classification_report(y_true, y_pred, target_names = self.my_tags))
-        print('accuracy\n %s' % accuracy_score(y_true, y_pred))
-        print('f1-score\n %s' % f1_score(y_true, y_pred, average=average))
-        print('precision_score\n %s' % precision_score(y_true, y_pred, average=average))
-        print('recall_score\n %s' % recall_score(y_true, y_pred, average=average))
+        print('classification_report\n %s' % classification_report(y_true=y_true, y_pred=y_pred, target_names=self.my_tags))
+        print('accuracy\n %s' % accuracy_score(y_true=y_true, y_pred=y_pred))
+        print('f1-score\n %s' % f1_score(y_true=y_true, y_pred=y_pred, average=average))
+        print('precision_score\n %s' % precision_score(y_true=y_true, y_pred=y_pred, average=average))
+        print('recall_score\n %s' % recall_score(y_true=y_true, y_pred=y_pred, average=average))
         #print('confusion matrix\n %s' % confusion_matrix(y_true, y_pred, labels=self.my_tags))
         
-        accuracy = accuracy_score(y_true, y_pred)
-        f1 = f1_score(y_true, y_pred, average=average)
-        precision = precision_score(y_true, y_pred, average=average)
-        recall = recall_score(y_true, y_pred, average=average)
+        accuracy = accuracy_score(y_true=y_true, y_pred=y_pred)
+        f1 = f1_score(y_true=y_true, y_pred=y_pred, average=average)
+        precision = precision_score(y_true=y_true, y_pred=y_pred, average=average)
+        recall = recall_score(y_true=y_true, y_pred=y_pred, average=average)
 
         disp = plot_confusion_matrix(model, x_pred, y_true, display_labels=self.my_tags, cmap=plt.cm.Blues, normalize=normalize_cm)
         disp.ax_.set_title("Normalized confusion matrix")
@@ -255,7 +253,7 @@ eval_frame = pd.DataFrame(columns=["model", "Balancing", "Features", "Accuracy",
 
 # Model input parameters
 seed = 69
-n_cores = 6
+n_cores = -1
 iterations = 1000 # Logistic Regression, SVM: Higher value means longer running
 estimators = 10 # Random Forest: Higher value means longer running
 alpha = 0.1
