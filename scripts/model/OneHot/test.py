@@ -10,6 +10,8 @@ from pymongo import MongoClient
 from scripts.mongoConnection import getCollection, insertCollection
 from sklearn.preprocessing import OneHotEncoder
 
+#TODO Delete unnecessary files cleanup the folder of one hot and rename the file to onehotencoding no spaces please
+
 class one_hot: #TODO Capital name OneHot
     """One Hot class provides function to apply OneHot encoding using logistic regression on the given training and
     testing data to generate prediction with accuracy functions
@@ -17,7 +19,7 @@ class one_hot: #TODO Capital name OneHot
     def __init__(self, filepath, score_function, use_fs_data, acc_thresh):
 
         self.filepath = filepath
-        self.X_test = sc.sparse.load_npz(filepath + '/NPZs/X_test.npz')
+        self.X_test = sc.sparse.load_npz(filepath + '/NPZs/X_test.npz')#TODO #self to be added
         self.onehotencoder = OneHotEncoder(sparse=False)
         self.modelName = "LogisticRegression"
         self.balancing_technique = ["SMOTE",
@@ -27,13 +29,13 @@ class one_hot: #TODO Capital name OneHot
                                     "SMOTE",
                                     "TomekLinks"]
         self.score_function = score_function
-        self.client = MongoClient('localhost', 27017)
-        self.db = self.client['09_TrainingData']
+        self.client = MongoClient('localhost', 27017) #TODO #Why?
+        self.db = self.client['09_TrainingData'] #TODO #Why? Use mongodbconnection to get/load data needed anywhere
         self.use_fs_data = use_fs_data
         self.acc_thresh = acc_thresh
         self.SMOTE_y = getCollection('09_TrainingData', 'SMOTE_y') #TODO Remove
 
-    def training_model(self,y_test, X_test):
+    def training_model(self,y_test, X_test): #TODO Rename variables to origin or pass data with different variable name
         counter = 0
         """
         #Loading y_test and X_test
@@ -68,14 +70,14 @@ class one_hot: #TODO Capital name OneHot
                 print(type(y))
 
                 y1 = self.onehotencoder.fit_transform(y[['identityMotive']])
-                y_1 = pd.DataFrame(y1[:, 0].tolist()).astype(str)
+                y_1 = pd.DataFrame(y1[:, 0].tolist()).astype(str) #TODO Meaningful variable name? what data does y_1 holds?
             """
                 y_2 = y1[:, 1].tolist()
                 y_3 = y1[:, 2].tolist()
                 y_4 = y1[:, 3].tolist()
                 y_5 = y1[:, 4].tolist()
                 y_6 = y1[:, 5].tolist()
-            """
+            """  #TODO Removee if not using
 
                 # Load "X"
             if not self.use_fs_data:
@@ -129,7 +131,7 @@ class one_hot: #TODO Capital name OneHot
             print('recall_score\n %s' % metrics.recall_score(y_true, y_pred, average="macro"))
             # print('confusion matrix\n %s' % metrics.confusion_matrix(y_true, y_pred, labels=my_tags))
 
-            acc = round(metrics.accuracy_score(y_true, y_pred) * 100, 2)
+            acc = round(metrics.accuracy_score(y_true, y_pred) * 100, 2) # #TODO Remove if not using
 
             print("Logistic Regression Done with One hot Done")
 
