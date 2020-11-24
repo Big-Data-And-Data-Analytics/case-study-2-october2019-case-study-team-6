@@ -13,7 +13,7 @@ from sklearn.preprocessing import OneHotEncoder
 class OneHot:
     """One Hot class provides function to apply OneHot encoding using logistic regression on the given training and
     testing data to generate prediction with accuracy functions
-    OneHotEncoder he features are encoded using a one-hot encoding scheme. This creates a binary column for each category and returns a sparse matrix or dense array (depending on the sparse parameter)
+    OneHotEncoder features are encoded using a one-hot encoding scheme. This creates a binary column for each category and returns a sparse matrix or dense array (depending on the sparse parameter)
     By default, the encoder derives the categories based on the unique values in each feature.
         """
 
@@ -53,9 +53,8 @@ class OneHot:
             print(f'"y" loaded, {self.balancing_technique[counter]}')
             print(type(y))
 
-            y1 = self.onehotencoder.fit_transform(y[['identityMotive']])
-            y_1 = pd.DataFrame(y1[:, 0].tolist()).astype(
-                str)  # TODO Meaningful variable name? what data does y_1 holds?
+            yoh = self.onehotencoder.fit_transform(y[['identityMotive']])
+            yoh1 = pd.DataFrame(yoh[:, 0].tolist()).astype(str)
 
             # Load "X"
             if not self.use_fs_data:
@@ -89,7 +88,7 @@ class OneHot:
 
             logreg = LogisticRegression(n_jobs=6, max_iter=1000)
             print("Started fitting model with " + self.balancing_technique[counter])
-            logreg.fit(X, y_1.values.ravel())
+            logreg.fit(X, yoh1.values.ravel())
             print("Finished fitting model")
 
             print("Started predicting")
@@ -108,7 +107,6 @@ class OneHot:
             print('recall_score\n %s' % metrics.recall_score(y_true, y_t1, average="macro"))
             # print('confusion matrix\n %s' % metrics.confusion_matrix(y_true, y_pred, labels=my_tags))
 
-            acc = round(metrics.accuracy_score(y_true, y_t1) * 100, 2)  # #TODO Remove if not using
 
             print("Logistic Regression Done with One hot Done")
 
