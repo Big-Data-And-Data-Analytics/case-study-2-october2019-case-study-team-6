@@ -11,10 +11,10 @@ class Sentiment:
     :param col_name: passed otherwise
 
 
-    :param new_data: Pass a dataframe with 'onlyText' column to get sentiment for the same
-    :param col_name: Pass the collection name to which it should be loaded, depending on the data type
-    :type new_data: pandas.DataFrame
-    :type col_name: str
+    :param1 new_data: Pass a dataframe with 'onlyText' column to get sentiment for the same
+    :param2 col_name: Pass the collection name to which it should be loaded, depending on the data type
+    :type1 new_data: pandas.DataFrame
+    :type2 col_name: str
 
     :Example:
 
@@ -33,9 +33,10 @@ class Sentiment:
         """
         This method returns sentiment value for each sentence i.e. text passed to it.
 
-        :param sentence
+        :param sentence:
         :type sentence: str
-        :return str
+        :return: sentiment
+        :rtype: str
 
         """
         score = self.analyser.polarity_scores(sentence)

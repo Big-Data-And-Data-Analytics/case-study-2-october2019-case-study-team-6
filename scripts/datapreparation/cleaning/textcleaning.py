@@ -1,7 +1,4 @@
-
-import nltk
-import pandas as pd
-from nltk.corpus import stopwords, wordnet
+from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from scripts.mongoConnection import getCollection, insertCollection
@@ -36,7 +33,9 @@ class TextCleaning:
         """cleans onlyText column of the given dataframe and inserts that dataframe in the '07_PreProcessing' database
         
         :param1 df: Dataframe to Clean
+        :param2 col: Column Name
         :type1 df: Pandas Dataframe
+        :type2 col: String
         """
 
         df.dropna(subset=[col], inplace=True)

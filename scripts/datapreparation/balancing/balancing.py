@@ -1,5 +1,4 @@
 import os
-import sys
 import threading
 from collections import Counter
 
@@ -9,10 +8,9 @@ from imblearn.combine import SMOTEENN, SMOTETomek
 from imblearn.over_sampling import ADASYN, SMOTE
 from imblearn.under_sampling import NearMiss, TomekLinks
 from scripts.mongoConnection import getCollection, insertCollection
-from pymongo import MongoClient
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import Binarizer
+
 
 ##TODO Currently we are using test_train_split function from sklearn, the model shows that 2 classes are not present in the traindata. We should try StratifiedShuffleSplit, as far as i understood it, keep percentage of each class. Implement besides train_test_split
 class BalancingData:
@@ -258,8 +256,6 @@ if __name__ == "__main__":
 
     df_source_collection = getCollection('08_PreTrain', 'train_data')
 
-
-    
     filepath = input("Enter the path of your file with '/': ")
     
     if os.path.isdir(filepath):

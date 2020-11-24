@@ -1,8 +1,8 @@
 import pandas as pd
-from scripts.mongoConnection import getCollection, insertCollection
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
+from scripts.mongoConnection import getCollection, insertCollection
 
 
 class IdentityMotiveTagging:
@@ -43,8 +43,8 @@ class IdentityMotiveTagging:
         :param df: DataFrame in which the identity motives are to be searched
         :type df: Pandas Dataframe
 
-        :return df: Dataframe with identity motive tagged
-        :rtype df: Pandas DataFrame
+        :return: Dataframe with identity motive tagged
+        :rtype: Pandas DataFrame
         """
         df = df.loc[:, ['Id', 'source_Type', 'data_Type', 'onlyText', 'sentiments', 'country', 'countryem']]
         df.loc[df['onlyText'].str.contains(rf'\b{self.meaning}\b',regex=True, case=False), 'meaning'] = 1
@@ -128,7 +128,6 @@ if __name__ == '__main__':
     df = getCollection('07_PreProcessing', 'ni_comment_preprocessed')
     df = identityMotiveTagging.tagging(df)
     insertCollection('08_PreTrain', 'train_data', df)
-
 
     df = getCollection('07_PreProcessing', 'ni_subcomment_preprocessed')
     df = identityMotiveTagging.tagging(df)

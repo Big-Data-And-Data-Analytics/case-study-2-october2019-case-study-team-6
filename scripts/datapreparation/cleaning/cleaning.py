@@ -1,5 +1,3 @@
-from pymongo import MongoClient
-import pandas as pd
 import numpy as np
 from scripts.mongoConnection import getCollection, insertCollection
 
