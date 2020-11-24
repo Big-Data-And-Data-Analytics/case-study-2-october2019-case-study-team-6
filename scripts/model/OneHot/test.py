@@ -10,7 +10,7 @@ from pymongo import MongoClient
 from scripts.mongoConnection import getCollection, insertCollection
 from sklearn.preprocessing import OneHotEncoder
 
-class one_hot: #TODO Capital name OneHot
+class OneHot:
     """One Hot class provides function to apply OneHot encoding using logistic regression on the given training and
     testing data to generate prediction with accuracy functions
         """
@@ -69,13 +69,6 @@ class one_hot: #TODO Capital name OneHot
 
                 y1 = self.onehotencoder.fit_transform(y[['identityMotive']])
                 y_1 = pd.DataFrame(y1[:, 0].tolist()).astype(str)
-            """
-                y_2 = y1[:, 1].tolist()
-                y_3 = y1[:, 2].tolist()
-                y_4 = y1[:, 3].tolist()
-                y_5 = y1[:, 4].tolist()
-                y_6 = y1[:, 5].tolist()
-            """
 
                 # Load "X"
             if not self.use_fs_data:
@@ -105,6 +98,7 @@ class one_hot: #TODO Capital name OneHot
                     X_test_f_classif = fs.transform(X_test)
                     x_pred = X_test_f_classif
                     print(X)
+
                     #### LOGISTIC REGRESSION ####
             counter += 1
 
@@ -127,7 +121,7 @@ class one_hot: #TODO Capital name OneHot
             print('f1-score\n %s' % metrics.f1_score(y_true, y_pred, average="micro"))
             print('precision_score\n %s' % metrics.precision_score(y_true, y_pred, average="micro"))
             print('recall_score\n %s' % metrics.recall_score(y_true, y_pred, average="macro"))
-            # print('confusion matrix\n %s' % metrics.confusion_matrix(y_true, y_pred, labels=my_tags))
+            print('confusion matrix\n %s' % metrics.confusion_matrix(y_true, y_pred))
 
             acc = round(metrics.accuracy_score(y_true, y_pred) * 100, 2)
 
@@ -139,11 +133,8 @@ class one_hot: #TODO Capital name OneHot
             score_function = 'chi2'
             use_fs_data = False
             acc_thresh = 0.0
-
-            oh = one_hot(fp, score_function,use_fs_data,acc_thresh)
-
+            oh = OneHot(fp, score_function,use_fs_data,acc_thresh)
             X_test = sc.sparse.load_npz(fp + '/NPZs/X_test.npz')
-
             y_test = getCollection('09_TrainingData', 'y_test')
             oh.training_model(y_test, X_test)
 
