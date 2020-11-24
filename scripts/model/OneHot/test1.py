@@ -29,13 +29,30 @@ class one_hot:
         self.use_fs_data = False
         self.acc_thresh = 0.0
 
+
+        self.filepath = filepath
+        self.score_function = score_function
+        self.my_tags = ['belonging', 'meaning', 'efficacy', 'distinctivness', 'self esteem', 'continuity']
+        self.balancing_technique = [  # "ADASYN",
+             "SMOTE",
+            "SMOTEENN",
+            "NearMiss",
+            "SMOTETomek",
+            "TomekLinks"]
+        self.use_fs_data = False
+        self.modelName = "LogisticRegression"
+        self.acc_thresh = 0.0
+        # MongoDB connection
+        self.client = MongoClient('localhost', 27017)
+        self.db = self.client['09_TrainingData']
+
     def training_model(self,y_test, X_test):
-
-
-
         counter = 0
         x_pred = X_test
         for tech in self.balancing_technique:
+
+            # One Hot Encoder
+            onehotencoder = OneHotEncoder(sparse=False)
             # Logging
             if self.use_fs_data:
                 sys.stdout = open(
