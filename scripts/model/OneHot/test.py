@@ -15,13 +15,15 @@ from sklearn.preprocessing import OneHotEncoder
 class one_hot: #TODO Capital name OneHot
     """One Hot class provides function to apply OneHot encoding using logistic regression on the given training and
     testing data to generate prediction with accuracy functions
+
+    #TODO Variables definition is missing
         """
     def __init__(self, filepath, score_function, use_fs_data, acc_thresh):
 
         self.filepath = filepath
         self.X_test = sc.sparse.load_npz(filepath + '/NPZs/X_test.npz')#TODO #self to be added
         self.onehotencoder = OneHotEncoder(sparse=False)
-        self.modelName = "LogisticRegression"
+        self.modelName = "LogisticRegression" #TODO Do we need this?
         self.balancing_technique = ["SMOTE",
                                     "SMOTEENN",
                                     "NearMiss",
