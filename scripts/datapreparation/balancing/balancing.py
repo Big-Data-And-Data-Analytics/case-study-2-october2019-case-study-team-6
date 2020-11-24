@@ -247,20 +247,23 @@ class BalancingData:
         t4.start()
         t5.start()
         t6.start() 
+        
+        t1.join()
+        t2.join()
+        t3.join()
+        t4.join()
+        t5.join()
+        t6.join()
 
         print("Balancing Done!")
-
-
-
 
 
 if __name__ == "__main__":
 
     df_source_collection = getCollection('08_PreTrain', 'train_data')
 
-
-    
-    filepath = input("Enter the path of your file with '/': ")
+    filepath = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+    #filepath = input("Enter the path of your file with '/': ")
     
     if os.path.isdir(filepath):
         f = open(r"filepath", "w")
@@ -268,5 +271,5 @@ if __name__ == "__main__":
         print ("Directory does not exist.")
 
     balancing_input = BalancingData(filepath,df_source_collection)
-    balancing_input.split_train_test()
-    balancing_input.threading_function(test_size=0.3, random_state=69)
+    balancing_input.split_train_test(test_size=0.25, random_state=69)
+    balancing_input.threading_function()
