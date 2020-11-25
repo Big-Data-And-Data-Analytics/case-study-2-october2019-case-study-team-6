@@ -124,7 +124,7 @@ class Model:
         :return: The trained model
         :rtype: Model object
         """        
-        trained_model = model.fit(X, y)
+        trained_model = model.fit(X, y.values.ravel())
         return trained_model
     
     def save_model(self, model, filepath):
