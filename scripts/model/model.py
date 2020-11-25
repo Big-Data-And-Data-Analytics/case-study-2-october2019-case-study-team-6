@@ -11,7 +11,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, f1_score, precision_score, recall_score, plot_confusion_matrix
+from sklearn.metrics import accuracy_score, roc_auc_score, f1_score, precision_score, recall_score, plot_confusion_matrix
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -217,12 +217,16 @@ class Model:
         """        
 
         y_pred = model.predict(x_pred)
+        y_probas = model.predict_proba(x_pred)
         y_true = y_test
         
+        probs = y_probas[:, 1]
+
         accuracy = accuracy_score(y_true=y_true, y_pred=y_pred)
         f1 = f1_score(y_true=y_true, y_pred=y_pred, average=average)
         precision = precision_score(y_true=y_true, y_pred=y_pred, average=average)
         recall = recall_score(y_true=y_true, y_pred=y_pred, average=average)
+        auc = roc_auc_score(y_true, probs)
 
         if use_onehot == False:
             disp = plot_confusion_matrix(model, x_pred, y_true, display_labels=self.my_tags, cmap=plt.cm.Blues, normalize=normalize_cm)
@@ -232,7 +236,7 @@ class Model:
             if save_cm == True:
                 plt.savefig(filepath, bbox_inches='tight', dpi=199)
 
-        return accuracy, f1, precision, recall
+        return accuracy, f1, precision, recall, auc
 
     def predict_model(self, filepath_model, balancing_techniques):
         """Function for predicting stuff right away on the console
@@ -384,16 +388,16 @@ filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Mo
 filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test/"
 
 # Create empty evaluation dataframe
-eval_frame = pd.DataFrame(columns=["Model", "Balancing", "Features", "Accuracy", "F1-Score", "Precision", "Recall", "Date", "Timestamp"])
+eval_frame = pd.DataFrame(columns=["Model", "Balancing", "Features", "Accuracy", "F1-Score", "Precision", "Recall", "AUC", "Date", "Timestamp"])
 
 # Model input parameters
 seed = 69
-n_cores = 4
+n_cores = -1
 iterations = 1000 # Logistic Regression, SVM: Higher value means longer running
-estimators = 50 # Random Forest: Higher value means way longer running
+estimators = 10 # Random Forest: Higher value means way longer running
 alpha = 0.1
 learning_rate = "optimal"
-use_onehot=True
+use_onehot=False
 
 # Istanciate classes
 modeller = Model()
@@ -413,9 +417,85 @@ svm = SGDClassifier(  # New parameters added -> experimental
     tol=None)
 
 # Model selection parameters (Model != One-hot!)
-# models = [nb, dt, logreg, rf, svm]
-# balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
-# featureSelections = ["None", "chi2", "f_classif"]
+models = [nb, dt, logreg, rf, svm]
+balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
+featureSelections = ["None", "chi2", "f_classif"]
+
+# Model selection parameters (test)
+# models = [logreg]
+# balancingTechniques = ["NearMiss"]
+# featureSelections = ["None"]
+
+total_models = len(models) * len(balancingTechniques) * len(featureSelections)
+print(f'Training a total of {total_models} models')
+
+for model in models:
+    for balancingTechnique in balancingTechniques:
+        for featureSelection in featureSelections:
+            today = date.today()
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S")
+
+            if use_onehot == True:
+                modelname =  "OneHot_" + str(model)
+            else:
+                modelname = str(model)
+            
+            print("Started model: " + modelname + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection)
+            # import train and test data
+            if featureSelection == "None":
+                feature_selection = False
+            else:
+                feature_selection = True
+
+            X, X_test, y, y_test = modeller.import_train_test_data(
+                filepath=filepath_NPZ,
+                database="09_TrainingData",
+                balancing_technique=balancingTechnique,
+                feature_selection=feature_selection,
+                fs_function=featureSelection,
+                use_onehot=use_onehot)
+
+            trained_model = modeller.train_model(model=model, X=X, y=y)
+
+            accuracy, f1, precision, recall, auc = modeller.evaluate(
+                model=trained_model,
+                x_pred=X_test,
+                y_test=y_test,
+                average="macro",
+                normalize_cm="true",
+                save_cm=True,
+                filepath=filepath_Eval + modelname + "_" + balancingTechnique + "_" + featureSelection + ".png",
+                use_onehot=use_onehot)
+            
+            temp_d = {
+                "Model": modelname,
+                "Balancing": balancingTechnique,
+                "Features": featureSelection,
+                "Accuracy": accuracy,
+                "F1-Score": f1,
+                "Precision": precision,
+                "Recall": recall,
+                "AUC": auc,
+                "Date": today,
+                "Timestamp": current_time
+                }
+
+            temp = pd.DataFrame(data=temp_d, index=[0])
+            eval_frame = pd.concat([eval_frame, temp])
+
+            modeller.save_model(
+                model=trained_model,
+                filepath=filepath_Model + modelname + "_" + balancingTechnique + "_" + featureSelection + ".model")
+
+            print("Done model: " + modelname + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection)
+            total_models = total_models - 1
+            print(str(total_models) + " models left.")
+
+################################################
+############### ONE HOT ENCODING ###############
+################################################
+use_onehot=True
 
 # Model selection parameters (Model = One-hot!)
 models = [logreg]
@@ -454,7 +534,7 @@ for model in models:
 
             trained_model = modeller.train_model(model=model, X=X, y=y)
 
-            accuracy, f1, precision, recall = modeller.evaluate(
+            accuracy, f1, precision, recall, auc = modeller.evaluate(
                 model=trained_model,
                 x_pred=X_test,
                 y_test=y_test,
@@ -472,6 +552,7 @@ for model in models:
                 "F1-Score": f1,
                 "Precision": precision,
                 "Recall": recall,
+                "AUC": auc,
                 "Date": today,
                 "Timestamp": current_time
                 }
@@ -487,8 +568,6 @@ for model in models:
             total_models = total_models - 1
             print(str(total_models) + " models left.")
 
-print("Modelling done")
-
 if isfile(filepath_Eval + "Eval_Overview.csv"):
     existing_eval_frame = pd.read_csv(filepath_Eval + "Eval_Overview.csv")
     eval_frame = pd.concat([existing_eval_frame, eval_frame])
@@ -497,6 +576,8 @@ if isfile(filepath_Eval + "Eval_Overview.csv"):
 else:
     eval_frame.reset_index(inplace=True)
     eval_frame.to_csv(filepath_Eval + "Eval_Overview.csv")
+
+print("Modelling done")
 
 # modeller.predict_model(
 #     filepath_model=filepath_Model,
