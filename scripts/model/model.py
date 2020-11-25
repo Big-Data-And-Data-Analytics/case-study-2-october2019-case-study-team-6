@@ -226,7 +226,9 @@ class Model:
         f1 = f1_score(y_true=y_true, y_pred=y_pred, average=average)
         precision = precision_score(y_true=y_true, y_pred=y_pred, average=average)
         recall = recall_score(y_true=y_true, y_pred=y_pred, average=average)
-        auc = roc_auc_score(y_true, probs)
+        
+        if use_onehot == True:
+            auc = roc_auc_score(y_true, probs)
 
         if use_onehot == False:
             disp = plot_confusion_matrix(model, x_pred, y_true, display_labels=self.my_tags, cmap=plt.cm.Blues, normalize=normalize_cm)
@@ -236,7 +238,10 @@ class Model:
             if save_cm == True:
                 plt.savefig(filepath, bbox_inches='tight', dpi=199)
 
-        return accuracy, f1, precision, recall, auc
+        if use_onehot == True:
+            return accuracy, f1, precision, recall, auc
+        else:
+            return accuracy, f1, precision, recall
 
     def predict_model(self, filepath_model, balancing_techniques):
         """Function for predicting stuff right away on the console
@@ -458,7 +463,7 @@ for model in models:
 
             trained_model = modeller.train_model(model=model, X=X, y=y)
 
-            accuracy, f1, precision, recall, auc = modeller.evaluate(
+            accuracy, f1, precision, recall = modeller.evaluate(
                 model=trained_model,
                 x_pred=X_test,
                 y_test=y_test,
@@ -476,7 +481,6 @@ for model in models:
                 "F1-Score": f1,
                 "Precision": precision,
                 "Recall": recall,
-                "AUC": auc,
                 "Date": today,
                 "Timestamp": current_time
                 }
