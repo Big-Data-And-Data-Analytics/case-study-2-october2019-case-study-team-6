@@ -1,3 +1,6 @@
+import nltk
+import yaml
+
 import pickle as pi
 import scipy as sc
 import pandas as pd
@@ -9,15 +12,16 @@ from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, f1_score, precision_score, recall_score, plot_confusion_matrix
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.feature_extraction.text import CountVectorizer
 
-import yaml
 from os import listdir
 from os.path import isfile, join
-from sklearn.feature_extraction.text import CountVectorizer
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-import nltk
+from datetime import datetime, date
+
 
 class Model:
     """The Model class provides every function necessary for loading the prepared data, training and evaluating the model and finally predicting
@@ -79,7 +83,41 @@ class Model:
         y_test = y_test.drop(["_id", "id"], axis=1)
         return y_test
     
-    def import_train_test_data(self, filepath, database, balancing_technique, feature_selection, fs_function):
+    def __import_Y_train_onehot(self, database, collection):
+        """Imports the Y train data.
+
+        :param database: The database where the data is stored
+        :type database: string
+        :param collection: The collection where the data is stored
+        :type collection: string
+        :return: Y data frame for training
+        :rtype: Pandas data frame
+        """
+        y = mc.getCollection(database, collection)
+        y = y.drop(["_id", "id"], axis=1)
+
+        y_train_onehot = onehotencoder.fit_transform(y[['identityMotive']])
+        y_train_onehot_ = pd.DataFrame(y_train_onehot[:, 0].tolist()).astype(str)
+        return y_train_onehot_
+
+    def __import_Y_test_onehot(self, database, collection):
+        """Imports the Y test data.
+
+        :param database: The database where the data is stored
+        :type database: string
+        :param collection: The collection where the data is stored
+        :type collection: string
+        :return: Y data frame for testing
+        :rtype: Pandas data frame
+        """
+        y_test = mc.getCollection(database, collection)
+        y_test = y_test.drop(["_id", "id"], axis=1)
+
+        y_test_onehot = onehotencoder.fit_transform(y_test[['identityMotive']])
+        y_test_onehot_ = pd.DataFrame(y_test_onehot[:, 0].tolist()).astype(str)
+        return y_test_onehot_
+
+    def import_train_test_data(self, filepath, database, balancing_technique, feature_selection, fs_function, use_onehot):
         """Runs the functions __import_X_train, __import_X_test, __import_Y_train and __import_Y_test regarding the given input.
 
         :param filepath: Provide the filepath including "/NPZs/"
@@ -92,6 +130,8 @@ class Model:
         :type feature_selection: bool
         :param fs_function: The name of the feature selection function ("None", "chi2", "f_classif")
         :type fs_function: string
+        :param use_onehot: Should one-hot encoded y should be used
+        :type use_onehot: bool
         :return: The data for training and testing the data
         :rtype: Sparse matrix, sparse matrix, Pandas data frame, Pandas data frame
         """        
@@ -108,8 +148,12 @@ class Model:
             x_test_fp = filepath + "X_test.npz"
             X_test = self.__import_X_test(x_test_fp)
 
-        y = self.__import_Y_train(database=database, collection=balancing_technique + "_y")
-        y_test = self.__import_Y_test(database=database, collection="y_test")
+        if use_onehot == True:
+            y = self.__import_Y_train_onehot(database=database, collection=balancing_technique + "_y")
+            y_test = self.__import_Y_test_onehot(database=database, collection="y_test")
+        else:
+            y = self.__import_Y_train(database=database, collection=balancing_technique + "_y")
+            y_test = self.__import_Y_test(database=database, collection="y_test")
         return X, X_test, y, y_test
 
     def train_model(self, model, X, y):
@@ -124,9 +168,9 @@ class Model:
         :return: The trained model
         :rtype: Model object
         """        
-        trained_model = model.fit(X, y.values.ravel())
+        trained_model = model.fit(X, y)
         return trained_model
-    
+
     def save_model(self, model, filepath):
         """Function for saving the model to a specific filepath
 
@@ -151,7 +195,7 @@ class Model:
         model = pi.load(open(filepath))
         return model
 
-    def evaluate(self, model, x_pred, y_test, average, normalize_cm, save_cm, filepath):
+    def evaluate(self, model, x_pred, y_test, average, normalize_cm, save_cm, filepath, use_onehot):
         """Function for evaluating a model
 
         :param model: The model object which should be evaluated
@@ -174,25 +218,19 @@ class Model:
 
         y_pred = model.predict(x_pred)
         y_true = y_test
-
-        # print('classification_report\n %s' % classification_report(y_true=y_true, y_pred=y_pred, target_names=self.my_tags))
-        # print('accuracy\n %s' % accuracy_score(y_true=y_true, y_pred=y_pred))
-        # print('f1-score\n %s' % f1_score(y_true=y_true, y_pred=y_pred, average=average))
-        # print('precision_score\n %s' % precision_score(y_true=y_true, y_pred=y_pred, average=average))
-        # print('recall_score\n %s' % recall_score(y_true=y_true, y_pred=y_pred, average=average))
-        # print('confusion matrix\n %s' % confusion_matrix(y_true, y_pred, labels=self.my_tags))
         
         accuracy = accuracy_score(y_true=y_true, y_pred=y_pred)
         f1 = f1_score(y_true=y_true, y_pred=y_pred, average=average)
         precision = precision_score(y_true=y_true, y_pred=y_pred, average=average)
         recall = recall_score(y_true=y_true, y_pred=y_pred, average=average)
 
-        disp = plot_confusion_matrix(model, x_pred, y_true, display_labels=self.my_tags, cmap=plt.cm.Blues, normalize=normalize_cm)
-        disp.ax_.set_title("Normalized confusion matrix")
-        plt.xticks(rotation=90)
+        if use_onehot == False:
+            disp = plot_confusion_matrix(model, x_pred, y_true, display_labels=self.my_tags, cmap=plt.cm.Blues, normalize=normalize_cm)
+            disp.ax_.set_title("Normalized confusion matrix")
+            plt.xticks(rotation=90)
 
-        if save_cm == True:
-            plt.savefig(filepath, bbox_inches='tight', dpi=199)
+            if save_cm == True:
+                plt.savefig(filepath, bbox_inches='tight', dpi=199)
 
         return accuracy, f1, precision, recall
 
@@ -346,7 +384,7 @@ filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Mo
 filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test/"
 
 # Create empty evaluation dataframe
-eval_frame = pd.DataFrame(columns=["Model", "Balancing", "Features", "Accuracy", "F1-Score", "Precision", "Recall"])
+eval_frame = pd.DataFrame(columns=["Model", "Balancing", "Features", "Accuracy", "F1-Score", "Precision", "Recall", "Date", "Timestamp"])
 
 # Model input parameters
 seed = 69
@@ -355,9 +393,11 @@ iterations = 1000 # Logistic Regression, SVM: Higher value means longer running
 estimators = 50 # Random Forest: Higher value means way longer running
 alpha = 0.1
 learning_rate = "optimal"
+use_onehot=True
 
 # Istanciate classes
 modeller = Model()
+onehotencoder = OneHotEncoder(sparse=False)
 nb = MultinomialNB()
 dt = DecisionTreeClassifier(random_state=seed)
 logreg = LogisticRegression(n_jobs=n_cores, max_iter=iterations)
@@ -372,23 +412,32 @@ svm = SGDClassifier(  # New parameters added -> experimental
     learning_rate=learning_rate,
     tol=None)
 
-# Model selection parameters
+# Model selection parameters (Model != One-hot!)
 # models = [nb, dt, logreg, rf, svm]
 # balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
 # featureSelections = ["None", "chi2", "f_classif"]
 
-models = [rf]
+# Model selection parameters (Model = One-hot!)
+models = [logreg]
 balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
 featureSelections = ["None", "chi2", "f_classif"]
 
 total_models = len(models) * len(balancingTechniques) * len(featureSelections)
+print(f'Training a total of {total_models} models')
 
 for model in models:
     for balancingTechnique in balancingTechniques:
         for featureSelection in featureSelections:
-            modelname = str(model)
+            today = date.today()
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S")
+
+            if use_onehot == True:
+                modelname =  "OneHot_" + str(model)
+            else:
+                modelname = str(model)
             
-            print("Model: " + modelname + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection + " started!")
+            print("Started model: " + modelname + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection)
             # import train and test data
             if featureSelection == "None":
                 feature_selection = False
@@ -400,7 +449,8 @@ for model in models:
                 database="09_TrainingData",
                 balancing_technique=balancingTechnique,
                 feature_selection=feature_selection,
-                fs_function=featureSelection)
+                fs_function=featureSelection,
+                use_onehot=use_onehot)
 
             trained_model = modeller.train_model(model=model, X=X, y=y)
 
@@ -411,7 +461,8 @@ for model in models:
                 average="macro",
                 normalize_cm="true",
                 save_cm=True,
-                filepath=filepath_Eval + modelname + "_" + balancingTechnique + "_" + featureSelection + ".png")
+                filepath=filepath_Eval + modelname + "_" + balancingTechnique + "_" + featureSelection + ".png",
+                use_onehot=use_onehot)
             
             temp_d = {
                 "Model": modelname,
@@ -420,7 +471,10 @@ for model in models:
                 "Accuracy": accuracy,
                 "F1-Score": f1,
                 "Precision": precision,
-                "Recall": recall}
+                "Recall": recall,
+                "Date": today,
+                "Timestamp": current_time
+                }
 
             temp = pd.DataFrame(data=temp_d, index=[0])
             eval_frame = pd.concat([eval_frame, temp])
@@ -429,13 +483,11 @@ for model in models:
                 model=trained_model,
                 filepath=filepath_Model + modelname + "_" + balancingTechnique + "_" + featureSelection + ".model")
 
-            print("Model: " + modelname + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection + " done!")
+            print("Done model: " + modelname + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection)
             total_models = total_models - 1
             print(str(total_models) + " models left.")
 
 print("Modelling done")
-
-##TODO check if files exists, if yes load and then append reset index and then save, no reset index and save
 
 if isfile(filepath_Eval + "Eval_Overview.csv"):
     existing_eval_frame = pd.read_csv(filepath_Eval + "Eval_Overview.csv")
