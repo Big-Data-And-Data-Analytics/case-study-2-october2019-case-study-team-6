@@ -15,7 +15,7 @@ class FeatureSelection():
         self.balancing_technique = ["NearMiss", "SMOTEENN", "SMOTETomek", "SMOTE", "TomekLinks"]  # "ADASYN",
         self.counter = 0
         self.number_of_features = 1000
-        self.filepath = "D:/OneDrive - SRH IT/Case Study 1/02 Input_Data/03 Model"
+        self.filepath = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model"
 
 
     def balancing(self):
@@ -43,7 +43,7 @@ class FeatureSelection():
             print(f'Saved chi2 {self.balancing_technique[self.counter]}')
 
             # Save SelectKBest Technique Variable for chi2
-            filename = (self.filepath + "/Models/Feature_" + self.balancing_technique[self.counter]
+            filename = (self.filepath + "/NPZs/Feature_" + self.balancing_technique[self.counter]
                         + 'fs_chi2' + '.tchq')
             pi.dump(chi2_fs, open(filename, 'wb'))
             print(f'Saved chi2 technique - {self.balancing_technique[self.counter]}')
@@ -57,12 +57,12 @@ class FeatureSelection():
             print(f'Saved f_classif {self.balancing_technique[self.counter]}')
 
             # Save SelectKBest Technique Variable for f_classif
-            filename = (self.filepath + "/Models/Feature_" + self.balancing_technique[self.counter]
+            filename = (self.filepath + "/NPZs/Feature_" + self.balancing_technique[self.counter]
                         + 'fs_f_classif' + '.tchq')
             pi.dump(f_classif_fs, open(filename, 'wb'))
             print(f'Saved fs_f_classif technique - {self.balancing_technique[self.counter]}')
             self.counter = self.counter + 1
 
-if __name__ == 'main':
+if __name__ == "__main__":
     featureSelection = FeatureSelection()
     featureSelection.balancing()

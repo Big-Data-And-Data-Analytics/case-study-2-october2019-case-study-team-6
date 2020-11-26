@@ -91,12 +91,7 @@ class Cleaning:
 
 if __name__ == "__main__":
 
-    client = MongoClient('localhost', 27017)
-    db = client['01_NationalIdentity_Crawled']
-    data = db.youTube_Video_Comments_Raw
-    data = data.find({})
-    data = list(data)
-    data = pd.DataFrame(data)
+    data = getCollection(db="01_NationalIdentity_Crawled", col="youTube_Video_Comments_Raw")
 
     cleaner = Cleaning(data)
 
@@ -105,5 +100,3 @@ if __name__ == "__main__":
     data = cleaner.change_empty_tona("textOriginal")
 
     insertCollection('01_NationalIdentity_Crawled', 'cleaned_data', data)
-
-
