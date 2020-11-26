@@ -1,7 +1,7 @@
 # National Identity Case Study
 
 
-#### Sprint 5 Status [19-Nov to 25-Nov]
+#### Sprint 6 Status [19-Nov to 25-Nov]
 **Highlights:**
 1. Critical Pending Tasks: 
 	1. ***One Hot Encoding Migration (Differed five times)***
