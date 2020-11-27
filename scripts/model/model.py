@@ -387,9 +387,13 @@ class Model:
 #if __name__ == "__main__":
 
 # Set paths
-filepath_NPZ = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
-filepath_Model = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test/"
-filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test/"
+# filepath_NPZ = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+# filepath_Model = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test/"
+# filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test/"
+
+filepath_NPZ = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test/"
+filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test/"
 
 # Create empty evaluation dataframe
 eval_frame = pd.DataFrame(columns=["Model", "Balancing", "Features", "Accuracy", "F1-Score", "Precision", "Recall", "AUC", "Date", "Timestamp"])
@@ -412,7 +416,7 @@ logreg = LogisticRegression(n_jobs=n_cores, max_iter=iterations)
 rf = RandomForestClassifier(n_jobs=n_cores, n_estimators=estimators, random_state=seed)
 svm = SGDClassifier(  # New parameters added -> experimental
     n_jobs=n_cores,
-    loss='hinge',
+    loss='log',
     penalty='l2',
     alpha=alpha,
     random_state=seed,
@@ -421,17 +425,17 @@ svm = SGDClassifier(  # New parameters added -> experimental
     tol=None)
 
 # Model selection parameters (Model != One-hot!)
-models = [nb, dt, logreg, rf, svm]
+models = [svm, nb, dt, logreg, rf]
 balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
 featureSelections = ["None", "chi2", "f_classif"]
 
 # Model selection parameters (test)
-models = [svm]
-balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
-featureSelections = ["None", "chi2", "f_classif"]
+# models = [svm]
+# balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
+# featureSelections = ["None", "chi2", "f_classif"]
 
 total_models = len(models) * len(balancingTechniques) * len(featureSelections)
-print(f'Training a total of {total_models} models')
+print(f'Training a total of {total_models} single class models')
 
 for model in models:
     for balancingTechnique in balancingTechniques:
@@ -495,15 +499,6 @@ for model in models:
             total_models = total_models - 1
             print(str(total_models) + " models left.")
 
-if isfile(filepath_Eval + "Eval_Overview.csv"):
-    existing_eval_frame = pd.read_csv(filepath_Eval + "Eval_Overview.csv")
-    eval_frame = pd.concat([existing_eval_frame, eval_frame])
-    eval_frame.reset_index(inplace=True)
-    eval_frame.to_csv(filepath_Eval + "Eval_Overview.csv")
-else:
-    eval_frame.reset_index(inplace=True)
-    eval_frame.to_csv(filepath_Eval + "Eval_Overview.csv")
-
 ################################################
 ############### ONE HOT ENCODING ###############
 ################################################
@@ -515,7 +510,7 @@ balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks
 featureSelections = ["None", "chi2", "f_classif"]
 
 total_models = len(models) * len(balancingTechniques) * len(featureSelections)
-print(f'Training a total of {total_models} models')
+print(f'Training a total of {total_models} multiclass models')
 
 for model in models:
     for balancingTechnique in balancingTechniques:
