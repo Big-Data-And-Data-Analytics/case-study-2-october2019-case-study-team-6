@@ -8,6 +8,7 @@ from sklearn.feature_selection import (SelectFromModel, SelectKBest, chi2,
                                        f_classif)
 
 ##TODO Rework naming convention to something more appealing and easier to work with
+##TODO Docstrings
 class FeatureSelection():
 
     def __init__(self):

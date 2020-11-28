@@ -27,7 +27,7 @@ class Translation:
         :rtype df: Pandas Dataframe
         
         """
-
+        ##TODO check :param1, return too
         for index, row in df['onlyText'].iteritems():
             try:
                 lang = detect(row)

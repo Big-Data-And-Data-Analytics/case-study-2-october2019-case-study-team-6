@@ -38,6 +38,7 @@ class TextCleaning:
         
         :param1 df: Dataframe to Clean
         :type1 df: Pandas Dataframe
+        #TODO it should be :param, :type
         """
 
         df.dropna(subset=['onlyText'], inplace=True)

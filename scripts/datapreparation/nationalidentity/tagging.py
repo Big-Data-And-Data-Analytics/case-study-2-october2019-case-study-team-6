@@ -126,6 +126,7 @@ class NationalIdentityTagging:
         :type2 collection: String
         
         """
+        ##TODO :param instead of :param1, same with :type
         # Initialisations
 
         post = post.fillna('0')

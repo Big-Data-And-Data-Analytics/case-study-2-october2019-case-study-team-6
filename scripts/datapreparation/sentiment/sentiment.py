@@ -46,7 +46,7 @@ class Sentiment:
 
         :param sentence
         :type sentence: str
-        :return str
+        :return: str
 
         """
         score = self.analyser.polarity_scores(sentence)

@@ -51,7 +51,10 @@ class DataModel:
         :type source_col_names: [type]
         :return: [description]
         :rtype: [type]
+
+        #TODO details
         """
+
         data_filtered = data.filter(items=[
             source_col_names[0],
             source_col_names[1],
@@ -85,6 +88,7 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """
+         #TODO details
         data_filtered = data.filter(items=[
             source_col_names[0],
             source_col_names[1],
@@ -122,6 +126,7 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """
+         #TODO details
         data["source_Type"] = source_Type
         data["data_Type"] = data_Type
         return data
@@ -136,6 +141,7 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """
+         #TODO details
         youTube_Video_Stats_Cleaned = data1.drop(columns="_id")
         youTube_Videos_Cleaned = data2.drop(columns="_id")
 
@@ -163,6 +169,7 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """
+         #TODO details
         youTube_Video_Comments_Cleaned = data.copy()
         youTube_Video_Comments_Cleaned = youTube_Video_Comments_Cleaned.drop(columns="_id")
         youTube_Video_Comments_Cleaned["parentId_check"] = youTube_Video_Comments_Cleaned.parentId.isnull()
@@ -194,6 +201,7 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """
+         #TODO details
         youTube_Video_Comments_Cleaned = data.copy()
         youTube_Video_Comments_Cleaned = data.drop(columns="_id")
         youTube_Video_Comments_Cleaned = youTube_Video_Comments_Cleaned.astype({'parentId': 'string'})
@@ -225,6 +233,7 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """
+         #TODO details
         reddit_Data_Post = self.add_data_and_source_type(data, "post", "Reddit")
         reddit_Data_Post = self.select_and_rename_columns_post(data=reddit_Data_Post, source_col_names=[
             "post_id",
@@ -248,6 +257,7 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """
+         #TODO details
         reddit_Data_Comment = self.add_data_and_source_type(data, "comment", "Reddit")
         reddit_Data_Comment = reddit_Data_Comment[~reddit_Data_Comment["structure"].str.contains("_")]
         reddit_Data_Comment = self.select_and_rename_columns_comment(data=reddit_Data_Comment, source_col_names=[
@@ -272,6 +282,7 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """
+         #TODO details
         reddit_Data_Subcomment = self.add_data_and_source_type(data, "subcomment", "Reddit")
         reddit_Data_Subcomment = reddit_Data_Subcomment[reddit_Data_Subcomment["structure"].str.contains("_")]
         reddit_Data_Subcomment = self.select_and_rename_columns_subcomment(data=reddit_Data_Subcomment, source_col_names=[
@@ -297,6 +308,7 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """
+         #TODO details
         twitter_post = self.add_data_and_source_type(data, "post", "Twitter")
         twitter_post = self.select_and_rename_columns_post(data=twitter_post, source_col_names=[
             "tweet_id",
@@ -320,6 +332,7 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """
+         #TODO details
         instagram_post = self.add_data_and_source_type(data, "post", "Instagram")
         instagram_post = self.select_and_rename_columns_post(data=instagram_post, source_col_names=[
             "post_Id",
@@ -343,6 +356,7 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """
+         #TODO details
         instagram_comment = self.add_data_and_source_type(data, "comment", "Instagram")
         instagram_comment = self.select_and_rename_columns_comment(data=instagram_comment, source_col_names=[
             "post_Id",
@@ -366,6 +380,7 @@ class DataModel:
         :return: [description]
         :rtype: [type]
         """
+         #TODO details
         comment_comment_id_check = data.copy()
         comment_comment_id_check = data.comment_comment_id != "NULL"
 
