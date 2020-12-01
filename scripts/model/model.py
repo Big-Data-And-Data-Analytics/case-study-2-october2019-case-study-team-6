@@ -4,6 +4,7 @@ import yaml
 import pickle as pi
 import scipy as sc
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import scripts.mongoConnection as mc
 
@@ -384,208 +385,209 @@ class Model:
             continueFlag = True
 
 
-#if __name__ == "__main__":
+if __name__ == "__main__":
 
-# Set paths
-# filepath_NPZ = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
-# filepath_Model = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test/"
-# filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test/"
+    # Set paths
+    # filepath_NPZ = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+    # filepath_Model = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test/"
+    # filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test/"
 
-filepath_NPZ = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
-filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test/"
-filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test/"
+    filepath_NPZ = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+    filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test/"
+    filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test/"
 
-# Create empty evaluation dataframe
-eval_frame = pd.DataFrame(columns=["Model", "Balancing", "Features", "Accuracy", "F1-Score", "Precision", "Recall", "AUC", "Date", "Timestamp"])
+    # Create empty evaluation dataframe
+    eval_frame = pd.DataFrame(columns=["Model", "Balancing", "Features", "Accuracy", "F1-Score", "Precision", "Recall", "AUC", "Date", "Timestamp"])
 
-# Model input parameters
-seed = 69
-n_cores = -1
-iterations = 1000 # Logistic Regression, SVM: Higher value means longer running
-estimators = 10 # Random Forest: Higher value means way longer running
-alpha = 0.1
-learning_rate = "optimal"
-use_onehot=False
+    # Model input parameters
+    seed = 69
+    np.random.seed(seed)
+    n_cores = -1
+    iterations = 1000 # Logistic Regression, SVM: Higher value means longer running
+    estimators = 10 # Random Forest: Higher value means way longer running
+    alpha = 0.1
+    learning_rate = "optimal"
+    use_onehot=False
 
-# Istanciate classes
-modeller = Model()
-onehotencoder = OneHotEncoder(sparse=False)
-nb = MultinomialNB()
-dt = DecisionTreeClassifier(random_state=seed)
-logreg = LogisticRegression(n_jobs=n_cores, max_iter=iterations)
-rf = RandomForestClassifier(n_jobs=n_cores, n_estimators=estimators, random_state=seed)
-svm = SGDClassifier(  # New parameters added -> experimental
-    n_jobs=n_cores,
-    loss='log',
-    penalty='l2',
-    alpha=alpha,
-    random_state=seed,
-    max_iter=iterations,
-    learning_rate=learning_rate,
-    tol=None)
+    # Istanciate classes
+    modeller = Model()
+    onehotencoder = OneHotEncoder(sparse=False)
+    nb = MultinomialNB()
+    dt = DecisionTreeClassifier(random_state=seed)
+    logreg = LogisticRegression(n_jobs=n_cores, max_iter=iterations)
+    rf = RandomForestClassifier(n_jobs=n_cores, n_estimators=estimators, random_state=seed)
+    svm = SGDClassifier(  # New parameters added -> experimental
+        n_jobs=n_cores,
+        loss='log',
+        penalty='l2',
+        alpha=alpha,
+        random_state=seed,
+        max_iter=iterations,
+        learning_rate=learning_rate,
+        tol=None)
 
-# Model selection parameters (Model != One-hot!)
-models = [svm, nb, dt, logreg, rf]
-balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
-featureSelections = ["None", "chi2", "f_classif"]
+    # Model selection parameters (Model != One-hot!)
+    models = [svm, nb, dt, logreg, rf]
+    balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
+    featureSelections = ["None", "chi2", "f_classif"]
 
-# Model selection parameters (test)
-# models = [svm]
-# balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
-# featureSelections = ["None", "chi2", "f_classif"]
+    # Model selection parameters (test)
+    # models = [svm]
+    # balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
+    # featureSelections = ["None", "chi2", "f_classif"]
 
-total_models = len(models) * len(balancingTechniques) * len(featureSelections)
-print(f'Training a total of {total_models} single class models')
+    total_models = len(models) * len(balancingTechniques) * len(featureSelections)
+    print(f'Training a total of {total_models} single class models')
 
-for model in models:
-    for balancingTechnique in balancingTechniques:
-        for featureSelection in featureSelections:
-            today = date.today()
-            now = datetime.now()
-            current_time = now.strftime("%H:%M:%S")
+    for model in models:
+        for balancingTechnique in balancingTechniques:
+            for featureSelection in featureSelections:
+                today = date.today()
+                now = datetime.now()
+                current_time = now.strftime("%H:%M:%S")
 
-            if use_onehot == True:
-                modelname =  "OneHot_" + str(model)
-            else:
-                modelname = str(model)
-            
-            print("Started model: " + modelname + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection)
-            # import train and test data
-            if featureSelection == "None":
-                feature_selection = False
-            else:
-                feature_selection = True
+                if use_onehot == True:
+                    modelname =  "OneHot_" + str(model)
+                else:
+                    modelname = str(model)
+                
+                print("Started model: " + modelname + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection)
+                # import train and test data
+                if featureSelection == "None":
+                    feature_selection = False
+                else:
+                    feature_selection = True
 
-            X, X_test, y, y_test = modeller.import_train_test_data(
-                filepath=filepath_NPZ,
-                database="09_TrainingData",
-                balancing_technique=balancingTechnique,
-                feature_selection=feature_selection,
-                fs_function=featureSelection,
-                use_onehot=use_onehot)
+                X, X_test, y, y_test = modeller.import_train_test_data(
+                    filepath=filepath_NPZ,
+                    database="09_TrainingData",
+                    balancing_technique=balancingTechnique,
+                    feature_selection=feature_selection,
+                    fs_function=featureSelection,
+                    use_onehot=use_onehot)
 
-            trained_model = modeller.train_model(model=model, X=X, y=y)
+                trained_model = modeller.train_model(model=model, X=X, y=y)
 
-            accuracy, f1, precision, recall = modeller.evaluate(
-                model=trained_model,
-                x_pred=X_test,
-                y_test=y_test,
-                average="macro",
-                normalize_cm="true",
-                save_cm=True,
-                filepath=filepath_Eval + modelname + "_" + balancingTechnique + "_" + featureSelection + ".png",
-                use_onehot=use_onehot)
-            
-            temp_d = {
-                "Model": modelname,
-                "Balancing": balancingTechnique,
-                "Features": featureSelection,
-                "Accuracy": accuracy,
-                "F1-Score": f1,
-                "Precision": precision,
-                "Recall": recall,
-                "Date": today,
-                "Timestamp": current_time
-                }
+                accuracy, f1, precision, recall = modeller.evaluate(
+                    model=trained_model,
+                    x_pred=X_test,
+                    y_test=y_test,
+                    average="macro",
+                    normalize_cm="true",
+                    save_cm=True,
+                    filepath=filepath_Eval + modelname + "_" + balancingTechnique + "_" + featureSelection + ".png",
+                    use_onehot=use_onehot)
+                
+                temp_d = {
+                    "Model": modelname,
+                    "Balancing": balancingTechnique,
+                    "Features": featureSelection,
+                    "Accuracy": accuracy,
+                    "F1-Score": f1,
+                    "Precision": precision,
+                    "Recall": recall,
+                    "Date": today,
+                    "Timestamp": current_time
+                    }
 
-            temp = pd.DataFrame(data=temp_d, index=[0])
-            eval_frame = pd.concat([eval_frame, temp])
+                temp = pd.DataFrame(data=temp_d, index=[0])
+                eval_frame = pd.concat([eval_frame, temp])
 
-            modeller.save_model(
-                model=trained_model,
-                filepath=filepath_Model + modelname + "_" + balancingTechnique + "_" + featureSelection + ".model")
+                modeller.save_model(
+                    model=trained_model,
+                    filepath=filepath_Model + modelname + "_" + balancingTechnique + "_" + featureSelection + ".model")
 
-            print("Done model: " + modelname + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection)
-            total_models = total_models - 1
-            print(str(total_models) + " models left.")
+                print("Done model: " + modelname + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection)
+                total_models = total_models - 1
+                print(str(total_models) + " models left.")
 
-################################################
-############### ONE HOT ENCODING ###############
-################################################
-use_onehot=True
+    ################################################
+    ############### ONE HOT ENCODING ###############
+    ################################################
+    use_onehot=True
 
-# Model selection parameters (Model = One-hot!)
-models = [logreg]
-balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
-featureSelections = ["None", "chi2", "f_classif"]
+    # Model selection parameters (Model = One-hot!)
+    models = [logreg]
+    balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
+    featureSelections = ["None", "chi2", "f_classif"]
 
-total_models = len(models) * len(balancingTechniques) * len(featureSelections)
-print(f'Training a total of {total_models} multiclass models')
+    total_models = len(models) * len(balancingTechniques) * len(featureSelections)
+    print(f'Training a total of {total_models} multiclass models')
 
-for model in models:
-    for balancingTechnique in balancingTechniques:
-        for featureSelection in featureSelections:
-            today = date.today()
-            now = datetime.now()
-            current_time = now.strftime("%H:%M:%S")
+    for model in models:
+        for balancingTechnique in balancingTechniques:
+            for featureSelection in featureSelections:
+                today = date.today()
+                now = datetime.now()
+                current_time = now.strftime("%H:%M:%S")
 
-            if use_onehot == True:
-                modelname =  "OneHot_" + str(model)
-            else:
-                modelname = str(model)
-            
-            print("Started model: " + modelname + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection)
-            # import train and test data
-            if featureSelection == "None":
-                feature_selection = False
-            else:
-                feature_selection = True
+                if use_onehot == True:
+                    modelname =  "OneHot_" + str(model)
+                else:
+                    modelname = str(model)
+                
+                print("Started model: " + modelname + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection)
+                # import train and test data
+                if featureSelection == "None":
+                    feature_selection = False
+                else:
+                    feature_selection = True
 
-            X, X_test, y, y_test = modeller.import_train_test_data(
-                filepath=filepath_NPZ,
-                database="09_TrainingData",
-                balancing_technique=balancingTechnique,
-                feature_selection=feature_selection,
-                fs_function=featureSelection,
-                use_onehot=use_onehot)
+                X, X_test, y, y_test = modeller.import_train_test_data(
+                    filepath=filepath_NPZ,
+                    database="09_TrainingData",
+                    balancing_technique=balancingTechnique,
+                    feature_selection=feature_selection,
+                    fs_function=featureSelection,
+                    use_onehot=use_onehot)
 
-            trained_model = modeller.train_model(model=model, X=X, y=y)
+                trained_model = modeller.train_model(model=model, X=X, y=y)
 
-            accuracy, f1, precision, recall, auc = modeller.evaluate(
-                model=trained_model,
-                x_pred=X_test,
-                y_test=y_test,
-                average="macro",
-                normalize_cm="true",
-                save_cm=True,
-                filepath=filepath_Eval + modelname + "_" + balancingTechnique + "_" + featureSelection + ".png",
-                use_onehot=use_onehot)
-            
-            temp_d = {
-                "Model": modelname,
-                "Balancing": balancingTechnique,
-                "Features": featureSelection,
-                "Accuracy": accuracy,
-                "F1-Score": f1,
-                "Precision": precision,
-                "Recall": recall,
-                "AUC": auc,
-                "Date": today,
-                "Timestamp": current_time
-                }
+                accuracy, f1, precision, recall, auc = modeller.evaluate(
+                    model=trained_model,
+                    x_pred=X_test,
+                    y_test=y_test,
+                    average="macro",
+                    normalize_cm="true",
+                    save_cm=True,
+                    filepath=filepath_Eval + modelname + "_" + balancingTechnique + "_" + featureSelection + ".png",
+                    use_onehot=use_onehot)
+                
+                temp_d = {
+                    "Model": modelname,
+                    "Balancing": balancingTechnique,
+                    "Features": featureSelection,
+                    "Accuracy": accuracy,
+                    "F1-Score": f1,
+                    "Precision": precision,
+                    "Recall": recall,
+                    "AUC": auc,
+                    "Date": today,
+                    "Timestamp": current_time
+                    }
 
-            temp = pd.DataFrame(data=temp_d, index=[0])
-            eval_frame = pd.concat([eval_frame, temp])
+                temp = pd.DataFrame(data=temp_d, index=[0])
+                eval_frame = pd.concat([eval_frame, temp])
 
-            modeller.save_model(
-                model=trained_model,
-                filepath=filepath_Model + modelname + "_" + balancingTechnique + "_" + featureSelection + ".model")
+                modeller.save_model(
+                    model=trained_model,
+                    filepath=filepath_Model + modelname + "_" + balancingTechnique + "_" + featureSelection + ".model")
 
-            print("Done model: " + modelname + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection)
-            total_models = total_models - 1
-            print(str(total_models) + " models left.")
+                print("Done model: " + modelname + ", Balancing: " + balancingTechnique + ", Features: " + featureSelection)
+                total_models = total_models - 1
+                print(str(total_models) + " models left.")
 
-if isfile(filepath_Eval + "Eval_Overview.csv"):
-    existing_eval_frame = pd.read_csv(filepath_Eval + "Eval_Overview.csv")
-    eval_frame = pd.concat([existing_eval_frame, eval_frame])
-    eval_frame.reset_index(inplace=True)
-    eval_frame.to_csv(filepath_Eval + "Eval_Overview.csv")
-else:
-    eval_frame.reset_index(inplace=True)
-    eval_frame.to_csv(filepath_Eval + "Eval_Overview.csv")
+    if isfile(filepath_Eval + "Eval_Overview.csv"):
+        existing_eval_frame = pd.read_csv(filepath_Eval + "Eval_Overview.csv")
+        eval_frame = pd.concat([existing_eval_frame, eval_frame])
+        eval_frame.reset_index(inplace=True)
+        eval_frame.to_csv(filepath_Eval + "Eval_Overview.csv")
+    else:
+        eval_frame.reset_index(inplace=True)
+        eval_frame.to_csv(filepath_Eval + "Eval_Overview.csv")
 
-print("Modelling done")
+    print("Modelling done")
 
-# modeller.predict_model(
-#     filepath_model=filepath_Model,
-#     balancing_techniques=balancingTechniques)
+    # modeller.predict_model(
+    #     filepath_model=filepath_Model,
+    #     balancing_techniques=balancingTechniques)
