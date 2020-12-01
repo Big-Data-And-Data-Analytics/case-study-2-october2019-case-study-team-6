@@ -1,5 +1,3 @@
-from pymongo import MongoClient
-import pandas as pd
 import numpy as np
 from scripts.mongoConnection import getCollection, insertCollection
 
@@ -38,24 +36,10 @@ class Cleaning:
     version = "0.1"
 
     def __init__(self, new_data=None):
-
-        if new_data is not None:
             self.data = new_data
-            self.execute_and_load()
-        else:
-            col_list = ['youTube_Video_Comments_Raw']
-            for each_col in col_list:
-                self.data = getCollection('01_NationalIdentity_Crawled',each_col)
-                self.execute_and_load()
 
         # db = client['01_NationalIdentity_Crawled']
         # data = db.youTube_Video_Comments_Raw
-
-    def execute_and_load(self):
-        self.data = self.remove_duplicates()
-        self.data = self.remove_white_spaces("textOriginal")
-        self.data = self.change_empty_tona("textOriginal")
-        insertCollection('01_NationalIdentity_Crawled', 'cleaned_data', self.data)
 
     def remove_white_spaces(self, column): # Remove whitepsaces in the given data-column
         """Removes all whitespaces before and after the text and multi whitespaces inside the text
@@ -105,14 +89,12 @@ class Cleaning:
 
 if __name__ == "__main__":
 
+    data = getCollection(db="01_NationalIdentity_Crawled", col="youTube_Video_Comments_Raw")
 
-    # client = MongoClient('localhost', 27017)
-    # db = client['01_NationalIdentity_Crawled']
-    # self.data = db.youTube_Video_Comments_Raw
-    # self.data = data.find({})
-    # data = list(data)
-    # data = pd.DataFrame(data)
+    cleaner = Cleaning(data)
 
-    Cleaning()
+    data = cleaner.remove_duplicates()
+    data = cleaner.remove_white_spaces("textOriginal")
+    data = cleaner.change_empty_tona("textOriginal")
 
-
+    insertCollection('01_NationalIdentity_Crawled', 'cleaned_data', data)

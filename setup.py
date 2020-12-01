@@ -25,6 +25,12 @@ setup(name='national-identity',
         "pymongo",
         "re",
         "vaderSentiment",
+        "imblearn",
+        "pyyaml",
+        "scikit-learn",
+        "matplotlib",
+        "googletrans",
+         "langdetect"
       ],
       extras_require={              # Requires to be more specific for the development purpose
           "dev": [

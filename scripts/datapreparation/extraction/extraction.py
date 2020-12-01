@@ -21,8 +21,8 @@ class ExtractTagHashtag:
         :param text: text from the column "text" of a dataframe
         :type text: string 
 
-        :return hashtag- takes the words starting with #
-        :return onlyText- text without hashtags
+        :return hashtag: takes the words starting with #
+        :return onlyText: text without hashtags
         """
         def wrapper_function(extract_taglist):
             hashtag_removed = func(extract_taglist)
@@ -47,8 +47,8 @@ class ExtractTagHashtag:
         :param : text from the column "onlyText" of a dataframe
         :type text: string
 
-        :return taglist- takes the words starting with @
-        :return onlyText- text without taglist
+        :return taglist: takes the words starting with @
+        :return onlyText: text without taglist
         """
         def wrapper_function(extract_hashtag): 
             extract_hashtag['hashtag'] = extract_hashtag['text'].str.findall(r'#.*?(?=\s|$)')

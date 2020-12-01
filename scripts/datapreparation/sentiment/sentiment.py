@@ -11,10 +11,10 @@ class Sentiment:
     :param col_name: passed otherwise
 
 
-    :param new_data: Pass a dataframe with 'onlyText' column to get sentiment for the same
-    :param col_name: Pass the collection name to which it should be loaded, depending on the data type
-    :type new_data: pandas.DataFrame
-    :type col_name: str
+    :param1 new_data: Pass a dataframe with 'onlyText' column to get sentiment for the same
+    :param2 col_name: Pass the collection name to which it should be loaded, depending on the data type
+    :type1 new_data: pandas.DataFrame
+    :type2 col_name: str
 
     :Example:
 
@@ -25,28 +25,19 @@ class Sentiment:
     data_type [post, comment or subcomment].
 
     """
-    def __init__(self, new_data=None, col_name=None):
+    def __init__(self):
         self.analyser = SentimentIntensityAnalyzer()
-        print('Inside Init')
-        if new_data is not None:
-            # new_data['sentiment'] = new_data['onlyText'].apply(sentiment_analyzer_scores)
-            self.apply_load_sentiment(new_data, col_name)
-        else:
-            post = getCollection('03_NationalIdentity_Combined', 'common_post_Combined')
-            comment = getCollection('03_NationalIdentity_Combined', 'common_comment_Combined')
-            sub_comment = getCollection('03_NationalIdentity_Combined', 'common_subcomment_Combined')
-            self.apply_load_sentiment(post, 'sentiment_post_Collection2')
-            self.apply_load_sentiment(comment, 'sentiment_comment_Collection2')
-            self.apply_load_sentiment(sub_comment, 'sentiment_subcomment_Collection2')
 
 
     def sentiment_analyzer_scores(self, sentence):
         """
         This method returns sentiment value for each sentence i.e. text passed to it.
 
-        :param sentence
+        :param sentence:
         :type sentence: str
         :return: str
+        :return: sentiment
+        :rtype: str
 
         """
         score = self.analyser.polarity_scores(sentence)
@@ -77,5 +68,12 @@ class Sentiment:
 
 if __name__ == '__main__':
 
-    Sentiment()
+    post = getCollection('03_NationalIdentity_Combined', 'common_post_Combined')
+    comment = getCollection('03_NationalIdentity_Combined', 'common_comment_Combined')
+    sub_comment = getCollection('03_NationalIdentity_Combined', 'common_subcomment_Combined')
+
+    sentiment = Sentiment()
+    sentiment.apply_load_sentiment(post, 'sentiment_post_Collection3')
+    sentiment.apply_load_sentiment(comment, 'sentiment_comment_Collection2')
+    sentiment.apply_load_sentiment(sub_comment, 'sentiment_subcomment_Collection2')
 

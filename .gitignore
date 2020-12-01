@@ -24,3 +24,17 @@ scripts/datapreparation/extraction/.vscode/settings.json
 .idea/*
 .vscode/settings.json
 /scripts/datapreparation/sentiment/test.R
+scripts/model/__pycache__/Prediction.cpython-38.pyc
+scripts/model/__pycache__/*
+/scripts/model/OneHot/class one hot.py
+/scripts/model/OneHot/dummy.py
+/scripts/model/OneHot/One Hot Model.py
+/scripts/model/OneHot/OneHot_NearMiss.R
+/scripts/model/OneHot/OneHot_Prediction.R
+/scripts/model/OneHot/oneHot_Preprocessing.py
+/scripts/model/OneHot/OneHot_SMOTE.R
+/scripts/model/OneHot/test1.py
+
+
+
+
