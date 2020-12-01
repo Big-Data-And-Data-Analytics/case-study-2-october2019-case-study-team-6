@@ -28,7 +28,9 @@ setup(name='national-identity',
         "imblearn",
         "pyyaml",
         "scikit-learn",
-        "matplotlib"
+        "matplotlib",
+        "googletrans",
+         "langdetect"
       ],
       extras_require={              # Requires to be more specific for the development purpose
           "dev": [

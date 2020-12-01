@@ -9,8 +9,6 @@ from scripts.datapreparation.translation.translation import Translation
 from scripts.datapreparation.nationalidentity.motive import IdentityMotiveTagging
 from scripts.datapreparation.nationalidentity.tagging import NationalIdentityTagging
 from scripts.datapreparation.featureselection.featureselection import FeatureSelection
-
-
 import os
 
 """
