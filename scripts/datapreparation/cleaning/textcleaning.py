@@ -1,7 +1,4 @@
-
-import nltk
-import pandas as pd
-from nltk.corpus import stopwords, wordnet
+from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from scripts.mongoConnection import getCollection, insertCollection
@@ -37,6 +34,7 @@ class TextCleaning:
         
         :param1 df: Dataframe to Clean
         :type1 df: Pandas Dataframe
+        #TODO it should be :param, :type
         """
 
         df.dropna(subset=[col], inplace=True)

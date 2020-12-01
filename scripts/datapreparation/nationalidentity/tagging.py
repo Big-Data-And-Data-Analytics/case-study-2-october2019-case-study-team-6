@@ -27,7 +27,7 @@ class NationalIdentityTagging:
         :type text: String
 
         :return: country- list of countries found in the text
-        :rtype: []
+        :rtype: list
 
         """
         country_list = ["albania", "belgium", "croatia", "czech republic", "england", "france", "germany", "hungary",
@@ -50,7 +50,7 @@ class NationalIdentityTagging:
         :type emojis: list
 
         :return: country_flags- list of countries found in the text
-        :rtype: []
+        :rtype: list
         """
 
         country_flags = [flag for flag in emojis if flag in self.flags]
@@ -126,6 +126,7 @@ class NationalIdentityTagging:
         :type2 collection: String
         
         """
+        ##TODO :param instead of :param1, same with :type
         # Initialisations
 
         post = post.fillna('0')

@@ -18,13 +18,16 @@ from sklearn.preprocessing import Binarizer
 class BalancingData:
     """BalancingData class represents performance of different balancing data on 'X' and 'y' train data.
         The sequentially used functions  are:
-        1) :func : split_train_test
-        2) :func : thread1_ADASYN
-        3) :func : thread2_SMOTE
-        4) :func : thread3_SMOTEENN
-        5) :func : thread4_SMOTETomek
-        6) :func : thread5_NearMiss
-        7) :func : thread6_TomekLinks
+        :func:
+        1 :func: `plit_train_test()`
+        2 :func: `thread1_ADASYN()`
+        3 :func: `thread2_SMOTE()`
+        4 :func: `thread3_SMOTEENN()`
+        5 :func: `thread4_SMOTETomek()`
+        6 :func: `thread5_NearMiss()`
+        7 :func: `thread6_TomekLinks()`
+        The file path needs to be provided where the output needs to be stored and the entire dataframe collection 
+        provided as the input
     """
     
     
@@ -41,8 +44,8 @@ class BalancingData:
         The vocabulary is saved into CountVectorVocabulary. The results of 'X_test' is saved in the provided filepath 
         and 'y_test' is inserted into the database.
 
-        :param : complete collection
-        :type : dataframe
+        :param new_data: complete collection
+        :type new_data: dataframe
         """
         X = self.new_data[['onlyText']]
         y = self.new_data[['identityMotive']]
@@ -75,11 +78,11 @@ class BalancingData:
         """An object of the class ADASYN is created and the dataset is resampled using 'fit_resample'. The output
         'X_res'  of the resampling is saved in the provided path and the output of 'y_res' is stored into the database.
 
-        :param : X_train
-        :param : y_train
+        :param x: X_train
+        :param y: y_train
 
-        :return : X_res
-        :return : y_res
+        :return: X_res
+        :return: y_res
         """
         ada = ADASYN()
         print("ADASYN started")
@@ -101,11 +104,11 @@ class BalancingData:
         """An object of the class SMOTE is created and the dataset is resampled using 'fit_resample'. The output
         'X_sm'  of the resampling is saved in the provided path and the output of 'y_sm' is stored into the database.
 
-        :param : X_train
-        :param : y_train
+        :param x: X_train
+        :param y: y_train
 
-        :return : X_sm
-        :return : y_sm
+        :return: X_sm
+        :return: y_sm
         """
         sm = SMOTE()
         print("SMOTE started")
@@ -127,11 +130,11 @@ class BalancingData:
         """An object of the class SMOTEENN is created and the dataset is resampled using 'fit_resample'. The output
         'X_se'  of the resampling is saved in the provided path and the output of 'y_se' is stored into the database.
 
-        :param : X_train
-        :param : y_train
+        :param x: X_train
+        :param y: y_train
 
-        :return : X_se
-        :return : y_se
+        :return: X_se
+        :return: y_se
         """
         se = SMOTEENN()
         print("SMOTEENN started")
@@ -153,11 +156,11 @@ class BalancingData:
         """An object of the class SMOTETomek is created and the dataset is resampled using 'fit_resample'. The output
         'X_st'  of the resampling is saved in the provided path and the output of 'y_st' is stored into the database.
 
-        :param : X_train
-        :param : y_train
+        :param x: X_train
+        :param y: y_train
 
-        :return : X_st
-        :return : y_st
+        :return: X_st
+        :return: y_st
         """
 
         st = SMOTETomek()
@@ -180,11 +183,11 @@ class BalancingData:
         """An object of the class NearMiss is created and the dataset is resampled using 'fit_resample'. The output
         'X_nm'  of the resampling is saved in the provided path and the output of 'y_nm' is stored into the database.
 
-        :param : X_train
-        :param : y_train
+        :param x: X_train
+        :param y: y_train
 
-        :return : X_nm
-        :return : y_nm
+        :return: X_nm
+        :return: y_nm
         """
 
         nm = NearMiss()
@@ -208,11 +211,11 @@ class BalancingData:
         """An object of the class TomekLinks is created and the dataset is resampled using 'fit_resample'. The output
         'X_tl'  of the resampling is saved in the provided path and the output of 'y_tl' is stored into the database.
 
-        :param : X_train
-        :param : y_train
+        :param x: X_train
+        :param y: y_train
 
-        :return : X_tl
-        :return : y_tl
+        :return: X_tl
+        :return: y_tl
         """
 
         tl = TomekLinks()

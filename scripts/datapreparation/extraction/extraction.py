@@ -5,9 +5,10 @@ class ExtractTagHashtag:
     """ExtractTagHashtag class represents extraction of hashtags, taglists and text without hashtags and taglists i.e onlyText
         from the text
         The sequentially used functions  are:
-        1) :func : extract
-        2) :func : decorator_hashtag
-        3) :func : decorator_taglist
+        :func:
+        1 :func : `extract()`
+        2 :func : `decorator_hashtag()`
+        3 :func : `decorator_taglist()`
     """
     def decorator_taglist(func):
         """ Extracts hashtag from the text and replaces the text having hashtags with space
@@ -20,8 +21,8 @@ class ExtractTagHashtag:
         :param text: text from the column "text" of a dataframe
         :type text: string 
 
-        :return hashtag- takes the words starting with #
-        :return onlyText- text without hashtags
+        :return hashtag: takes the words starting with #
+        :return onlyText: text without hashtags
         """
         def wrapper_function(extract_taglist):
             hashtag_removed = func(extract_taglist)
@@ -46,8 +47,8 @@ class ExtractTagHashtag:
         :param : text from the column "onlyText" of a dataframe
         :type text: string
 
-        :return taglist- takes the words starting with @
-        :return onlyText- text without taglist
+        :return taglist: takes the words starting with @
+        :return onlyText: text without taglist
         """
         def wrapper_function(extract_hashtag): 
             extract_hashtag['hashtag'] = extract_hashtag['text'].str.findall(r'#.*?(?=\s|$)')

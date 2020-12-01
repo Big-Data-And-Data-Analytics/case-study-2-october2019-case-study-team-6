@@ -20,14 +20,14 @@ class Translation:
         if the language is not english then translates that text into english and finally insert the dataframe
         into the database
 
-        :param1 df: dataframe on which detect_translate is to be applied
-        :type1 df: Pandas Dataframe
+        :param df: dataframe on which detect_translate is to be applied
+        :type df: Pandas Dataframe
 
-        :return df: Translated dataframe
-        :rtype df: Pandas Dataframe
+        :return: Translated dataframe
+        :rtype: Pandas Dataframe
         
         """
-
+        ##TODO check :param1, return too
         for index, row in df['onlyText'].iteritems():
             try:
                 lang = detect(row)
