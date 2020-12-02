@@ -22,7 +22,9 @@ from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from datetime import datetime, date
+from time import time
 
+t0 = time()
 
 class Model:
     """The Model class provides every function necessary for loading the prepared data, training and evaluating the model and finally predicting
@@ -393,8 +395,8 @@ if __name__ == "__main__":
     # filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test/"
 
     filepath_NPZ = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
-    filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test/"
-    filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test/"
+    filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test_Global_Seed_Desktop_MK/"
+    filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test_Global_Seed_Desktop_MK/"
 
     # Create empty evaluation dataframe
     eval_frame = pd.DataFrame(columns=["Model", "Balancing", "Features", "Accuracy", "F1-Score", "Precision", "Recall", "AUC", "Date", "Timestamp"])
@@ -577,16 +579,21 @@ if __name__ == "__main__":
                 total_models = total_models - 1
                 print(str(total_models) + " models left.")
 
-    if isfile(filepath_Eval + "Eval_Overview.csv"):
-        existing_eval_frame = pd.read_csv(filepath_Eval + "Eval_Overview.csv")
+    if isfile(filepath_Eval + "Eval_Overview_Global_Seed_Desktop_MK.csv"):
+        existing_eval_frame = pd.read_csv(filepath_Eval + "Eval_Overview_Global_Seed_Desktop_MK.csv")
         eval_frame = pd.concat([existing_eval_frame, eval_frame])
         eval_frame.reset_index(inplace=True)
-        eval_frame.to_csv(filepath_Eval + "Eval_Overview.csv")
+        eval_frame.to_csv(filepath_Eval + "Eval_Overview_Global_Seed_Desktop_MK.csv")
     else:
         eval_frame.reset_index(inplace=True)
-        eval_frame.to_csv(filepath_Eval + "Eval_Overview.csv")
+        eval_frame.to_csv(filepath_Eval + "Eval_Overview_Global_Seed_Desktop_MK.csv")
 
     print("Modelling done")
+
+t1 = time()
+totalTime = t1-t0
+
+print(f'Modeling took that much time: {totalTime}')
 
     # modeller.predict_model(
     #     filepath_model=filepath_Model,
