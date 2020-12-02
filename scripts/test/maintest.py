@@ -36,7 +36,7 @@ apply_model = DataModel()
 youTube_Video_Stats_Cleaned = getCollection("02_NationalIdentity_Cleaned", "youTube_Video_Stats_Cleaned")
 youTube_Videos_Cleaned = getCollection("02_NationalIdentity_Cleaned", "youTube_Videos_Cleaned")
 youTube_Videos_Data = apply_model.run_youtube_post(data1=youTube_Video_Stats_Cleaned, data2=youTube_Videos_Cleaned)
-insertCollection("03_NationalIdentity_Combined_Test", "common_post_Combined", youTube_Videos_Data)
+insertCollection("03_NationalIdentity_Combined", "common_post_Combined", youTube_Videos_Data)
 
 #### YOUTUBE COMMENT ####
 youTube_Video_Comments_Cleaned = getCollection("02_NationalIdentity_Cleaned", "youTube_Video_Comments_Cleaned")
