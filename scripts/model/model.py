@@ -1,27 +1,26 @@
-import nltk
-import yaml
-
 import pickle as pi
-import scipy as sc
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import scripts.mongoConnection as mc
-
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.linear_model import LogisticRegression, SGDClassifier
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, roc_auc_score, f1_score, precision_score, recall_score, plot_confusion_matrix
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.feature_extraction.text import CountVectorizer
-
+from datetime import date, datetime
 from os import listdir
 from os.path import isfile, join
-from nltk.stem import WordNetLemmatizer
+
+import matplotlib.pyplot as plt
+import nltk
+import pandas as pd
+import scipy as sc
+import scripts.mongoConnection as mc
+import yaml
 from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
-from datetime import datetime, date
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.linear_model import LogisticRegression, SGDClassifier
+from sklearn.metrics import (accuracy_score, f1_score, plot_confusion_matrix,
+                             precision_score, recall_score, roc_auc_score)
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.tree import DecisionTreeClassifier
+import numpy as np
 
 
 class Model:
@@ -169,7 +168,7 @@ class Model:
         :return: The trained model
         :rtype: Model object
         """        
-        trained_model = model.fit(X, y)
+        trained_model = model.fit(X, y.values.ravel())
         return trained_model
 
     def save_model(self, model, filepath):
@@ -392,9 +391,9 @@ if __name__ == "__main__":
     # filepath_Model = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test/"
     # filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test/"
 
-    filepath_NPZ = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
-    filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test/"
-    filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test/"
+    filepath_NPZ = "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/NPZs/"
+    filepath_Model = "D:/modelResults/Models_Test_vmdhhh/"
+    filepath_Eval = "D:/modelResults/Model_Eval_Test_vmdhhh/"
 
     # Create empty evaluation dataframe
     eval_frame = pd.DataFrame(columns=["Model", "Balancing", "Features", "Accuracy", "F1-Score", "Precision", "Recall", "AUC", "Date", "Timestamp"])
