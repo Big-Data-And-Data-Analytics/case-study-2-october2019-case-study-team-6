@@ -101,10 +101,10 @@ result_post = result_post.fillna('0')
 result_comment = result_comment.fillna('0')
 result_subcomment = result_subcomment.fillna('0')
 
-insertCollection('03_NationalIdentity_Combined', 'common_post_inserted', result_post)
-insertCollection('03_NationalIdentity_Combined', 'common_comment_inserted', result_comment)
-insertCollection('03_NationalIdentity_Combined', 'common_subcomment_inserted', result_subcomment)
-#TODO A Target is needed, should it be? 04_Extraction?
+insertCollection('04_NationalIdentity_Extract', 'common_post_extract', result_post)
+insertCollection('04_NationalIdentity_Extract', 'common_comment_extract', result_comment)
+insertCollection('04_NationalIdentity_Extract', 'common_subcomment_extract', result_subcomment)
+# TODO A Target is needed, should it be? 04_Extraction?
 del df_post
 del df_comment
 del df_subcomment
@@ -123,17 +123,17 @@ translate = Translation()
 # S 04_Extraction
 # T 05_NationalIdentity_Translated
 
-df = getCollection('05_NationalIdentity', 'ni_post')
+df = getCollection('04_NationalIdentity_Extract', 'common_post_extract')
 df = translate.detect_translate(df)
-insertCollection('06_NationalIdentity_Translated', 'ni_post_translated', df)
+insertCollection('05_NationalIdentity_Translated', 'ni_post_translated', df)
 
-df = getCollection('05_NationalIdentity', 'ni_comment')
+df = getCollection('05_NationalIdentity_Extract', 'common_comment_extract')
 df = translate.detect_translate(df)
-insertCollection('06_NationalIdentity_Translated', 'ni_comment_translated', df)
+insertCollection('05_NationalIdentity_Translated', 'ni_comment_translated', df)
 
-df = getCollection('05_NationalIdentity', 'ni_subcomment')
+df = getCollection('04_NationalIdentity_Extract', 'common_subcomment_extract')
 df = translate.detect_translate(df)
-insertCollection('06_NationalIdentity_Translated', 'ni_subcomment_translated', df)
+insertCollection('05_NationalIdentity_Translated', 'ni_subcomment_translated', df)
 
 
 """
@@ -145,15 +145,20 @@ insertCollection('06_NationalIdentity_Translated', 'ni_subcomment_translated', d
 # T 06_NationalIdentity_Sentiment
 
 #TODO Compare columns from previous step and test, source and target dbnames need to be changed
-post = getCollection('03_NationalIdentity_Combined', 'common_post_Combined')
-comment = getCollection('03_NationalIdentity_Combined', 'common_comment_Combined')
-sub_comment = getCollection('03_NationalIdentity_Combined', 'common_subcomment_Combined')
+post = getCollection('05_NationalIdentity_Translated', 'ni_post_translated')
+comment = getCollection('05_NationalIdentity_Translated', 'ni_comment_translated')
+sub_comment = getCollection('05_NationalIdentity_Translated', 'ni_subcomment_translated')
 
 ##TODO Check if ran twice does data load?
 sentiment = Sentiment()
-sentiment.apply_load_sentiment(post, 'sentiment_post_Collection')
-sentiment.apply_load_sentiment(comment, 'sentiment_comment_Collection')
-sentiment.apply_load_sentiment(sub_comment, 'sentiment_subcomment_Collection')
+post_data = sentiment.apply_load_sentiment(post)
+insertCollection('06_NationalIdentity_Sentiment', 'sentiment_post_Collection', post_data)
+
+comment_data = sentiment.apply_load_sentiment(comment)
+insertCollection('06_NationalIdentity_Sentiment', 'sentiment_comment_Collection', comment_data)
+
+sub_comment_data = sentiment.apply_load_sentiment(sub_comment)
+insertCollection('06_NationalIdentity_Sentiment', 'sentiment_subcomment_Collection', sub_comment_data)
 
 del post
 del comment
@@ -170,15 +175,15 @@ del sub_comment
 #TODO Compare columns from previous step and test, source and target dbnames need to be changed
 textCleaning = TextCleaning()
 
-df_post = getCollection('06_NationalIdentity_Translated', 'ni_post_translated')
+df_post = getCollection('06_NationalIdentity_Sentiment', 'sentiment_post_Collection')
 df_post = textCleaning.get_clean_df(df=df_post, col="onlyText")
 insertCollection('07_PreProcessing', 'ni_post_preprocessed', df_post)
 
-df_comment = getCollection('06_NationalIdentity_Translated', 'ni_comment_translated')
+df_comment = getCollection('06_NationalIdentity_Sentiment', 'sentiment_comment_Collection')
 df_comment = textCleaning.get_clean_df(df=df_comment, col="onlyText")
 insertCollection('07_PreProcessing', 'ni_comment_preprocessed', df_comment)
 
-df_subcomment = getCollection('06_NationalIdentity_Translated', 'ni_subcomment_translated')
+df_subcomment = getCollection('06_NationalIdentity_Sentiment', 'sentiment_subcomment_Collection')
 df_subcomment = textCleaning.get_clean_df(df=df_subcomment, col="onlyText")
 insertCollection('07_PreProcessing', 'ni_subcomment_preprocessed', df_subcomment)
 
@@ -197,14 +202,14 @@ insertCollection('07_PreProcessing', 'ni_subcomment_preprocessed', df_subcomment
 nationalIdentityTaggingObj = NationalIdentityTagging()
 nationalIdentityTaggingObj.get_flags()
 
-df = getCollection('04_NationalIdentity_Sentiment', 'sentiment_post_Collection')
+df = getCollection('07_PreProcessing', 'sentiment_post_Collection')
 nationalIdentityTaggingObj.postData(df, 'ni_post') ##TODO Change the method name postData sound too specific
 
-df = getCollection('04_NationalIdentity_Sentiment', 'sentiment_comment_Collection')
+df = getCollection('07_PreProcessing', 'sentiment_comment_Collection')
 df.rename(columns={'Comment': 'text'}, inplace=True)
 nationalIdentityTaggingObj.postData(df, 'ni_comment')
 
-df = getCollection('04_NationalIdentity_Sentiment', 'sentiment_subcomment_Collection')
+df = getCollection('07_PreProcessing', 'sentiment_subcomment_Collection')
 df.rename(columns={'Sub_Comment': 'text'}, inplace=True)
 nationalIdentityTaggingObj.postData(df, 'ni_subcomment')
 

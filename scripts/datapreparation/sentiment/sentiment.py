@@ -49,7 +49,7 @@ class Sentiment:
         else:
             return 'negative'
 
-    def apply_load_sentiment(self, data, col_name):
+    def apply_load_sentiment(self, data):
         """
         This method retrieves sentiment from sentiment_analyser_scores and loads into appropriate database collection
 
@@ -60,8 +60,9 @@ class Sentiment:
         """
 
         data['onlyText'] = data['onlyText'].str.strip()
+        data['onlyText'] = data['onlyText'].astype("str")
         data['sentiment'] = data['onlyText'].apply(self.sentiment_analyzer_scores)
-        insertCollection('04_NationalIdentity_Sentiment', col_name, data)
+        return data
 
 
 
