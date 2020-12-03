@@ -409,7 +409,7 @@ if __name__ == "__main__":
     learning_rate = "optimal"
     use_onehot=False
 
-    # Istanciate classes
+    # Istanciate classes # TODO Can go under init method
     modeller = Model()
     onehotencoder = OneHotEncoder(sparse=False)
     nb = MultinomialNB()
@@ -427,6 +427,7 @@ if __name__ == "__main__":
         tol=None)
 
     # Model selection parameters (Model != One-hot!)
+    # TODO Can go under init method
     models = [svm, nb, dt, logreg, rf]
     balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
     featureSelections = ["None", "chi2", "f_classif"]
@@ -438,7 +439,7 @@ if __name__ == "__main__":
 
     total_models = len(models) * len(balancingTechniques) * len(featureSelections)
     print(f'Training a total of {total_models} single class models')
-
+    # TODO New Function? for the loops
     for model in models:
         for balancingTechnique in balancingTechniques:
             for featureSelection in featureSelections:
@@ -514,6 +515,7 @@ if __name__ == "__main__":
     total_models = len(models) * len(balancingTechniques) * len(featureSelections)
     print(f'Training a total of {total_models} multiclass models')
 
+    # TODO New Function? for the loops
     for model in models:
         for balancingTechnique in balancingTechniques:
             for featureSelection in featureSelections:
