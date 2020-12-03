@@ -113,7 +113,7 @@ class NationalIdentityTagging:
         self.flags = list(flags)
 
 
-    def postData(self, post, collection):
+    def postData(self, post):
         """Extracts emojis and country from a dataframe and returns transformed dataframe
 
         To extract emojis and countries from a dataframe given to this function, it applies extract_emojis,
@@ -136,7 +136,7 @@ class NationalIdentityTagging:
         post['countryem'] = post['emojis'].apply(self.extract_country_emojis)
         post['country'] = post['text'].apply(self.find_national_identity)
 
-        insertCollection('05_NationalIdentity', collection, post)
+        return post
 
 if __name__ == "__main__":
     

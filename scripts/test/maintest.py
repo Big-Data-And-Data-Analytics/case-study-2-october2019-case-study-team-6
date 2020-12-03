@@ -202,16 +202,22 @@ insertCollection('07_PreProcessing', 'ni_subcomment_preprocessed', df_subcomment
 nationalIdentityTaggingObj = NationalIdentityTagging()
 nationalIdentityTaggingObj.get_flags()
 
-df = getCollection('07_PreProcessing', 'sentiment_post_Collection')
-nationalIdentityTaggingObj.postData(df, 'ni_post') ##TODO Change the method name postData sound too specific
+df = getCollection('07_PreProcessing', 'ni_post_preprocessed')
+post = nationalIdentityTaggingObj.postData(df) ##TODO Change the method name postData sound too specific
+insertCollection('08_NationalIdentity', 'ni_post', post)
 
-df = getCollection('07_PreProcessing', 'sentiment_comment_Collection')
+
+df = getCollection('07_PreProcessing', 'ni_comment_preprocessed')
 df.rename(columns={'Comment': 'text'}, inplace=True)
-nationalIdentityTaggingObj.postData(df, 'ni_comment')
+comment = nationalIdentityTaggingObj.postData(df)
+insertCollection('08_NationalIdentity', 'ni_comment', comment)
 
-df = getCollection('07_PreProcessing', 'sentiment_subcomment_Collection')
+
+df = getCollection('07_PreProcessing', 'ni_subcomment_preprocessed')
 df.rename(columns={'Sub_Comment': 'text'}, inplace=True)
-nationalIdentityTaggingObj.postData(df, 'ni_subcomment')
+sub_comment = nationalIdentityTaggingObj.postData(df)
+
+insertCollection('08_NationalIdentity', 'ni_subcomment', sub_comment)
 
 
 """
