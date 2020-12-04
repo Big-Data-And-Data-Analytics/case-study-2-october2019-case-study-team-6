@@ -230,7 +230,7 @@ class Model:
         if use_onehot == True:
             y_probas = model.predict_proba(x_pred)
             probs = y_probas[:, 1]
-            auc = roc_auc_score(y_true, probs)
+            auc = roc_auc_score(y_true, probs, average=average, multi_class="ovr")
 
         if use_onehot == False:
             disp = plot_confusion_matrix(model, x_pred, y_true, display_labels=self.my_tags, cmap=plt.cm.Blues, normalize=normalize_cm)
@@ -395,11 +395,11 @@ if __name__ == "__main__":
     # filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test/"
 
     filepath_NPZ = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
-    filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test_Global_Seed_Desktop_MK/"
-    filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test_Global_Seed_Desktop_MK/"
+    filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test_Global_Seed_Desktop_MK/"
+    filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test_Global_Seed_Desktop_MK/"
 
     # Create empty evaluation dataframe
-    eval_frame = pd.DataFrame(columns=["Model", "Balancing", "Features", "Accuracy", "F1-Score", "Precision", "Recall", "AUC", "Date", "Timestamp"])
+    eval_frame = pd.DataFrame(columns=["Model", "Balancing", "Features", "Accuracy", "F1-Score", "Precision", "Recall", "ROC_AUC", "Date", "Timestamp"])
 
     # Model input parameters
     seed = 69
@@ -563,7 +563,7 @@ if __name__ == "__main__":
                     "F1-Score": f1,
                     "Precision": precision,
                     "Recall": recall,
-                    "AUC": auc,
+                    "ROC_AUC": auc,
                     "Date": today,
                     "Timestamp": current_time
                     }
