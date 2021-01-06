@@ -36,7 +36,7 @@ Y = np.array(label_token.texts_to_sequences(df['identityMotive'].values))
 X, x_test, Y, y_test = train_test_split(X, Y, test_size = 0.2)
 print(f'{X.shape} shape of x; {Y.shape} is shape of y')
 
-tm = TomekLinks()
+tm = SMOTEENN()
 print("TM started")
 X_sm, y_sm = tm.fit_resample(X, Y)
 print(f'{X_sm.shape} shape of x; {y_sm.shape} is shape of y')
