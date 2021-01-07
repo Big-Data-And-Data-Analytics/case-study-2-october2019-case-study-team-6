@@ -68,5 +68,5 @@ if __name__ == '__main__':
     df = getCollection('08_PreTrain', 'train_data')
     nn = NN_Model()
     nn.tokenize(df)
-    nn.lstm('SMOTEENN')
+    nn.lstm(SMOTEENN)
     
