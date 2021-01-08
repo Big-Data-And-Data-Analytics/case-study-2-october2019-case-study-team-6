@@ -24,7 +24,6 @@ del data
 insertCollection('02_NationalIdentity_Cleaned', 'youTube_Video_Comments_Cleaned', cleaned_data)
 del cleaned_data
 
-
 """
 ************************************************ DATA MODEL ************************************************************
 """
@@ -118,7 +117,7 @@ del result_subcomment
 """
 translate = Translation()
 
-#TODO Compare columns from previous step and test, source and target dbnames need to be changed
+# TODO Compare columns from previous step and test, source and target dbnames need to be changed
 
 # S 04_Extraction
 # T 05_NationalIdentity_Translated
@@ -135,16 +134,14 @@ df = getCollection('04_NationalIdentity_Extract', 'common_subcomment_extract')
 df = translate.detect_translate(df)
 insertCollection('05_NationalIdentity_Translated', 'ni_subcomment_translated', df)
 
-
 """
 ************************************************ SENTIMENT *************************************************************
 """
 
-
 # S 05_NationalIdentity_Translated
 # T 06_NationalIdentity_Sentiment
 
-#TODO Compare columns from previous step and test, source and target dbnames need to be changed
+# TODO Compare columns from previous step and test, source and target dbnames need to be changed
 post = getCollection('05_NationalIdentity_Translated', 'ni_post_translated')
 comment = getCollection('05_NationalIdentity_Translated', 'ni_comment_translated')
 sub_comment = getCollection('05_NationalIdentity_Translated', 'ni_subcomment_translated')
@@ -164,7 +161,6 @@ del post
 del comment
 del sub_comment
 
-
 """
 ************************************************ LEMMITIZATION *********************************************************
 """
@@ -172,7 +168,7 @@ del sub_comment
 # S 06_NationalIdentity_Sentiment
 # T 07_PreProcessing
 
-#TODO Compare columns from previous step and test, source and target dbnames need to be changed
+# TODO Compare columns from previous step and test, source and target dbnames need to be changed
 textCleaning = TextCleaning()
 
 df_post = getCollection('06_NationalIdentity_Sentiment', 'sentiment_post_Collection')
@@ -187,13 +183,12 @@ df_subcomment = getCollection('06_NationalIdentity_Sentiment', 'sentiment_subcom
 df_subcomment = textCleaning.get_clean_df(df=df_subcomment, col="onlyText")
 insertCollection('07_PreProcessing', 'ni_subcomment_preprocessed', df_subcomment)
 
-
-#TODO Merge Motive and National Identity under one class
+# TODO Merge Motive and National Identity under one class
 """ 
 ************************************************ TAGGING **************************************************************
 ***************************************** NATIONAL IDENTITY TAGGING ****************************************************
 """
-#TODO Compare columns from previous step and test, source and target dbnames need to be changed
+# TODO Compare columns from previous step and test, source and target dbnames need to be changed
 
 # T 07_PreProcessing
 # S 08_NationalIdentity
@@ -203,22 +198,19 @@ nationalIdentityTaggingObj = NationalIdentityTagging()
 nationalIdentityTaggingObj.get_flags()
 
 df = getCollection('07_PreProcessing', 'ni_post_preprocessed')
-post = nationalIdentityTaggingObj.postData(df) ##TODO Change the method name postData sound too specific
+post = nationalIdentityTaggingObj.postData(df)  ##TODO Change the method name postData sound too specific
 insertCollection('08_NationalIdentity', 'ni_post', post)
-
 
 df = getCollection('07_PreProcessing', 'ni_comment_preprocessed')
 df.rename(columns={'Comment': 'text'}, inplace=True)
 comment = nationalIdentityTaggingObj.postData(df)
 insertCollection('08_NationalIdentity', 'ni_comment', comment)
 
-
 df = getCollection('07_PreProcessing', 'ni_subcomment_preprocessed')
 df.rename(columns={'Sub_Comment': 'text'}, inplace=True)
 sub_comment = nationalIdentityTaggingObj.postData(df)
 
 insertCollection('08_NationalIdentity', 'ni_subcomment', sub_comment)
-
 
 """
 ****************************************** IDENTITY MOTIVE TAGGING *****************************************************
@@ -227,7 +219,7 @@ insertCollection('08_NationalIdentity', 'ni_subcomment', sub_comment)
 # T 07_PreProcessing
 # S 08_PreTrain
 
-#TODO Compare columns from previous step and test, source and target dbnames need to be changed
+# TODO Compare columns from previous step and test, source and target dbnames need to be changed
 identityMotiveTagging = IdentityMotiveTagging()
 identityMotiveTagging.get_synonyms()
 
@@ -275,12 +267,9 @@ featureSelection.balancing()
 """
 ****************************************************** MODEL ***********************************************************
 """
-#TODO Need steps from Max
+# TODO Need steps from Max
 
 """
 ************************************************ PREDICTION ************************************************************
 """
-#TODO Need steps from Max
-
-
-
+# TODO Need steps from Max
