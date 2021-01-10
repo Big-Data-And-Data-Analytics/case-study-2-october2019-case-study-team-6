@@ -11,7 +11,7 @@ def getCollection(db, col):
     :return: Data from the given collection
     :rtype: pandas dataframe
     """    
-    conn = MongoClient("localhost" , 27017)
+    conn = MongoClient("localhost", 27017)
     collobj = conn[db][col]
     collection = pd.DataFrame(list(collobj.find({})))
     return collection.copy()
@@ -25,8 +25,9 @@ def insertCollection(db, col, result):
     :type col: string
     :param result: Data that should be stored
     :type result: Pandas Dataframe
-    """    
+    """
+    ## TODO Add a "db.drop(col)" before inserting, so everytime we insert a collection to the database, remove this particular collection
     result = result.to_dict("records")
-    conn = MongoClient("localhost" , 27017)
+    conn = MongoClient("localhost", 27017)
     connObj =  conn[db][col]
     connObj.insert_many(result)
