@@ -9,7 +9,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from scripts.mongoConnection import getCollection
-import argparse
 import tensorflow as tf
 from scripts.model.sepCNN import build_model
 from scripts.model.sepCNN import load_data
@@ -24,7 +23,7 @@ TOP_K = 20000
 
 def train_sequence_model(data,
                          learning_rate=1e-3,
-                         epochs=1000,
+                         epochs=10,
                          batch_size=128,
                          blocks=2,
                          filters=64,
@@ -120,14 +119,19 @@ if __name__ == '__main__':
     # parser.add_argument('--data_dir', type=str, default='./data',
     #                     help='input data directory')
     # FLAGS, unparsed = parser.parse_known_args()
-    data_dir = "C:/Users/shubham/Downloads/sentiment-analysis-on-movie-reviews/"
+    # data_dir = "C:/Users/shubham/Downloads/sentiment-analysis-on-movie-reviews/"
+
     # Using the Rotten tomatoes movie reviews dataset to demonstrate
     # training sequence model.
-    data = load_data.load_rotten_tomatoes_sentiment_analysis_dataset(
-            data_dir)
+    data = getCollection(db="08_PreTrain", col="ni_post_pretrain")
+    # data = load_data.load_rotten_tomatoes_sentiment_analysis_dataset(data_dir)
     # print(data)
 
 
+
+    (train_texts, train_labels), (val_texts, val_labels) = data
+
+
+
 # FLAGS.data_dir)
-#     train_sequence_model(data)
-    getCollection(db="08_PreTrain", col="ni_post_pretrain")
+    train_sequence_model(data)
