@@ -173,6 +173,7 @@ class Model:
             X_test = self.__import_X_test(x_test_fp)
 
             fs = pi.load(open(self.filepath_NPZ + '/Feature_' + balancing_technique + 'fs_' + fs_function + '.tchq', 'rb'))
+            
             X_test = fs.transform(X_test)
         else:
             X = self.__import_X_train(npz_filepath=self.filepath_NPZ + balancing_technique + "_x_matrix.npz")
@@ -491,13 +492,13 @@ class Model:
 if __name__ == "__main__":
 
     # Set paths
-    filepath_NPZ = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
-    filepath_Model = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test_Global_Seed_Notebook_MK/"
-    filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test_Global_Seed_Notebook_MK/"
+    # filepath_NPZ = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+    # filepath_Model = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test_Global_Seed_Notebook_MK/"
+    # filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test_Global_Seed_Notebook_MK/"
 
-    # filepath_NPZ = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/",
-    # filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test/",
-    # filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test/"
+    filepath_NPZ = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+    filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Test_NewY/"
+    filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test_NewY/"
 
     t0 = time()
 
