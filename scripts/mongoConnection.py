@@ -16,7 +16,7 @@ def getCollection(db, col):
     collection = pd.DataFrame(list(collobj.find({})))
     return collection.copy()
 
-def insertCollection(db, col, result):
+def insertCollection(db, col, result, drop = True):
     """Inserts the given data into the specified databases collection
 
     :param db: Database where the collection is
@@ -25,8 +25,11 @@ def insertCollection(db, col, result):
     :type col: string
     :param result: Data that should be stored
     :type result: Pandas Dataframe
-    """    
+    """
+
     result = result.to_dict("records")
     conn = MongoClient("localhost" , 27017)
     connObj =  conn[db][col]
+    if drop:
+        connObj.drop()
     connObj.insert_many(result)

@@ -123,12 +123,12 @@ if __name__ == '__main__':
 
     df = getCollection('07_PreProcessing', 'ni_post_preprocessed')
     df = identityMotiveTagging.tagging(df)
-    insertCollection('08_PreTrain', 'train_data', df)
+    insertCollection('08_PreTrain', 'train_data', df, drop=False)
 
     df = getCollection('07_PreProcessing', 'ni_comment_preprocessed')
     df = identityMotiveTagging.tagging(df)
-    insertCollection('08_PreTrain', 'train_data', df)
+    insertCollection('08_PreTrain', 'train_data', df, drop=False)
 
     df = getCollection('07_PreProcessing', 'ni_subcomment_preprocessed')
     df = identityMotiveTagging.tagging(df)
-    insertCollection('08_PreTrain', 'train_data', df)
+    insertCollection('08_PreTrain', 'train_data', df, drop=False)
