@@ -48,3 +48,5 @@ scripts/datapreparation/translation/__pycache__/*
 
 
 
+/rotten_tomatoes_sepcnn_model.h5
+/scripts/model/TNN_GOOGLE.py
