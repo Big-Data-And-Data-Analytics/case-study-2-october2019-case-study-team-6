@@ -29,7 +29,9 @@ def get_num_classes(labels):
             is missing or if number of classes is <= 1.
     """
     num_classes = max(labels) + 1
+    labels = labels.tolist()
     missing_classes = [i for i in range(num_classes) if i not in labels]
+    print(f"Missing Classes are:{missing_classes}")
     if len(missing_classes):
         raise ValueError('Missing samples with label value(s) '
                          '{missing_classes}. Please make sure you have '

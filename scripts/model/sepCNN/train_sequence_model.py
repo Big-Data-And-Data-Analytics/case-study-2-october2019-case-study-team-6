@@ -5,9 +5,11 @@ training a sequence model - a sepCNN model. We use sequence model for text
 classification when the ratio of number of samples to number of words per
 sample for the given dataset is very large (>~15K).
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+# from __future__ import absolute_import
+# from __future__ import division
+# from __future__ import print_function
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import StratifiedShuffleSplit
 from scripts.mongoConnection import getCollection
 import tensorflow as tf
 from scripts.model.sepCNN import build_model
@@ -22,12 +24,13 @@ TOP_K = 20000
 
 
 def train_sequence_model(data,
-                         learning_rate=1e-3,
-                         epochs=10,
-                         batch_size=128,
+                         learning_rate=2e-3,
+                         # learning_rate=0.001,
+                         epochs=50,
+                         batch_size=64,
                          blocks=2,
                          filters=64,
-                         dropout_rate=0.2,
+                         dropout_rate=0.5,
                          embedding_dim=200,
                          kernel_size=3,
                          pool_size=3):
@@ -60,11 +63,11 @@ def train_sequence_model(data,
                          ' {unexpected_labels}. Please make sure that the '
                          'labels in the validation set are in the same range '
                          'as training labels.'.format(
-                             unexpected_labels=unexpected_labels))
+            unexpected_labels=unexpected_labels))
 
     # Vectorize texts.
     x_train, x_val, word_index = vectorize_data.sequence_vectorize(
-            train_texts, val_texts)
+        train_texts, val_texts)
 
     # Number of features will be the embedding input dimension. Add 1 for the
     # reserved index 0.
@@ -96,18 +99,18 @@ def train_sequence_model(data,
 
     # Train and validate model.
     history = model.fit(
-            x_train,
-            train_labels,
-            epochs=epochs,
-            callbacks=callbacks,
-            validation_data=(x_val, val_labels),
-            verbose=1,  # Logs once per epoch.
-            batch_size=batch_size)
+        x_train,
+        train_labels,
+        epochs=epochs,
+        callbacks=callbacks,
+        validation_data=(x_val, val_labels),
+        verbose=1,  # Logs once per epoch.
+        batch_size=batch_size)
 
     # Print results.
     history = history.history
     print('Validation accuracy: {acc}, loss: {loss}'.format(
-            acc=history['val_acc'][-1], loss=history['val_loss'][-1]))
+        acc=history['val_acc'][-1], loss=history['val_loss'][-1]))
 
     # Save model.
     model.save('rotten_tomatoes_sepcnn_model.h5')
@@ -123,15 +126,32 @@ if __name__ == '__main__':
 
     # Using the Rotten tomatoes movie reviews dataset to demonstrate
     # training sequence model.
-    data = getCollection(db="08_PreTrain", col="ni_post_pretrain")
+    test_size = 0.25
+    random_state = 69
+    data = getCollection(db="08_PreTrain", col="train_data")
+    data = data[data["country"] != "NORTHEN IRELAND"]
+    data = data[data["country"] != 0]
+    le = LabelEncoder()
+    data['country'] = le.fit_transform(data['country'])
+
     # data = load_data.load_rotten_tomatoes_sentiment_analysis_dataset(data_dir)
     # print(data)
 
+    # data = data[data["country"] != 0]
 
+    # TODO Add funtionality that it will automatically filter out countries below threshhold of 4
 
-    (train_texts, train_labels), (val_texts, val_labels) = data
+    X = data['onlyText'] + " " + data['identityMotive']
+    y = data['country']
+    sss = StratifiedShuffleSplit(n_splits=5, test_size=test_size, train_size=1 - test_size,
+                                 random_state=random_state)
 
+    for train_index, test_index in sss.split(X, y):
+        print("TRAIN:", train_index, "TEST:", test_index)
+        X_train, X_test = X.iloc[list(train_index)], X.iloc[list(test_index)]
+        y_train, y_test = y.iloc[list(train_index)], y.iloc[list(test_index)]
 
+    data = (X_train, y_train), (X_test, y_test)
 
-# FLAGS.data_dir)
+    # FLAGS.data_dir)
     train_sequence_model(data)
