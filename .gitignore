@@ -44,9 +44,7 @@ scripts/datapreparation/nationalidentity/__pycache__/*
 scripts/datapreparation/nationalidentity/__pycache__/*
 scripts/datapreparation/sentiment/__pycache__/*
 scripts/datapreparation/translation/__pycache__/*
-
-
-
-
 /rotten_tomatoes_sepcnn_model.h5
 /scripts/model/TNN_GOOGLE.py
+/logs/
+/logs_lstm/

@@ -16,6 +16,7 @@ from scripts.model.sepCNN import build_model
 from scripts.model.sepCNN import load_data
 from scripts.model.sepCNN import vectorize_data
 from scripts.model.sepCNN import explore_data
+from tensorflow.keras.callbacks import TensorBoard
 
 FLAGS = None
 
@@ -24,16 +25,16 @@ TOP_K = 20000
 
 
 def train_sequence_model(data,
-                         learning_rate=2e-3,
+                         learning_rate=1e-3,
                          # learning_rate=0.001,
-                         epochs=50,
-                         batch_size=64,
+                         epochs=10,
+                         batch_size=128,
                          blocks=2,
                          filters=64,
-                         dropout_rate=0.5,
-                         embedding_dim=200,
+                         dropout_rate=0.2,
+                         embedding_dim=2000,
                          kernel_size=3,
-                         pool_size=3):
+                         pool_size=3, tensorboard=None):
     """Trains sequence model on the given dataset.
 
     # Arguments
@@ -94,8 +95,10 @@ def train_sequence_model(data,
 
     # Create callback for early stopping on validation loss. If the loss does
     # not decrease in two consecutive tries, stop training.
-    callbacks = [tf.keras.callbacks.EarlyStopping(
-        monitor='val_loss', patience=2)]
+    # callbacks = [tf.keras.callbacks.EarlyStopping(
+    #     monitor='val_loss', patience=2), tensorboard]
+
+    callbacks = [tensorboard]
 
     # Train and validate model.
     history = model.fit(
@@ -113,7 +116,7 @@ def train_sequence_model(data,
         acc=history['val_acc'][-1], loss=history['val_loss'][-1]))
 
     # Save model.
-    model.save('rotten_tomatoes_sepcnn_model.h5')
+    # model.save('rotten_tomatoes_sepcnn_model.h5')
     return history['val_acc'][-1], history['val_loss'][-1]
 
 
@@ -154,4 +157,36 @@ if __name__ == '__main__':
     data = (X_train, y_train), (X_test, y_test)
 
     # FLAGS.data_dir)
-    train_sequence_model(data)
+    # NAME = "testLog"
+    # tensorboard = TensorBoard(log_dir="logs/{}".format(NAME))
+    # train_sequence_model(data, tensorboard=tensorboard)
+
+    embedding_dim = [200, 2000, 4000, 8000]
+    batch_size = [32, 64, 128]
+    dropout_rate = [0.2, 0.5]
+    learning_rate = [1e-3, 1e-2, 1e-1]
+    blocks = 3
+    pool_size = [3]
+    epochs = 50
+    filters = 7
+    kernel_size = 3
+
+    for em in embedding_dim:
+        for dr in dropout_rate:
+            for bs in batch_size:
+                for lr in learning_rate:
+                    for pool in pool_size:
+                        print(em, dr, bs, lr, pool, epochs, filters, kernel_size)
+                        NAME = f"sepCNN_lr{lr}_em{em}_dr{dr}_bs_{bs}_pool{pool}_{epochs}_{filters}_{kernel_size}"
+                        tensorboard = TensorBoard(log_dir="logs/{}".format(NAME))
+                        train_sequence_model(data,
+                                                 learning_rate=lr,
+                                                 # learning_rate=0.001,
+                                                 epochs=10,
+                                                 batch_size=bs,
+                                                 blocks=3,
+                                                 filters=7,
+                                                 dropout_rate=dr,
+                                                 embedding_dim=em,
+                                                 kernel_size=3,
+                                                 pool_size=pool, tensorboard=tensorboard)
