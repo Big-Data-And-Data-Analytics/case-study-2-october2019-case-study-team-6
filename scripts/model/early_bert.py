@@ -1,3 +1,5 @@
+# https://stackabuse.com/text-classification-with-bert-tokenizer-and-tf-2-0-in-python/
+
 import scripts.mongoConnection as mc
 import tensorflow_hub as hub
 #import bert
@@ -114,9 +116,6 @@ class TEXT_MODEL(tf.keras.Model):
         
         return model_output
 print("Model function created")
-
-# Architecture of BERT
-# https://stackabuse.com/text-classification-with-bert-tokenizer-and-tf-2-0-in-python/
 
 VOCAB_LENGTH = len(tokenizer.vocab)
 EMB_DIM = 200
