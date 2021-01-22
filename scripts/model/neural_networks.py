@@ -1,9 +1,5 @@
 import numpy as np
-import pandas as pd
 import tensorflow as tf
-from imblearn.combine import SMOTEENN, SMOTETomek
-from imblearn.over_sampling import ADASYN, SMOTE
-from imblearn.under_sampling import NearMiss, TomekLinks
 from scripts.mongoConnection import getCollection
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.layers import (LSTM, Activation, Bidirectional, Dense,
@@ -86,7 +82,6 @@ if __name__ == '__main__':
                     print(f"Model Number: {counter}")
                     counter += 1
                     NAME = f"Model_Vocabsize_{vc_size}_Embdim_{emb}_maxlen_{max_l}_trp_{trp}"
-
                     tb = TensorBoard(log_dir="logs_lstm/{}".format(NAME))
                     nn = NN_Model(vocab_size=vc_size, embedding_dim=emb, max_length=max_l, trunc_type='post',
                         padding_type='post', oov_tok='<OOV>', training_portion=tp, num_epochs=5, tensorboard=tb)
