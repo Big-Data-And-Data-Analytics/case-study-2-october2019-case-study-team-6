@@ -8,7 +8,8 @@ import tensorflow as tf
 import numpy as np
 import random
 import math
-import torch
+import pickle as pi
+import datetime
 
 # GPU check
 print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices("GPU")))
@@ -27,7 +28,7 @@ print("Data received")
 
 # Download BERT model
 bert = BertTokenizer
-bert_layer = hub.KerasLayer("https://tfhub.dev/tensorflow/bert_multi_cased_L-12_H-768_A-12/2", trainable=True)
+bert_layer = hub.KerasLayer("https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/3", trainable=True)
 print("BERT download done / BERT LOADED")
 
 vocabulary_file = bert_layer.resolved_object.vocab_file.asset_path.numpy()
@@ -137,6 +138,9 @@ else:
                        optimizer="adam",
                        metrics=["sparse_categorical_accuracy"])
 
+log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
 text_model.fit(train_data, epochs=NB_EPOCHS, batch_size=BATCH_SIZE)
 print("Model fitted")
 
@@ -144,4 +148,5 @@ results = text_model.evaluate(test_data)
 print(results)
 
 # Save model
-torch.save(text_model, "D:/OneDrive - SRH IT/09 Case Study II/03 Pipeline outputs/01 Models/01 BERT")
+# pi.dump(text_model, open("D:/OneDrive - SRH IT/09 Case Study II/03 Pipeline outputs/01 Models/01 BERT/bert.model", 'wb'))
+# text_model.save_pretrained("D:/OneDrive - SRH IT/09 Case Study II/03 Pipeline outputs/01 Models/01 BERT/bert.model")
