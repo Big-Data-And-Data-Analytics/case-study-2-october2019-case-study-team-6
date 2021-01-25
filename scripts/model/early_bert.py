@@ -141,7 +141,7 @@ text_model.compile(loss="sparse_categorical_crossentropy", optimizer="adam", met
 log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-text_model.fit(train_data, epochs=NB_EPOCHS, batch_size=BATCH_SIZE)
+text_model.fit(train_data, epochs=NB_EPOCHS, batch_size=BATCH_SIZE, callbacks=[tensorboard_callback])
 print("Model fitted")
 
 results = text_model.evaluate(test_data)
