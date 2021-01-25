@@ -1,36 +1,44 @@
 # https://stackabuse.com/text-classification-with-bert-tokenizer-and-tf-2-0-in-python/
 
+## TODO: Balancing!
+
 import scripts.mongoConnection as mc
 import tensorflow_hub as hub
-#import bert
 from transformers import BertTokenizer
 import tensorflow as tf
-import numpy as np
 import random
 import math
-import pickle as pi
 import datetime
+from sklearn.preprocessing import LabelEncoder
+from keras.utils import plot_model
 
 # GPU check
 print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices("GPU")))
 
 # Get data and prepare it
 df = mc.getCollection("08_PreTrain", "train_data")
+print("Data received")
 
 df["onlyTextMotive"] = df["onlyText"] + df["identityMotive"]
 
 df = df[['country', 'onlyTextMotive']]
 df = df[df["country"] != 0]
 
-y = df['country']
-y = np.array(list(map(lambda x: 1 if x=="positive" else 0, y)))
-print("Data received")
+print(df.shape)
+print(df.columns.values)
+print(df.country.unique())
+
+# Encode labels
+le = LabelEncoder()
+y = le.fit_transform(df["country"]) # Use this for later predicting
+# tf.keras.utils.to_categorical(y, num_classes=None, dtype='float32') # Can also use this instead of above line
+print("Data prepared")
 
 # Download BERT model
-bert = BertTokenizer
 bert_layer = hub.KerasLayer("https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/3", trainable=True)
 print("BERT download done / BERT LOADED")
 
+bert = BertTokenizer
 vocabulary_file = bert_layer.resolved_object.vocab_file.asset_path.numpy()
 to_lower_case = bert_layer.resolved_object.do_lower_case.numpy()
 tokenizer = bert(vocabulary_file, to_lower_case)
@@ -99,10 +107,7 @@ class TEXT_MODEL(tf.keras.Model):
         
         self.dense_1 = tf.keras.layers.Dense(units=dnn_units, activation="relu")
         self.dropout = tf.keras.layers.Dropout(rate=dropout_rate)
-        if model_output_classes == 2:
-            self.last_dense = tf.keras.layers.Dense(units=1, activation="sigmoid")
-        else:
-            self.last_dense = tf.keras.layers.Dense(units=model_output_classes, activation="softmax")
+        self.last_dense = tf.keras.layers.Dense(units=model_output_classes, activation="softmax")
     
     def call(self, inputs, training):
         l = self.embedding(inputs)
@@ -127,16 +132,11 @@ text_model = TEXT_MODEL(vocabulary_size=VOCAB_LENGTH,
                         dnn_units=DNN_UNITS,
                         model_output_classes=OUTPUT_CLASSES,
                         dropout_rate=DROPOUT_RATE)
+
+plot_model(text_model, to_file='model.png', show_shapes=True)
 print("Model class instanciated")
 
-if OUTPUT_CLASSES == 2:
-    text_model.compile(loss="binary_crossentropy",
-                       optimizer="adam",
-                       metrics=["accuracy"])
-else:
-    text_model.compile(loss="sparse_categorical_crossentropy",
-                       optimizer="adam",
-                       metrics=["sparse_categorical_accuracy"])
+text_model.compile(loss="sparse_categorical_crossentropy", optimizer="adam", metrics=["sparse_categorical_accuracy"])
 
 log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
@@ -146,7 +146,3 @@ print("Model fitted")
 
 results = text_model.evaluate(test_data)
 print(results)
-
-# Save model
-# pi.dump(text_model, open("D:/OneDrive - SRH IT/09 Case Study II/03 Pipeline outputs/01 Models/01 BERT/bert.model", 'wb'))
-# text_model.save_pretrained("D:/OneDrive - SRH IT/09 Case Study II/03 Pipeline outputs/01 Models/01 BERT/bert.model")
