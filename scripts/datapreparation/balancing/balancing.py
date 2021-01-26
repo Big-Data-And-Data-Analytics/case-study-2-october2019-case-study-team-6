@@ -35,6 +35,7 @@ class BalancingData:
         self.filepath = filepath
         self.new_data = new_data
 
+    #TODO: Generalize the function if possible
     def split_train_test(self, test_size, random_state):
 
         """ 'X' variable is assigned 'onlyText' column and 'y' variable has the 'identityMotive'.  The 'X' and 'y' are 
