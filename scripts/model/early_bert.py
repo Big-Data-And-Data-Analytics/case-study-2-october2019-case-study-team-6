@@ -1,6 +1,6 @@
 # https://stackabuse.com/text-classification-with-bert-tokenizer-and-tf-2-0-in-python/
 
-## TODO: Balancing!
+# TODO: Balancing!
 
 import scripts.mongoConnection as mc
 import tensorflow_hub as hub
@@ -20,7 +20,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices("
 df = mc.getCollection("08_PreTrain", "train_data")
 print("Data received")
 
-df["onlyTextMotive"] = df["onlyText"] + df["identityMotive"]
+df["onlyTextMotive"] = df["onlyText"] + " " +df["identityMotive"]
 
 df = df[['country', 'onlyTextMotive']]
 df = df[df["country"] != 0]

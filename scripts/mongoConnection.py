@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 import pandas as pd
 
+
 def getCollection(db, col):
     """Retruns the data for a given database and collection
 
@@ -10,13 +11,14 @@ def getCollection(db, col):
     :type col: String
     :return: Data from the given collection
     :rtype: pandas dataframe
-    """    
+    """
     conn = MongoClient("localhost", 27017)
     collobj = conn[db][col]
     collection = pd.DataFrame(list(collobj.find({})))
     return collection.copy()
 
-def insertCollection(db, col, result, drop = True):
+
+def insertCollection(db, col, result, drop=True):
     """Inserts the given data into the specified databases collection
 
     :param db: Database where the collection is
@@ -27,11 +29,10 @@ def insertCollection(db, col, result, drop = True):
     :type result: Pandas Dataframe
     """
     ## TODO Add a "db.drop(col)" before inserting, so everytime we insert a collection to the database, remove this particular collection
-    """
 
     result = result.to_dict("records")
     conn = MongoClient("localhost", 27017)
-    connObj =  conn[db][col]
+    connObj = conn[db][col]
     if drop:
         connObj.drop()
     connObj.insert_many(result)

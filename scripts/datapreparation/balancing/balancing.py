@@ -34,7 +34,8 @@ class BalancingData:
     
     
     def __init__(self, filepath, new_data):
-        self.filepath = filepath
+        self.filepath = filepath[0]
+        self.filepath_ni = filepath[1]
         self.new_data = new_data
 
     def split_train_test(self, test_size, random_state, stratified=False):
@@ -95,8 +96,11 @@ class BalancingData:
         :param new_data: complete collection
         :type new_data: dataframe
         """
-        X = self.new_data[['onlyText']]
-        y = self.new_data[['identityMotive']]
+        self.new_data = self.new_data[self.new_data["country"] != 0]
+        self.new_data["onlyTextMotive"] = self.new_data["onlyText"] + " " + self.new_data["identityMotive"]
+        X = self.new_data[['onlyTextMotive']]
+        y = self.new_data[['country']]
+
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
 
         print(type(X_train))
@@ -315,8 +319,9 @@ if __name__ == "__main__":
     df_source_collection = getCollection('08_PreTrain', 'train_data')
 
     filepath = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+    filepath_ni = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs_ni/"
 
-    balancing_input = BalancingData(filepath, df_source_collection)
+    balancing_input = BalancingData((filepath, filepath_ni), df_source_collection)
     balancing_input.split_train_test(test_size=0.25, random_state=69, stratified=True)
     # balancing_input.split_train_test(test_size=0.25, random_state=69) # Stratified as default false
     balancing_input.threading_function()
