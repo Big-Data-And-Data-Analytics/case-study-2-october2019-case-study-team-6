@@ -117,18 +117,18 @@ class IdentityMotiveTagging:
 
 
 if __name__ == '__main__':
-    
+
     identityMotiveTagging = IdentityMotiveTagging()
     identityMotiveTagging.get_synonyms()
 
     df = getCollection('07_PreProcessing', 'ni_post_preprocessed')
     df = identityMotiveTagging.tagging(df)
-    insertCollection('08_PreTrain', 'train_data', df, drop=False)
+    insertCollection('08_PreTrain', 'train_data', df)
 
     df = getCollection('07_PreProcessing', 'ni_comment_preprocessed')
     df = identityMotiveTagging.tagging(df)
-    insertCollection('08_PreTrain', 'train_data', df, drop=False)
+    insertCollection('08_PreTrain', 'train_data', df)
 
     df = getCollection('07_PreProcessing', 'ni_subcomment_preprocessed')
     df = identityMotiveTagging.tagging(df)
-    insertCollection('08_PreTrain', 'train_data', df, drop=False)
+    insertCollection('08_PreTrain', 'train_data', df)

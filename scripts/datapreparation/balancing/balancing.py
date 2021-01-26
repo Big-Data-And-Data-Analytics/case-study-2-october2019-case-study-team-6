@@ -11,11 +11,12 @@ from imblearn.under_sampling import NearMiss, TomekLinks
 from scripts.mongoConnection import getCollection, insertCollection
 from pymongo import MongoClient
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, StratifiedShuffleSplit
 from sklearn.preprocessing import Binarizer
 
 
 ##TODO Currently we are using test_train_split function from sklearn, the model shows that 2 classes are not present in the traindata. We should try StratifiedShuffleSplit, as far as i understood it, keep percentage of each class. Implement besides train_test_split
+
 class BalancingData:
     """BalancingData class represents performance of different balancing data on 'X' and 'y' train data.
         The sequentially used functions  are:
@@ -30,14 +31,14 @@ class BalancingData:
         The file path needs to be provided where the output needs to be stored and the entire dataframe collection 
         provided as the input
     """
-
+    
+    
     def __init__(self, filepath, new_data):
         self.filepath = filepath
         self.new_data = new_data
 
-    # TODO: Generalize the function if possible
-    def split_train_test(self, test_size, random_state):
-        """ 'X' variable is assigned 'onlyText' column and 'y' variable has the 'identityMotive'.  The 'X' and 'y' are
+    def split_train_test(self, test_size, random_state, stratified=False):
+        """ 'X' variable is assigned 'onlyText' column and 'y' variable has the 'identityMotive'.  The 'X' and 'y' are 
         then divided into test and train data.
         The input for different balancing techniques must be in vectorised form. Thus, count vectoriser is applied on
         'X'. 
@@ -47,9 +48,21 @@ class BalancingData:
         :param new_data: complete collection
         :type new_data: dataframe
         """
+        # Filters
+        self.new_data = self.new_data[self.new_data["country"] != 0]
+        self.new_data = self.new_data[self.new_data["country"] != "NORTHEN IRELAND"]  ## TODO Add funtionality that it will automatically filter out countries below threshhold of 4
+
         X = self.new_data[['onlyText']]
         y = self.new_data[['identityMotive']]
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+        if not stratified:
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+        else:
+            sss = StratifiedShuffleSplit(n_splits=5, test_size=test_size, train_size=1 - test_size,
+                                         random_state=random_state)
+            for train_index, test_index in sss.split(X, y):
+                print("TRAIN:", train_index, "TEST:", test_index)
+                X_train, X_test = X.iloc[list(train_index)], X.iloc[list(test_index)]
+                y_train, y_test = y.iloc[list(train_index)], y.iloc[list(test_index)]
 
         print(type(X_train))
         cv = CountVectorizer()
@@ -109,6 +122,7 @@ class BalancingData:
     #### FIT BALANCING #### Multi Threading Part
     # Thread1 # ADASYN
     def thread1_ADASYN(self, x, y):
+
         """An object of the class ADASYN is created and the dataset is resampled using 'fit_resample'. The output
         'X_res'  of the resampling is saved in the provided path and the output of 'y_res' is stored into the database.
 
@@ -128,11 +142,13 @@ class BalancingData:
         ## Save y_res
         y_res.insert(0, 'id', range(0, len(y_res)))
         insertCollection('09_TrainingData', 'ADASYN_y', y_res)
-
+        
         print("ADASYN saved and done")
+
 
     # Thread 2 # SMOTE
     def thread2_SMOTE(self, x, y):
+
         """An object of the class SMOTE is created and the dataset is resampled using 'fit_resample'. The output
         'X_sm'  of the resampling is saved in the provided path and the output of 'y_sm' is stored into the database.
 
@@ -155,8 +171,10 @@ class BalancingData:
 
         print("SMOTE saved and done")
 
+
     # Thread 3 # SMOTEENN
     def thread3_SMOTEENN(self, x, y):
+
         """An object of the class SMOTEENN is created and the dataset is resampled using 'fit_resample'. The output
         'X_se'  of the resampling is saved in the provided path and the output of 'y_se' is stored into the database.
 
@@ -179,8 +197,10 @@ class BalancingData:
 
         print("SMOTEENN saved and done")
 
+
     # Thread 4 # SMOTETomek
     def thread4_SMOTETomek(self, x, y):
+
         """An object of the class SMOTETomek is created and the dataset is resampled using 'fit_resample'. The output
         'X_st'  of the resampling is saved in the provided path and the output of 'y_st' is stored into the database.
 
@@ -204,8 +224,10 @@ class BalancingData:
 
         print("SMOTETomek saved and done")
 
+
     # Thread 5 # NearMiss
     def thread5_NearMiss(self, x, y):
+
         """An object of the class NearMiss is created and the dataset is resampled using 'fit_resample'. The output
         'X_nm'  of the resampling is saved in the provided path and the output of 'y_nm' is stored into the database.
 
@@ -229,8 +251,11 @@ class BalancingData:
 
         print("NearMiss saved and done")
 
+
     # Thread 6 # TomekLinks
     def thread6_TomekLinks(self, x, y):
+
+        
         """An object of the class TomekLinks is created and the dataset is resampled using 'fit_resample'. The output
         'X_tl'  of the resampling is saved in the provided path and the output of 'y_tl' is stored into the database.
 
@@ -255,7 +280,8 @@ class BalancingData:
         print("TomekLinks saved and done")
 
     def threading_function(self):
-        """Different threads are created for each balancing technique having the target as the functions of
+
+        """Different threads are created for each balancing technique having the target as the functions of 
         balancing techniques and arguments are the inputs i.e 'X_train' and 'y_train'. After the creation of threads,
         the threads are executed.
         """
@@ -286,17 +312,11 @@ class BalancingData:
 
 
 if __name__ == "__main__":
-
     df_source_collection = getCollection('08_PreTrain', 'train_data')
 
     filepath = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
-    # filepath = input("Enter the path of your file with '/': ")
-
-    if os.path.isdir(filepath):
-        f = open(r"filepath", "w")
-    else:
-        print("Directory does not exist.")
 
     balancing_input = BalancingData(filepath, df_source_collection)
-    balancing_input.split_train_test(test_size=0.25, random_state=69)
+    balancing_input.split_train_test(test_size=0.25, random_state=69, stratified=True)
+    # balancing_input.split_train_test(test_size=0.25, random_state=69) # Stratified as default false
     balancing_input.threading_function()
