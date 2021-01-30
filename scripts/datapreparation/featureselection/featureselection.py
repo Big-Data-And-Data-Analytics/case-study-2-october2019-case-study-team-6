@@ -38,7 +38,7 @@ class FeatureSelection:
             #### FEATURE SELECTION ####
             # chi2
             chi2_fs = SelectKBest(chi2, k = self.number_of_features)
-            X_chi2 = chi2_fs.fit_transform(X, y)
+            X_chi2 = chi2_fs.fit_transform(X, y.values.ravel())
 
             # Saving 'X_chi2' feature selected data after selection  using chi2
             sci.sparse.save_npz(self.filepath + self.balancing_technique[
@@ -54,7 +54,7 @@ class FeatureSelection:
             # f_classif
             # Saving 'X' feature selected data after selection using f_classif
             f_classif_fs = SelectKBest(f_classif, k = self.number_of_features)
-            X_f_classif = f_classif_fs.fit_transform(X, y)
+            X_f_classif = f_classif_fs.fit_transform(X, y.values.ravel())
             sci.sparse.save_npz(self.filepath + self.balancing_technique[
                 self.counter] + '_x_matrix_fs_f_classif.npz', X_f_classif)
             print(f'Saved f_classif {self.balancing_technique[self.counter]}')
