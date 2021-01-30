@@ -8,7 +8,7 @@ import scipy
 from imblearn.combine import SMOTEENN, SMOTETomek
 from imblearn.over_sampling import ADASYN, SMOTE
 from imblearn.under_sampling import NearMiss, TomekLinks
-from mongoConnection import getCollection, insertCollection
+from scripts.mongoConnection import getCollection, insertCollection
 from pymongo import MongoClient
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split, StratifiedShuffleSplit
@@ -31,8 +31,7 @@ class BalancingData:
         The file path needs to be provided where the output needs to be stored and the entire dataframe collection 
         provided as the input
     """
-    
-    
+
     def __init__(self, filepath, new_data):
         self.filepath = filepath[0]
         self.filepath_ni = filepath[1]
@@ -51,7 +50,8 @@ class BalancingData:
         """
         # Filters
         self.new_data = self.new_data[self.new_data["country"] != 0]
-        self.new_data = self.new_data[self.new_data["country"] != "NORTHEN IRELAND"]  ## TODO Add funtionality that it will automatically filter out countries below threshhold of 4
+        self.new_data = self.new_data[self.new_data[
+                                          "country"] != "NORTHEN IRELAND"]  ## TODO Add funtionality that it will automatically filter out countries below threshhold of 4
 
         X = self.new_data[['onlyText']]
         y = self.new_data[['identityMotive']]
@@ -105,11 +105,12 @@ class BalancingData:
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
  """
         self.new_data = self.new_data[self.new_data["country"] != 0]
-        self.new_data = self.new_data[self.new_data["country"] != "NORTHEN IRELAND"]  ## TODO Add funtionality that it will automatically filter out countries below threshhold of 4
+        self.new_data = self.new_data[self.new_data[
+                                          "country"] != "NORTHEN IRELAND"]  ## TODO Add funtionality that it will automatically filter out countries below threshhold of 4
         self.new_data["onlyTextMotive"] = self.new_data["onlyText"] + " " + self.new_data["identityMotive"]
         X = self.new_data[['onlyTextMotive']]
         y = self.new_data[['country']]
-        
+
         if not stratified:
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
         else:
@@ -167,12 +168,11 @@ class BalancingData:
         else:
             scipy.sparse.save_npz(self.filepath + 'ADASYN_x_matrix.npz', X_res)
             insertCollection('09_TrainingData', 'ADASYN_y', y_res)
-        
-        #y_res.insert(0, 'id', range(0, len(y_res)))
-        #insertCollection('09_TrainingData', 'ADASYN_y', y_res)
-        
-        print("ADASYN saved and done")
 
+        # y_res.insert(0, 'id', range(0, len(y_res)))
+        # insertCollection('09_TrainingData', 'ADASYN_y', y_res)
+
+        print("ADASYN saved and done")
 
     # Thread 2 # SMOTE
     def thread2_SMOTE(self, x, y):
@@ -200,11 +200,8 @@ class BalancingData:
         else:
             scipy.sparse.save_npz(self.filepath + 'SMOTE_x_matrix.npz', X_sm)
             insertCollection('09_TrainingData', 'SMOTE_y', y_sm)
-        
-        
 
         print("SMOTE saved and done")
-
 
     # Thread 3 # SMOTEENN
     def thread3_SMOTEENN(self, x, y):
@@ -232,11 +229,8 @@ class BalancingData:
         else:
             scipy.sparse.save_npz(self.filepath + 'SMOTEENN_x_matrix.npz', X_se)
             insertCollection('09_TrainingData', 'SMOTEENN_y', y_se)
-        
-        
 
         print("SMOTEENN saved and done")
-
 
     # Thread 4 # SMOTETomek
     def thread4_SMOTETomek(self, x, y):
@@ -265,11 +259,8 @@ class BalancingData:
         else:
             scipy.sparse.save_npz(self.filepath + 'SMOTETomek_x_matrix.npz', X_st)
             insertCollection('09_TrainingData', 'SMOTETomek_y', y_st)
-        
-        
 
         print("SMOTETomek saved and done")
-
 
     # Thread 5 # NearMiss
     def thread5_NearMiss(self, x, y):
@@ -298,16 +289,12 @@ class BalancingData:
         else:
             scipy.sparse.save_npz(self.filepath + 'NearMiss_x_matrix.npz', X_nm)
             insertCollection('09_TrainingData', 'NearMiss_y', y_nm)
-        
-        
 
         print("NearMiss saved and done")
-
 
     # Thread 6 # TomekLinks
     def thread6_TomekLinks(self, x, y):
 
-        
         """An object of the class TomekLinks is created and the dataset is resampled using 'fit_resample'. The output
         'X_tl'  of the resampling is saved in the provided path and the output of 'y_tl' is stored into the database.
 
@@ -332,8 +319,6 @@ class BalancingData:
             scipy.sparse.save_npz(self.filepath + 'TomekLinks_x_matrix.npz', X_tl)
             insertCollection('09_TrainingData', 'TomekLinks_y', y_tl)
         ## Save y_tl
-        
-        
 
         print("TomekLinks saved and done")
 
@@ -343,7 +328,7 @@ class BalancingData:
         balancing techniques and arguments are the inputs i.e 'X_train' and 'y_train'. After the creation of threads,
         the threads are executed.
         """
-        t1 = threading.Thread(name="thread1_ADASYN", target=self.thread1_ADASYN, args=(self.X_train, self.y_train))
+        # t1 = threading.Thread(name="thread1_ADASYN", target=self.thread1_ADASYN, args=(self.X_train, self.y_train))
         t2 = threading.Thread(name="thread2_SMOTE", target=self.thread2_SMOTE, args=(self.X_train, self.y_train))
         t3 = threading.Thread(name="thread3_SMOTEENN", target=self.thread3_SMOTEENN, args=(self.X_train, self.y_train))
         t4 = threading.Thread(name="thread4_SMOTETomek", target=self.thread4_SMOTETomek,
@@ -352,14 +337,14 @@ class BalancingData:
         t6 = threading.Thread(name="thread6_TomekLinks", target=self.thread6_TomekLinks,
                               args=(self.X_train, self.y_train))
 
-        t1.start()
+        # t1.start()
         t2.start()
         t3.start()
         t4.start()
         t5.start()
         t6.start()
 
-        t1.join()
+        # t1.join()
         t2.join()
         t3.join()
         t4.join()
@@ -370,16 +355,17 @@ class BalancingData:
 
 
 if __name__ == "__main__":
-    #df_source_collection = getCollection('08_PreTrain', 'train_data')
-    df_source_collection = getCollection('Train', 'train')
+    df_source_collection = getCollection('08_PreTrain', 'train_data')
+    # df_source_collection = getCollection('Train', 'train')
 
-    #filepath = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
-    #filepath_ni = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs_ni/"
-    filepath = "C:/Users/mavis/Documents/GitHub/case-study-2-october2019-case-study-team-6/NPZs/"
-    filepath_ni = "C:/Users/mavis/Documents/GitHub/case-study-2-october2019-case-study-team-6/NPZs_ni/"
+    filepath = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+    filepath_ni = "C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student)" \
+                  " - 06 Case Study I/02 Input_Data/03 Model/NPZs_ni/"
+    # filepath = "C:/Users/mavis/Documents/GitHub/case-study-2-october2019-case-study-team-6/NPZs/"
+    # filepath_ni = "C:/Users/mavis/Documents/GitHub/case-study-2-october2019-case-study-team-6/NPZs_ni/"
 
     balancing_input = BalancingData((filepath, filepath_ni), df_source_collection)
-    balancing_input.split_train_test(test_size=0.25, random_state=69, stratified=True)
+    # balancing_input.split_train_test(test_size=0.25, random_state=69, stratified=True)
     balancing_input.split_train_test_ni(test_size=0.25, random_state=69, stratified=True)
     # balancing_input.split_train_test(test_size=0.25, random_state=69) # Stratified as default false
     balancing_input.threading_function()
