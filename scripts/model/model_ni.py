@@ -498,9 +498,16 @@ if __name__ == "__main__":
     # filepath_Model = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test_Global_Seed_Notebook_MK/"
     # filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test_Global_Seed_Notebook_MK/"
 
-    filepath_NPZ = "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/NPZs_ni/"
-    filepath_Model = "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/Model_Test_NI_vmdhhh/"
-    filepath_Eval = "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/Model_Eval_Test_NI_vmdhhh/"
+    filepath_NPZ = "C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study " \
+                   "I/02 Input_Data/03 Model/NPZs_ni/"
+    filepath_Model = "C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study " \
+                     "I/02 Input_Data/03 Model/Model_Test_NI_ss/"
+    filepath_Eval = "C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study " \
+                    "I/02 Input_Data/03 Model/Model_Eval_Test_NI_ss/"
+
+    # filepath_NPZ = "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/NPZs_ni/"
+    # filepath_Model = "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/Model_Test_NI_vmdhhh/"
+    # filepath_Eval = "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/Model_Eval_Test_NI_vmdhhh/"
 
     t0 = time()
 
@@ -516,7 +523,7 @@ if __name__ == "__main__":
         filepath_Eval = filepath_Eval
     )
 
-    modeller.train_models(use_onehot=False)
+    modeller.train_models(use_onehot=True)
 
     t1 = time()
     totalTime = t1-t0
