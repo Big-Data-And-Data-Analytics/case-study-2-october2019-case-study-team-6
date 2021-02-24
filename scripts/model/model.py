@@ -514,7 +514,7 @@ if __name__ == "__main__":
         filepath_Eval = filepath_Eval
     )
 
-    modeller.train_models(use_onehot=False)
+    modeller.train_models(use_onehot=True)
 
     t1 = time()
     totalTime = t1-t0
