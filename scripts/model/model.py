@@ -1,4 +1,4 @@
-'import nltk
+import nltk
 import yaml
 
 import pickle as pi
@@ -492,13 +492,13 @@ class Model:
 if __name__ == "__main__":
 
     # Set paths
-    # filepath_NPZ = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
-    # filepath_Model = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test_Global_Seed_Notebook_MK/"
-    # filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test_Global_Seed_Notebook_MK/"
+    filepath_NPZ = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+    filepath_Model = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting/"
+    filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting_Eval/"
 
-    filepath_NPZ = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
-    filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting/"
-    filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting_Eval/"
+    # filepath_NPZ = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+    # filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting/"
+    # filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting_Eval/"
 
     t0 = time()
 
@@ -514,7 +514,7 @@ if __name__ == "__main__":
         filepath_Eval = filepath_Eval
     )
 
-    modeller.train_models(use_onehot=False)
+    modeller.train_models(use_onehot=True)
 
     t1 = time()
     totalTime = t1-t0
@@ -523,4 +523,3 @@ if __name__ == "__main__":
     # modeller.predict_model(
     #     filepath_model=filepath_Model,
     #     balancing_techniques=balancingTechniques)
-'
