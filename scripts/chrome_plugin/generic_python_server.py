@@ -27,7 +27,8 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.    
 """
 import argparse
-from http.server import HTTPServer, BaseHTTPRequestHandler
+import flask_cors
+from http.server import HTTPServer, BaseHTTPRequestHandler, SimpleHTTPRequestHandler
 
 
 class S(BaseHTTPRequestHandler):
@@ -50,6 +51,7 @@ class S(BaseHTTPRequestHandler):
     def do_HEAD(self):
         self._set_headers()
 
+    @cross_origin()
     def do_POST(self):
         # Doesn't do anything with posted data
         self._set_headers()
