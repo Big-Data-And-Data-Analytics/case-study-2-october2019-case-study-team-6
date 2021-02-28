@@ -159,7 +159,9 @@ if __name__ == '__main__':
     filepath_Model_NI="D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/Model_Test_NI_vmdhhh/"
 
     predictIdentityMotive = Prediction("09_TrainingData", "CountVectorVocabulary")
+    predictNationalIdentity = Prediction("09_TrainingData_Ni", "CountVectorVocabulary")
     predictIdentityMotive.initFunction(filepath_Model= filepath_Model_IM)
+    predictNationalIdentity.initFunction(filepath_Model=filepath_Model_NI)
 
     @app.get('/models_IM')
     def get_models_IM():
@@ -171,8 +173,7 @@ if __name__ == '__main__':
         inp = takeInput.dict()
         return predictIdentityMotive.predict(inp, filepath_model=filepath_Model, balancing_techniques=balancingTechniques)
 
-    predictNationalIdentity = Prediction("09_TrainingData_Ni", "CountVectorVocabulary")
-    predictNationalIdentity.initFunction(filepath_Model=filepath_Model_NI)
+    
     @app.get('/models_NI')
     def get_models_NI():
         return predictNationalIdentity.getModels()
@@ -182,5 +183,5 @@ if __name__ == '__main__':
         balancingTechniques = ["NearMiss", "SMOTEENN", "SMOTETomek","SMOTE", "TomekLinks"]
         inp = takeInput.dict()
         return predictNationalIdentity.predict(inp, filepath_model=filepath_Model, balancing_techniques=balancingTechniques)
-
+        
     uvicorn.run(app=app, host='0.0.0.0', port=5000)
