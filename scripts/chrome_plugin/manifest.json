@@ -1,0 +1,22 @@
+{
+  "manifest_version": 2,
+
+  "name": "Selection Printer",
+  "description": "This plugin will print anything the user has selected.",
+  "version": "1.0",
+
+  "browser_action": {
+   "default_icon": {
+     "16": "icon.png",
+     "32": "icon.png",
+     "48": "icon.png",
+     "128": "icon.png"
+   },
+   "default_popup": "popup.html"
+  },
+  "permissions": [
+   "activeTab",
+   "*://*.twitter.com/*",
+   "<all_urls>"
+   ]
+}

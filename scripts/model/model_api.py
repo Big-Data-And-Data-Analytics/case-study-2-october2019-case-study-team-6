@@ -13,10 +13,13 @@ from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from pydantic import BaseModel
 from sklearn.feature_extraction.text import CountVectorizer
+
 nltk.download('stopwords')
 
 app = FastAPI()
 lemmatizer = WordNetLemmatizer()
+
+
 class Prediction:
 
     def __init__(self, database, vocab):
@@ -25,7 +28,7 @@ class Prediction:
         self.models = {}
         self.stop_words = set(stopwords.words('english'))
         self.modelFiles = []
-    
+
     def getModels(self):
         return self.models
 
@@ -39,7 +42,7 @@ class Prediction:
         :type balancing_techniques: list
         :return: [description]
         :rtype: [type]
-        """        
+        """
         vocab_collection = mc.getCollection(db=self.database, col=self.vocab)
         vocab_list = vocab_collection['dict'].to_list()
         self.vocab = yaml.safe_load(vocab_list[0])
@@ -49,7 +52,7 @@ class Prediction:
         # Filter FileNamesList for Models
         def features_files(model):
             return '.tchq' not in model
-        
+
         # Filtering Data using features_files
         exclude_tchq = filter(features_files, self.modelFiles)
         self.modelFiles = list(exclude_tchq)
@@ -72,13 +75,14 @@ class Prediction:
 
         def lemmatizeRemoveStopWords(df):
             df = df.str.lower()
-            df=df.replace(r'@', '', regex=True)
-            df=df.replace(r'http\S+', '', regex=True).replace(r'http \S+', '', regex=True).replace(r'www\S+', '', regex=True)
-            df=df.str.replace('[^\w\s]','')
-            df=df.str.replace('\s\s+',' ')
+            df = df.replace(r'@', '', regex=True)
+            df = df.replace(r'http\S+', '', regex=True).replace(r'http \S+', '', regex=True).replace(r'www\S+', '',
+                                                                                                     regex=True)
+            df = df.str.replace('[^\w\s]', '')
+            df = df.str.replace('\s\s+', ' ')
             df = df.str.strip()
-            df=df.apply(word_tokenize)
-            df=df.apply(removeStopWords)
+            df = df.apply(word_tokenize)
+            df = df.apply(removeStopWords)
             return df
 
         # Load Vocab for Non Feature Selected Models
@@ -103,7 +107,8 @@ class Prediction:
                 if tech in self.modelFiles[val]:
                     if 'chi2' in self.modelFiles[val]:
                         # Load Feature Selection Object
-                        fs = pi.load(open(filepath_model + 'Feature_' + balancing_techniques[cnt] + 'fs_chi2.tchq', 'rb'))
+                        fs = pi.load(
+                            open(filepath_model + 'Feature_' + balancing_techniques[cnt] + 'fs_chi2.tchq', 'rb'))
                         print(filepath_model + 'Feature_' + balancing_techniques[cnt] + 'fs_chi2.tchq')
                         # Get New Data
                         newData = loadNewDataForPrediction(self.vocab)
@@ -121,7 +126,8 @@ class Prediction:
                         return (y_pred_validation)
                     else:
                         # Load Feature Selection Object
-                        fs = pi.load(open(filepath_model + 'Feature_' + balancing_techniques[cnt] + 'fs_chi2.tchq', 'rb'))
+                        fs = pi.load(
+                            open(filepath_model + 'Feature_' + balancing_techniques[cnt] + 'fs_chi2.tchq', 'rb'))
                         print(filepath_model + 'Feature_' + balancing_techniques[cnt] + 'fs_chi2.tchq')
                         # Get New Data
                         newData = loadNewDataForPrediction(self.vocab)
@@ -148,8 +154,9 @@ class Prediction:
             response['prediction'] = y_pred_validation[0]
             return response
 
-    def initFunction(self, filepath_Model):    
+    def initFunction(self, filepath_Model):
         self.init_model(filepath_model=filepath_Model)
+
 
 class takeInput(BaseModel):
     sentence: str
@@ -157,27 +164,30 @@ class takeInput(BaseModel):
 
 
 if __name__ == '__main__':
-    filepath_Model_IM= "/models/"
+    filepath_Model_IM = "/models/"
     # filepath_Model_NI="C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study I/02 Input_Data/03 Model/Model_Test_NI_vmdhhh/"
     # filepath_Model_NI="C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study I/02 Input_Data/03 Model/Model_Test_NI_vmdhhh/"
 
     predictIdentityMotive = Prediction("09_TrainingData", "CountVectorVocabulary")
     predictIdentityMotive.initFunction(filepath_Model=filepath_Model_IM)
+
+
     # predictNationalIdentity = Prediction("09_TrainingData_Ni", "CountVectorVocabulary")
     # predictNationalIdentity.initFunction(filepath_Model=filepath_Model_NI)
-
-
 
     @app.get('/models_IM')
     def get_models_IM():
         return predictIdentityMotive.getModels()
 
+
     @app.post('/predict_id_motive')
     def predictInput(takeInput: takeInput):
         filepath_Model = filepath_Model_IM
-        balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek","SMOTE", "TomekLinks"]
+        balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek", "SMOTE", "TomekLinks"]
         inp = takeInput.dict()
-        return predictIdentityMotive.predict(inp, filepath_model=filepath_Model, balancing_techniques=balancingTechniques)
+        return predictIdentityMotive.predict(inp, filepath_model=filepath_Model,
+                                             balancing_techniques=balancingTechniques)
+
 
     uvicorn.run(app=app, host='0.0.0.0', port=5000)
 
