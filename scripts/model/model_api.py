@@ -4,7 +4,7 @@ from os.path import isfile, join
 
 import nltk
 import pandas as pd
-import scripts.mongoConnection as mc
+import mongoConnection as mc
 import uvicorn
 import yaml
 from fastapi import FastAPI
@@ -13,6 +13,7 @@ from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from pydantic import BaseModel
 from sklearn.feature_extraction.text import CountVectorizer
+nltk.download('stopwords')
 
 app = FastAPI()
 lemmatizer = WordNetLemmatizer()
@@ -92,6 +93,7 @@ class Prediction:
 
         val = inp['modelNumber']
         val = int(val)
+        print(f"filepath_model: {filepath_model}")
         mdl = pi.load(open(filepath_model + self.modelFiles[val], 'rb'))
         if 'fs' in self.modelFiles[val]:
             print('Feature Data')
@@ -155,15 +157,21 @@ class takeInput(BaseModel):
 
 
 if __name__ == '__main__':
-    filepath_Model_IM= "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/Models_Test/"
-    filepath_Model_NI="D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/Model_Test_NI_vmdhhh/"
+    filepath_Model_IM= "/models/"
+    # filepath_Model_NI="C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study I/02 Input_Data/03 Model/Model_Test_NI_vmdhhh/"
+    # filepath_Model_NI="C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study I/02 Input_Data/03 Model/Model_Test_NI_vmdhhh/"
 
     predictIdentityMotive = Prediction("09_TrainingData", "CountVectorVocabulary")
-    predictIdentityMotive.initFunction(filepath_Model= filepath_Model_IM)
+    predictIdentityMotive.initFunction(filepath_Model=filepath_Model_IM)
+    # predictNationalIdentity = Prediction("09_TrainingData_Ni", "CountVectorVocabulary")
+    # predictNationalIdentity.initFunction(filepath_Model=filepath_Model_NI)
+
+
 
     @app.get('/models_IM')
     def get_models_IM():
         return predictIdentityMotive.getModels()
+
     @app.post('/predict_id_motive')
     def predictInput(takeInput: takeInput):
         filepath_Model = filepath_Model_IM
@@ -171,8 +179,9 @@ if __name__ == '__main__':
         inp = takeInput.dict()
         return predictIdentityMotive.predict(inp, filepath_model=filepath_Model, balancing_techniques=balancingTechniques)
 
-    predictNationalIdentity = Prediction("09_TrainingData_Ni", "CountVectorVocabulary")
-    predictNationalIdentity.initFunction(filepath_Model=filepath_Model_NI)
+    uvicorn.run(app=app, host='0.0.0.0', port=5000)
+
+"""
     @app.get('/models_NI')
     def get_models_NI():
         return predictNationalIdentity.getModels()
@@ -182,5 +191,5 @@ if __name__ == '__main__':
         balancingTechniques = ["NearMiss", "SMOTEENN", "SMOTETomek","SMOTE", "TomekLinks"]
         inp = takeInput.dict()
         return predictNationalIdentity.predict(inp, filepath_model=filepath_Model, balancing_techniques=balancingTechniques)
+"""
 
-    uvicorn.run(app=app, host='0.0.0.0', port=5000)

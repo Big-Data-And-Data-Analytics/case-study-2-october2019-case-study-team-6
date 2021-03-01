@@ -1,0 +1,9 @@
+nltk
+numpy
+pandas
+uvicorn
+pyyaml
+fastapi
+pydantic
+sklearn
+pymongo
