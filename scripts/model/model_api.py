@@ -1,7 +1,9 @@
+from flask import Flask, request
+import flask
+import json
 import pickle as pi
 from os import listdir
 from os.path import isfile, join
-
 import nltk
 import pandas as pd
 import mongoConnection as mc
@@ -11,12 +13,14 @@ from fastapi import FastAPI
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
+from fastapi import Response
 from pydantic import BaseModel
 from sklearn.feature_extraction.text import CountVectorizer
 
 nltk.download('stopwords')
 
-app = FastAPI()
+# app = FastAPI()
+app = Flask(__name__)
 lemmatizer = WordNetLemmatizer()
 
 
@@ -175,21 +179,32 @@ if __name__ == '__main__':
     # predictNationalIdentity = Prediction("09_TrainingData_Ni", "CountVectorVocabulary")
     # predictNationalIdentity.initFunction(filepath_Model=filepath_Model_NI)
 
-    @app.get('/models_IM')
+    # @app.get('/models_IM')
+    @app.route('/models_IM', methods=['GET'])
     def get_models_IM():
-        return predictIdentityMotive.getModels()
+        with app.app_context():
+            response = flask.jsonify(predictIdentityMotive.getModels())
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
 
 
-    @app.post('/predict_id_motive')
-    def predictInput(takeInput: takeInput):
+    # @app.post('/predict_id_motive')
+    @app.route('/predict_id_motive', methods=['POST'])
+    def predictInput():
+        data = request.json
         filepath_Model = filepath_Model_IM
         balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek", "SMOTE", "TomekLinks"]
-        inp = takeInput.dict()
-        return predictIdentityMotive.predict(inp, filepath_model=filepath_Model,
-                                             balancing_techniques=balancingTechniques)
+        inp = data
+        # with app.app_context():
+        response = flask.jsonify(predictIdentityMotive.predict(inp, filepath_model=filepath_Model,
+                                             balancing_techniques=balancingTechniques))
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        print(response)
+        return response
 
 
-    uvicorn.run(app=app, host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000)
+    # uvicorn.run(app=app, host='0.0.0.0', port=5000)
 
 """
     @app.get('/models_NI')
