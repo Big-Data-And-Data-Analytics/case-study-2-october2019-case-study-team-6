@@ -69,11 +69,11 @@ class FeatureSelection:
         print("Feature Selection done!")
 
 if __name__ == '__main__':
-    # filepath = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
-    # database = '09_TrainingData'
+    filepath = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+    database = '09_TrainingData'
 
-    filepath = "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/NPZs_ni/"
-    database = '09_TrainingData_Ni'
+    # filepath = "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/NPZs_ni/"
+    # database = '09_TrainingData_Ni'
     featureSelection = FeatureSelection(1000, filepath)
     
     featureSelection.balancing(database)

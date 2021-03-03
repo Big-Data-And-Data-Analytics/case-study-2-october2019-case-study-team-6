@@ -200,7 +200,7 @@ class Model:
         :return: The trained model
         :rtype: Model object
         """        
-        trained_model = model.fit(X, y)
+        trained_model = model.fit(X, y.values.ravel())
         return trained_model
 
     def save_model(self, model, filepath):
@@ -410,7 +410,7 @@ class Model:
             continueFlag = True
 
     def train_models(self, use_onehot):
-        """The train_models function is a wrapper function which executes everything at once. With that you can train all given models except one-hot. One-hot needs a separate train_models call.
+        """The train_models function is a wrapper function which executes everything at once. With that you can train all given models.
 
         :param use_onehot: Whether the one_hot encoding should be used, or not. If the value is true, then only a logistic regression model can be trained.
         :type use_onehot: bool
@@ -464,6 +464,7 @@ class Model:
                         "Precision": precision,
                         "Recall": recall,
                         "ROC_AUC": auc,
+                        "Master_Score(NoROC_AUC)": accuracy + f1 + precision + recall,
                         "Date": today,
                         "Timestamp": current_time
                         }
@@ -480,13 +481,13 @@ class Model:
                     print(str(total_models) + " models left.")
 
         if isfile(self.filepath_Eval + "Eval_Overview.csv"):
-            existing_eval_frame = pd.read_csv(self.filepath_Eval + "Eval_Overview.csv")
+            existing_eval_frame = pd.read_csv(self.filepath_Eval + "Eval_Overview.csv", index_col=0)
             eval_frame = pd.concat([existing_eval_frame, self.eval_frame])
             eval_frame.reset_index(inplace=True)
-            eval_frame.to_csv(filepath_Eval + "Eval_Overview.csv")
+            eval_frame.to_csv(self.filepath_Eval + "Eval_Overview.csv", index=False)
         else:
             self.eval_frame.reset_index(inplace=True)
-            self.eval_frame.to_csv(filepath_Eval + "Eval_Overview.csv")                
+            self.eval_frame.to_csv(self.filepath_Eval + "Eval_Overview.csv", index=False)
 
 
 if __name__ == "__main__":
@@ -502,6 +503,7 @@ if __name__ == "__main__":
 
     t0 = time()
 
+    # Define desired parameters, not all apply for every model
     modeller = Model(
         seed=69,
         n_cores=-1,

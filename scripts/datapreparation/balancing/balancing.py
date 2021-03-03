@@ -357,15 +357,18 @@ class BalancingData:
 if __name__ == "__main__":
     df_source_collection = getCollection('08_PreTrain', 'train_data')
     # df_source_collection = getCollection('Train', 'train')
-
-    filepath = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
-    filepath_ni = "C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student)" \
-                  " - 06 Case Study I/02 Input_Data/03 Model/NPZs_ni/"
+    
+    # filepath = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+    # filepath_ni = "C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student)" \
+    #               " - 06 Case Study I/02 Input_Data/03 Model/NPZs_ni/"
     # filepath = "C:/Users/mavis/Documents/GitHub/case-study-2-october2019-case-study-team-6/NPZs/"
     # filepath_ni = "C:/Users/mavis/Documents/GitHub/case-study-2-october2019-case-study-team-6/NPZs_ni/"
 
+    filepath = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+    filepath_ni = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs_ni/"
+
     balancing_input = BalancingData((filepath, filepath_ni), df_source_collection)
-    # balancing_input.split_train_test(test_size=0.25, random_state=69, stratified=True)
-    balancing_input.split_train_test_ni(test_size=0.25, random_state=69, stratified=True)
-    # balancing_input.split_train_test(test_size=0.25, random_state=69) # Stratified as default false
+    balancing_input.split_train_test(test_size=0.25, random_state=69, stratified=True)
+    # balancing_input.split_train_test_ni(test_size=0.25, random_state=69, stratified=True)
+    #balancing_input.split_train_test(test_size=0.25, random_state=69) # Stratified as default false
     balancing_input.threading_function()
