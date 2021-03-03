@@ -46,7 +46,6 @@ class IdentityMotiveTagging:
         :return: Dataframe with identity motive tagged
         :rtype: Pandas DataFrame
         """
-
         df = df.loc[:, ['Id', 'source_Type', 'data_Type', 'onlyText', 'sentiments', 'country', 'countryem']]
         df.loc[df['onlyText'].str.contains(rf'\b{self.meaning}\b',regex=True, case=False), 'meaning'] = 1
         df.loc[df['onlyText'].str.contains(rf'\b{self.belonging}\b',regex=True, case=False), 'belonging'] = 1
@@ -124,15 +123,12 @@ if __name__ == '__main__':
 
     df = getCollection('07_PreProcessing', 'ni_post_preprocessed')
     df = identityMotiveTagging.tagging(df)
-    insertCollection('08_PreTrain', 'ni_post_preprocessed', df)
     insertCollection('08_PreTrain', 'train_data', df)
 
     df = getCollection('07_PreProcessing', 'ni_comment_preprocessed')
     df = identityMotiveTagging.tagging(df)
-    insertCollection('08_PreTrain', 'ni_comment_preprocessed', df)
     insertCollection('08_PreTrain', 'train_data', df)
 
     df = getCollection('07_PreProcessing', 'ni_subcomment_preprocessed')
     df = identityMotiveTagging.tagging(df)
-    insertCollection('08_PreTrain', 'ni_subcomment_preprocessed', df)
     insertCollection('08_PreTrain', 'train_data', df)

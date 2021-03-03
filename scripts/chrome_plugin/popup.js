@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
         {
             chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
                 chrome.tabs.executeScript(tabs[0].id, {
-                    file: 'inject.js'
+                    file: 'predict_id_motive.js'
                     //code: 'alert(window.getSelection().toString());'
                 });
             });

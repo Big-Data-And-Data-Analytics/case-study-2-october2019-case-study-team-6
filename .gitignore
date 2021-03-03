@@ -48,3 +48,4 @@ scripts/datapreparation/translation/__pycache__/*
 /scripts/model/TNN_GOOGLE.py
 /logs/
 /logs_lstm/
+/scripts/model/mongocommand.sh
