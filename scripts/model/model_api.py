@@ -198,8 +198,8 @@ if __name__ == '__main__':
         # with app.app_context():
         response = flask.jsonify(predictIdentityMotive.predict(inp, filepath_model=filepath_Model,
                                              balancing_techniques=balancingTechniques))
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        print(response)
+
+        # response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
 
