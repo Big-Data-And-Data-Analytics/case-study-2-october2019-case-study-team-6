@@ -492,13 +492,13 @@ class Model:
 if __name__ == "__main__":
 
     # Set paths
-    filepath_NPZ = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
-    filepath_Model = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting/"
-    filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting_Eval/"
+    # filepath_NPZ = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+    # filepath_Model = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting/"
+    # filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting_Eval/"
 
-    # filepath_NPZ = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
-    # filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting/"
-    # filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting_Eval/"
+    filepath_NPZ = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+    filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting/"
+    filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting_Eval/"
 
     t0 = time()
 
@@ -514,12 +514,10 @@ if __name__ == "__main__":
         filepath_Eval = filepath_Eval
     )
 
-    modeller.train_models(use_onehot=True)
+    trainBools = [False,True]
+    for trainBool in trainBools:
+        modeller.train_models(use_onehot=trainBool)
 
     t1 = time()
     totalTime = t1-t0
     print(f'Modeling took that much time: {totalTime}')
-
-    # modeller.predict_model(
-    #     filepath_model=filepath_Model,
-    #     balancing_techniques=balancingTechniques)
