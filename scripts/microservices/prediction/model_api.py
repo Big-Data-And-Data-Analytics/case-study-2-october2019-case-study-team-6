@@ -82,8 +82,8 @@ class Prediction:
             df = df.replace(r'@', '', regex=True)
             df = df.replace(r'http\S+', '', regex=True).replace(r'http \S+', '', regex=True).replace(r'www\S+', '',
                                                                                                      regex=True)
-            df = df.str.replace('[^\w\s]', '')
-            df = df.str.replace('\s\s+', ' ')
+            df = df.str.replace('[^\w\s]', '', regex=True)
+            df = df.str.replace('\s\s+', ' ', regex=True)
             df = df.str.strip()
             df = df.apply(word_tokenize)
             df = df.apply(removeStopWords)
@@ -103,7 +103,7 @@ class Prediction:
         val = int(val)
         print(f"filepath_model: {filepath_model}")
         mdl = pi.load(open(filepath_model + self.modelFiles[val], 'rb'))
-        if 'fs' in self.modelFiles[val]:
+        if 'chi2' in self.modelFiles[val] or 'f_classif' in self.modelFiles[val]:
             print('Feature Data')
             cnt = 0
             for tech in balancing_techniques:
@@ -131,8 +131,8 @@ class Prediction:
                     else:
                         # Load Feature Selection Object
                         fs = pi.load(
-                            open(filepath_model + 'Feature_' + balancing_techniques[cnt] + 'fs_chi2.tchq', 'rb'))
-                        print(filepath_model + 'Feature_' + balancing_techniques[cnt] + 'fs_chi2.tchq')
+                            open(filepath_model + 'Feature_' + balancing_techniques[cnt] + 'fs_f_classif.tchq', 'rb'))
+                        print(filepath_model + 'Feature_' + balancing_techniques[cnt] + 'fs_f_classif.tchq')
                         # Get New Data
                         newData = loadNewDataForPrediction(self.vocab)
 
