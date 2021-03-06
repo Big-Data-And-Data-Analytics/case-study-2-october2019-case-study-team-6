@@ -69,7 +69,7 @@ class FeatureSelection:
         print("Feature Selection done!")
 
 if __name__ == '__main__':
-    filepath = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+    filepath = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting/"
     database = '09_TrainingData'
 
     # filepath = "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/NPZs_ni/"

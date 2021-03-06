@@ -308,8 +308,8 @@ class Model:
             df = df.str.lower()
             df=df.replace(r'@', '', regex=True)
             df=df.replace(r'http\S+', '', regex=True).replace(r'http \S+', '', regex=True).replace(r'www\S+', '', regex=True)
-            df=df.str.replace('[^\w\s]','')
-            df=df.str.replace('\s\s+',' ')
+            df=df.str.replace('[^\w\s]','', regex=True)
+            df=df.str.replace('\s\s+',' ', regex=True)
             df = df.str.strip()
             df=df.apply(word_tokenize)
             df=df.apply(removeStopWords)
@@ -352,7 +352,7 @@ class Model:
                 mdl = pi.load(open(self.filepath_Model + modelFiles[val], 'rb'))
                 print('Model Loaded')
                 # Load Feature Data / Normal Data
-                if 'fs' in modelFiles[val]:
+                if "chi2" in modelFiles[val] or "f_classif" in modelFiles[val]:
                     print('Feature Data')
                     cnt = 0
                     for tech in balancing_techniques:
@@ -378,8 +378,8 @@ class Model:
                                 print(y_pred_validation)
                             else:
                                 # Load Feature Selection Object
-                                fs = pi.load(open(self.filepath_Model + 'Feature_' + balancing_techniques[cnt] + 'fs_chi2.tchq', 'rb'))
-                                print(self.filepath_Model + 'Feature_' + balancing_techniques[cnt] + 'fs_chi2.tchq')
+                                fs = pi.load(open(self.filepath_Model + 'Feature_' + balancing_techniques[cnt] + 'fs_f_classif.tchq', 'rb'))
+                                print(self.filepath_Model + 'Feature_' + balancing_techniques[cnt] + 'fs_f_classif.tchq')
                                 # Get New Data
                                 newData = loadNewDataForPrediction(vocab)
 
@@ -516,10 +516,13 @@ if __name__ == "__main__":
         filepath_Eval = filepath_Eval
     )
 
-    trainBools = [False,True]
-    for trainBool in trainBools:
-        modeller.train_models(use_onehot=trainBool)
+    # trainBools = [False,True]
+    # for trainBool in trainBools:
+    #     modeller.train_models(use_onehot=trainBool)
 
-    t1 = time()
-    totalTime = t1-t0
-    print(f'Modeling took that much time: {totalTime}')
+    # t1 = time()
+    # totalTime = t1-t0
+    # print(f'Modeling took that much time: {totalTime}')
+
+    bal = ["NearMiss", "SMOTEENN", "SMOTETomek","SMOTE", "TomekLinks"]
+    modeller.predict_model(balancing_techniques=bal)
