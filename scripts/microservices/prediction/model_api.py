@@ -127,7 +127,9 @@ class Prediction:
 
                         # Predict
                         y_pred_validation = mdl.predict(x_pred)
-                        return (y_pred_validation)
+                        response = {}
+                        response['prediction'] = y_pred_validation[0]
+                        return response
                     else:
                         # Load Feature Selection Object
                         fs = pi.load(
@@ -146,7 +148,9 @@ class Prediction:
 
                         # Predict
                         y_pred_validation = mdl.predict(x_pred)
-                        return (y_pred_validation)
+                        response = {}
+                        response['prediction'] = y_pred_validation[0]
+                        return response
                     break
                 cnt += 1
         else:
@@ -176,10 +180,11 @@ if __name__ == '__main__':
     predictIdentityMotive = Prediction("09_TrainingData", "CountVectorVocabulary")
     predictIdentityMotive.initFunction(filepath_Model=filepath_Model_IM)
 
-    # predictNationalIdentity = Prediction("09_TrainingData_Ni", "CountVectorVocabulary")
-    # predictNationalIdentity.initFunction(filepath_Model=filepath_Model_NI)
 
+    predictNationalIdentity = Prediction("09_TrainingData_Ni", "CountVectorVocabulary")
+    predictNationalIdentity.initFunction(filepath_Model=filepath_Model_NI)
 
+    # @app.get('/models_IM')
     @app.route('/models_IM', methods=['GET'])
     def get_models_IM():
         with app.app_context():
@@ -204,7 +209,7 @@ if __name__ == '__main__':
         inp = data
         # with app.app_context():
         response = flask.jsonify(predictIdentityMotive.predict(inp, filepath_model=filepath_Model,
-                                                               balancing_techniques=balancingTechniques))
+                                             balancing_techniques=balancingTechniques))
 
         # response.headers.add('Access-Control-Allow-Origin', '*')
         return response
@@ -213,6 +218,16 @@ if __name__ == '__main__':
     @app.route('/predict_nat_id', methods=['POST'])
     def predictInput_NI():
         data = request.json
+    @app.route('/models_NI', methods=['GET'])
+    def get_models_NI():
+        with app.app_context():
+            response = flask.jsonify(predictNationalIdentity.getModels())
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
+
+    @app.route('/predict_nat_id', methods=['POST'])
+    def predictInputNI():
+        data = request.json
         filepath_Model = filepath_Model_NI
         balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek", "SMOTE", "TomekLinks"]
         inp = data
@@ -220,6 +235,20 @@ if __name__ == '__main__':
                                                                balancing_techniques=balancingTechniques))
 
         return response
+        balancingTechniques = ["NearMiss", "SMOTEENN", "SMOTETomek","SMOTE", "TomekLinks"]
+        inp = data
+        # with app.app_context():
+        response = flask.jsonify(predictNationalIdentity.predict(inp, filepath_model=filepath_Model,
+                                             balancing_techniques=balancingTechniques))
+
+        # response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+
+    app.run(host='0.0.0.0', port=5000)
+    # uvicorn.run(app=app, host='0.0.0.0', port=5000)
+
+
+
 
 
     app.run(host='0.0.0.0', port=5000)
