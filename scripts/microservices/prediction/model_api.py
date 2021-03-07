@@ -168,18 +168,18 @@ class takeInput(BaseModel):
 
 
 if __name__ == '__main__':
-    filepath_Model_IM = "/models/"
+    filepath_Model_IM = "/models_im/"
+    filepath_Model_NI = "/models_ni/"
     # filepath_Model_NI="C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study I/02 Input_Data/03 Model/Model_Test_NI_vmdhhh/"
     # filepath_Model_NI="C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study I/02 Input_Data/03 Model/Model_Test_NI_vmdhhh/"
 
     predictIdentityMotive = Prediction("09_TrainingData", "CountVectorVocabulary")
     predictIdentityMotive.initFunction(filepath_Model=filepath_Model_IM)
 
-
     # predictNationalIdentity = Prediction("09_TrainingData_Ni", "CountVectorVocabulary")
     # predictNationalIdentity.initFunction(filepath_Model=filepath_Model_NI)
 
-    # @app.get('/models_IM')
+
     @app.route('/models_IM', methods=['GET'])
     def get_models_IM():
         with app.app_context():
@@ -188,7 +188,14 @@ if __name__ == '__main__':
             return response
 
 
-    # @app.post('/predict_id_motive')
+    @app.route('/models_NI', methods=['GET'])
+    def get_models_NI():
+        with app.app_context():
+            response = flask.jsonify(predictIdentityMotive.getModels())
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
+
+
     @app.route('/predict_id_motive', methods=['POST'])
     def predictInput():
         data = request.json
@@ -197,24 +204,22 @@ if __name__ == '__main__':
         inp = data
         # with app.app_context():
         response = flask.jsonify(predictIdentityMotive.predict(inp, filepath_model=filepath_Model,
-                                             balancing_techniques=balancingTechniques))
+                                                               balancing_techniques=balancingTechniques))
 
         # response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
 
-    app.run(host='0.0.0.0', port=5000)
-    # uvicorn.run(app=app, host='0.0.0.0', port=5000)
-
-"""
-    @app.get('/models_NI')
-    def get_models_NI():
-        return predictNationalIdentity.getModels()
-    @app.post('/predict_nat_id')
-    def predictInput(takeInput: takeInput):
+    @app.route('/predict_nat_id', methods=['POST'])
+    def predictInput_NI():
+        data = request.json
         filepath_Model = filepath_Model_NI
-        balancingTechniques = ["NearMiss", "SMOTEENN", "SMOTETomek","SMOTE", "TomekLinks"]
-        inp = takeInput.dict()
-        return predictNationalIdentity.predict(inp, filepath_model=filepath_Model, balancing_techniques=balancingTechniques)
-"""
+        balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek", "SMOTE", "TomekLinks"]
+        inp = data
+        response = flask.jsonify(predictIdentityMotive.predict(inp, filepath_model=filepath_Model,
+                                                               balancing_techniques=balancingTechniques))
 
+        return response
+
+
+    app.run(host='0.0.0.0', port=5000)
