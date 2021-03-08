@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     file: 'predict_id_motive.js'
                 });
 
-                chrome.storage.local.get('text_payload', function (items) {
-                    document.getElementById("extensionpopupcontent").innerHTML = items.text_payload;
+                chrome.storage.local.get('response_payload', function (items) {
+                    document.getElementById("extensionpopupcontent").innerHTML = items.response_payload;
                 });
             });
         };
