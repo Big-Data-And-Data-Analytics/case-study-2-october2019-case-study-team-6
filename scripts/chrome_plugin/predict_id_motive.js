@@ -14,7 +14,7 @@
     req.send(JSON.stringify(data));
     req.onreadystatechange = function() { // Call a function when the state changes.
         if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-            chrome.storage.local.set({response_payload: this.responseText}); // Response from api
+            chrome.storage.local.set({response_payload_im: this.responseText}); // Storing response from api in chrome local
         }
     }
 })();

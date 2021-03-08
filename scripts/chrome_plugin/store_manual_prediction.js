@@ -27,7 +27,4 @@
         });
         //chrome.storage.local.remove('payload'); // removes the given key value
     });
-
-
-
 })();
