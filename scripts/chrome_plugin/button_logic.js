@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var id_button = document.getElementById('id_button');
     var ni_button = document.getElementById('ni_button');
     var manual_predict_button = document.getElementById('manual_predict_button');
-    let pred_class_textbox = document.getElementById('pred_class')
+    var class_dropdown = document.getElementById('class_selector');
 
     id_button.onclick = predict_id_motive;
     function predict_id_motive() {
@@ -40,27 +40,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     manual_predict_button.onclick = manual_predict;
-    // function manual_predict() {
-    //     {
-    //         input_class = pred_class_textbox.value
-
-    //         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    //             chrome.tabs.executeScript(tabs[0].id, {
-    //                 file: "store_manual_prediction.js"
-    //             }, function(){
-    //                 chrome.tabs.sendMessage(tabs[0].id,{
-    //                     payload: input_class
-    //                 });
-    //             });
-    //         });
-    //     };
-    // }
     function manual_predict() {
         {
-            input_class = pred_class_textbox.value
+            input_class = class_dropdown.value
 
             chrome.storage.local.set({
-                class_payload : pred_class_textbox.value
+                class_payload : class_dropdown.value
             }, function () {
                 chrome.tabs.executeScript({
                     file: "store_manual_prediction.js"

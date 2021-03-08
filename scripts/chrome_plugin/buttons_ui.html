@@ -10,11 +10,18 @@
     <br></br>
     <button id="ni_button">Predict National-Identity</button>
     <br></br>
-    <h4>Predicted output</h4>
+    <h4>Predicted output:</h4>
     <div id="extensionpopupcontent"></div>
+    <h4>Choose class:</h4>
+    <select name="classes" id="class_selector">
+      <option value="meaninig">meaninig</option>
+      <option value="belonging">belonging</option>
+      <option value="continuity">continuity</option>
+      <option value="distintiveness">distintiveness</option>
+      <option value="efficacy">efficacy</option>
+      <option value="selfEsteem">selfEsteem</option>
+    </select>
     <br></br>
-    <p>Enter class:</p>
-    <input id="pred_class" placeholder="prediction class" title="e.g. 'efficacy'"/>
-    <button id="manual_predict_button" type="button">Save</button>   
+    <button id="manual_predict_button" type="button">Save</button>
   </body>
 </html>
