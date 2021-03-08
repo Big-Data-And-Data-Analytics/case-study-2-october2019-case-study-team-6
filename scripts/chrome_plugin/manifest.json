@@ -17,6 +17,8 @@
   "permissions": [
    "activeTab",
    "*://*.twitter.com/*",
-   "<all_urls>"
+   "<all_urls>",
+   "tabs",
+   "storage"
    ]
 }

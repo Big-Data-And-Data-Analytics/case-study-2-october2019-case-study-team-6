@@ -1,11 +1,11 @@
+// ContentScript
 (function() {
 
     let selected_Text;
     selected_Text = window.getSelection().toString();
-    alert(selected_Text);
-    
-    const req = new XMLHttpRequest();
+    // chrome.storage.local.set({text_payload: selected_Text}); // For testing
 
+    const req = new XMLHttpRequest();
     const baseUrl = "http://localhost:5000/ENDPOINT"; // Add rest endpoint here
     
     var data = {sentence: selected_Text, modelNumber: "0"};
@@ -13,9 +13,8 @@
     req.setRequestHeader("Content-Type", "application/json");
     req.send(JSON.stringify(data));
     req.onreadystatechange = function() { // Call a function when the state changes.
-        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-            alert("Got response 200!");
-            alert(this.responseText)
+        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {         
+            chrome.storage.local.set({text_payload: selected_Text});
         }
     }
 })();
