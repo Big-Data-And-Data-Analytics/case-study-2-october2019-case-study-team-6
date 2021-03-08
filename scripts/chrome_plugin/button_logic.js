@@ -13,11 +13,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     file: 'predict_id_motive.js'
                 });
 
-                chrome.runtime.onMessage.addListener(
-                    function(request, sender, sendResponse) {
-                        document.getElementById("extensionpopupcontent").innerHTML = request.payload;
-                    }
-                );
+                chrome.storage.local.get('text_payload', function (items) {
+                    document.getElementById("extensionpopupcontent").innerHTML = items.text_payload;
+                });
             });
         };
     }
@@ -30,11 +28,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     file: 'predict_ni.js'
                 });
 
-                chrome.runtime.onMessage.addListener(
-                    function(request, sender, sendResponse) {
-                        document.getElementById("extensionpopupcontent").innerHTML = request.payload;
-                    }
-                );
+                chrome.storage.local.get('text_payload', function (items) {
+                    document.getElementById("extensionpopupcontent").innerHTML = items.text_payload;
+                });
             });
         };
     }
