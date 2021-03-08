@@ -4,12 +4,13 @@
     chrome.storage.local.get('class_payload', function (items) {
         // console.log(items.class_payload)
         const my_class = items.class_payload
+        chrome.storage.local.remove('class_payload'); // removes the given key value
         
         chrome.storage.local.get('text_payload', function (items) {
             // console.log(items.text_payload);
             const text = items.text_payload;
             console.log(text, my_class)
-            //chrome.storage.local.remove('text_payload'); // removes the given key value
+            chrome.storage.local.remove('text_payload'); // removes the given key value
 
             const req = new XMLHttpRequest();
             const baseUrl = "http://localhost:5000/ENDPOINT"; // Endpoint for storing to DB
