@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
 
-  "name": "Selection Printer",
-  "description": "This plugin will print anything the user has selected.",
+  "name": "Predictor",
+  "description": "This plugin will predict either the national identity or idenity motive of a selected comment.",
   "version": "1.0",
 
   "browser_action": {
