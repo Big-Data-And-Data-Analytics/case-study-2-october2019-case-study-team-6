@@ -1,3 +1,5 @@
+import json
+from pymongo import MongoClient
 from flask import Flask, request
 import flask
 import json
@@ -174,14 +176,34 @@ class takeInput(BaseModel):
 if __name__ == '__main__':
     filepath_Model_IM = "/models_im/"
     filepath_Model_NI = "/models_ni/"
+
+
     # filepath_Model_NI="C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study I/02 Input_Data/03 Model/Model_Test_NI_vmdhhh/"
     # filepath_Model_NI="C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study I/02 Input_Data/03 Model/Model_Test_NI_vmdhhh/"
+
+    def load_Count_Vector_Vocab_Ni():
+        client = MongoClient('test_mongodb', 27017)
+        db = client['09_TrainingData_Ni']
+        collection_currency = db['CountVectorVocabulary']
+
+        with open('CountVectorVocabulary_Ni.json', encoding='utf-8') as f:
+            file_data = json.load(f)
+            jtopy = json.dumps(file_data)
+            # print(jtopy)
+            # jArray = json.dumps(odbcArray, default=json_util.default)
+
+        collection_currency.insert_one(file_data)
+        # collection_currency.insert_many(file_data)
+        client.close()
+
+
+    load_Count_Vector_Vocab_Ni()
+
+    predictNationalIdentity = Prediction("09_TrainingData_Ni", "CountVectorVocabulary")
+    predictNationalIdentity.initFunction(filepath_Model=filepath_Model_NI)
 
     predictIdentityMotive = Prediction("09_TrainingData", "CountVectorVocabulary")
     predictIdentityMotive.initFunction(filepath_Model=filepath_Model_IM)
-
-    # predictNationalIdentity = Prediction("09_TrainingData_Ni", "CountVectorVocabulary")
-    # predictNationalIdentity.initFunction(filepath_Model=filepath_Model_NI)
 
 
     # @app.get('/models_IM')
@@ -214,15 +236,6 @@ if __name__ == '__main__':
         # response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
-    app.run(host='0.0.0.0', port=5000)
-"""
-    @app.route('/models_NI', methods=['GET'])
-    def get_models_NI():
-        with app.app_context():
-            response = flask.jsonify(predictNationalIdentity.getModels())
-            response.headers.add('Access-Control-Allow-Origin', '*')
-            return response
-
 
     @app.route('/predict_nat_id', methods=['POST'])
     def predictInputNI():
@@ -235,4 +248,5 @@ if __name__ == '__main__':
 
         return response
 
-"""
+
+    app.run(host='0.0.0.0', port=5000)
