@@ -218,7 +218,7 @@ if __name__ == '__main__':
     @app.route('/models_NI', methods=['GET'])
     def get_models_NI():
         with app.app_context():
-            response = flask.jsonify(predictIdentityMotive.getModels())
+            response = flask.jsonify(predictNationalIdentity.getModels())
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
 
@@ -243,7 +243,7 @@ if __name__ == '__main__':
         filepath_Model = filepath_Model_NI
         balancingTechniques = ["SMOTEENN", "NearMiss", "SMOTETomek", "SMOTE", "TomekLinks"]
         inp = data
-        response = flask.jsonify(predictIdentityMotive.predict(inp, filepath_model=filepath_Model,
+        response = flask.jsonify(predictNationalIdentity.predict(inp, filepath_model=filepath_Model,
                                                                balancing_techniques=balancingTechniques))
 
         return response
