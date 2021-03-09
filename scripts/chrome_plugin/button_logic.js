@@ -13,8 +13,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     file: 'predict_id_motive.js'
                 });
 
-                chrome.storage.local.get('response_payload', function (items) {
-                    document.getElementById("extensionpopupcontent").innerHTML = items.response_payload;
+                chrome.storage.local.get('response_payload_im', function (items) {
+                    document.getElementById("extensionpopupcontent").innerHTML = items.response_payload_im;
+                    // Not sure if the response is of type string, might have to convert it from JSON to string
+                    my_class = items.response_payload_im;
+                    my_class = my_class.replace('{"prediction":"', "");
+                    my_class = my_class.replace('"}', '');
+                    document.getElementById("class_selector").value = my_class;
                 });
             });
         };
@@ -28,8 +33,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     file: 'predict_ni.js'
                 });
 
-                chrome.storage.local.get('text_payload', function (items) {
-                    document.getElementById("extensionpopupcontent").innerHTML = items.text_payload;
+                chrome.storage.local.get('response_payload_ni', function (items) {
+                    document.getElementById("extensionpopupcontent").innerHTML = items.response_payload_ni;
                 });
             });
         };
