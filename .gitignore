@@ -50,3 +50,5 @@ scripts/datapreparation/translation/__pycache__/*
 /logs_lstm/
 /scripts/model/mongocommand.sh
 /scripts/chrome_plugin_test/
+/scripts/microservices/prediction/models_im/
+/scripts/microservices/prediction/models_ni/
