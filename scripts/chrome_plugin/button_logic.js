@@ -14,13 +14,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 chrome.storage.local.get('response_payload_im', function (items) {
-                    document.getElementById("output_id").innerHTML = items.response_payload_im;
-                    // Not sure if the response is of type string, might have to convert it from JSON to string
-                    my_class = items.response_payload_im;
-                    //my_class = my_class.replace('{"prediction":"', "");
-                    //my_class = my_class.replace('"}', '');
-                    my_class = JSON.parse(my_class)
-                    document.getElementById("class_selector").value = my_class.prediction;
+                    my_class = JSON.parse(items.response_payload_im);
+                    my_class = my_class.prediction
+                    // my_class = my_class.replace('{"prediction":"', "");
+                    // my_class = my_class.replace('"}', '');
+                    document.getElementById("output_id").innerHTML = my_class;
+                    document.getElementById("class_selector").value =my_class;
                 });
             });
         };
@@ -35,13 +34,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 chrome.storage.local.get('response_payload_ni', function (items) {
-                    document.getElementById("output_in").innerHTML = items.response_payload_ni;
-//                    // Not sure if the response is of type string, might have to convert it from JSON to string
-//                    my_class = items.response_payload_im;
-//                    //my_class = my_class.replace('{"prediction":"', "");
-//                    //my_class = my_class.replace('"}', '');
-//                    my_class = JSON.parse(my_class)
-//                    document.getElementById("class_selector").value = my_class.prediction;
+                    my_class = JSON.parse(items.response_payload_in);
+                    my_class = my_class.prediction
+                    document.getElementById("output_in").innerHTML = my_class;
+                    document.getElementById("country_selector").value =my_class;
                 });
             });
         };
