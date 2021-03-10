@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 chrome.storage.local.get('response_payload_ni', function (items) {
-                    my_class = JSON.parse(items.response_payload_in);
+                    my_class = JSON.parse(items.response_payload_ni);
                     my_class = my_class.prediction
                     document.getElementById("output_in").innerHTML = my_class;
                     document.getElementById("country_selector").value =my_class;
