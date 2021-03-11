@@ -248,5 +248,11 @@ if __name__ == '__main__':
 
         return response
 
+    @app.route('/save_prediction', methods=['POST'])
+    def predictInputSaveModel():
+        data = request.json
+        response = data + str(type(data))
+        return response
+
 
     app.run(host='0.0.0.0', port=5000)
