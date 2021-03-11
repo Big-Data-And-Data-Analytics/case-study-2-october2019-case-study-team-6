@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var ni_button = document.getElementById('ni_button');
     var manual_predict_button = document.getElementById('manual_predict_button');
     var class_dropdown = document.getElementById('class_selector');
+    var country_dropdown = document.getElementById('country_selector');
 
     id_button.onclick = predict_id_motive;
     function predict_id_motive() {
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // my_class = my_class.replace('{"prediction":"', "");
                     // my_class = my_class.replace('"}', '');
                     document.getElementById("output_id").innerHTML = my_class;
-                    document.getElementById("class_selector").value =my_class;
+                    document.getElementById("class_selector").value = my_class;
                 });
             });
         };
@@ -37,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     my_class = JSON.parse(items.response_payload_in);
                     my_class = my_class.prediction
                     document.getElementById("output_in").innerHTML = my_class;
-                    document.getElementById("country_selector").value =my_class;
+                    document.getElementById("country_selector").value = my_class;
                 });
             });
         };
@@ -46,10 +47,9 @@ document.addEventListener('DOMContentLoaded', function() {
     manual_predict_button.onclick = manual_predict;
     function manual_predict() {
         {
-            input_class = class_dropdown.value
-
             chrome.storage.local.set({
-                class_payload : class_dropdown.value
+                class_payload : class_dropdown.value,
+                country_payload : country_dropdown.value
             }, function () {
                 chrome.tabs.executeScript({
                     file: "store_manual_prediction.js"
