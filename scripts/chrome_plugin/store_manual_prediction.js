@@ -17,7 +17,7 @@
                 chrome.storage.local.remove('country_payload');
 
                 const req = new XMLHttpRequest();
-                const baseUrl = "http://localhost:5000/ENDPOINT"; // Endpoint for storing to DB
+                const baseUrl = "http://localhost:5000/save_prediction"; // Endpoint for storing to DB
             
                 var data = {sentence: my_text, identity_motive: my_identity_motive, national_identity: my_country};
                 req.open(method="POST", url=baseUrl, true);
@@ -26,6 +26,7 @@
                 req.onreadystatechange = function() {
                     if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
                         // Also something could be here for status 200
+                        alert(this.responseText)
                     }
                 }
             });

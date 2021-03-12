@@ -251,7 +251,12 @@ if __name__ == '__main__':
     @app.route('/save_prediction', methods=['POST'])
     def predictInputSaveModel():
         data = request.json
-        response = data + str(type(data))
+        data['sentence'] = [str(data['sentence'])]
+        data['identity_motive'] = [str(data['identity_motive'])]
+        data['national_identity'] = [str(data['national_identity'])]
+        result = pd.DataFrame.from_dict(data)
+        mc.insertCollection("Extension_Database", "Pseudo_Encoded", result)
+        response = str(data)
         return response
 
 
