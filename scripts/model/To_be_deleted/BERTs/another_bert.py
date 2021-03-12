@@ -63,6 +63,22 @@ def tokenize_comments(comment):
 tokenized_comments = [tokenize_comments(comment) for comment in df["onlyTextMotive"]]
 print("Comments tokenized")
 # Make comment length equal
+comments_with_len = [[comment, y[i], len(comment)]
+                 for i, comment in enumerate(tokenized_comments)]
+print("Comment lenghts balanced")
+random.shuffle(comments_with_len)
+comments_with_len.sort(key=lambda x: x[2])
+sorted_commentss_labels = [(comment_lab[0], comment_lab[1]) for comment_lab in comments_with_len]
+processed_dataset = tf.data.Dataset.from_generator(lambda: sorted_commentss_labels, output_types=(tf.int32, tf.int32))
+batched_dataset = processed_dataset.padded_batch(BATCH_SIZE, padded_shapes=((None, ), ()))
+print("Preprocessing done")
+# Train test split
+TOTAL_BATCHES = math.ceil(len(sorted_commentss_labels) / BATCH_SIZE)
+TEST_BATCHES = TOTAL_BATCHES // 25
+batched_dataset.shuffle(TOTAL_BATCHES)
+test_data = batched_dataset.take(TEST_BATCHES)
+train_data = batched_dataset.skip(TEST_BATCHES)
+print("Train test split done")
 
 # Create model
 class TEXT_MODEL(tf.keras.Model):
