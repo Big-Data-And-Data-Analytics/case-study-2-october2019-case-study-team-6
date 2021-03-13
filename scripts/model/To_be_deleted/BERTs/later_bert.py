@@ -43,7 +43,7 @@ UNK_INDEX = tokenizer.convert_tokens_to_ids(tokenizer.unk_token)
 
 label_field = Field(sequential=False, use_vocab=False, batch_first=True, dtype=torch.float)
 text_field = Field(use_vocab=False, tokenize=tokenizer.encode, lower=False, include_lengths=False, batch_first=True, fix_length=MAX_SEQ_LEN, pad_token=PAD_INDEX, unk_token=UNK_INDEX)
-fields = [('label', label_field), ('title', text_field), ('text', text_field), ('titletext', text_field)]
+fields = [('country', label_field), ('onlyTextMotive', text_field)]
 
 # TabularDataset
 
@@ -53,8 +53,14 @@ df["onlyTextMotive"] = df["onlyText"] + df["identityMotive"]
 sliced_set = df[['country', 'onlyTextMotive']]
 sliced_set = sliced_set[sliced_set["country"] != 0]
 
+train, temp = train_test_split(sliced_set, random_state=2018, test_size=0.25) # , stratify=y
+test, valid = train_test_split(temp, random_state=2018, test_size=0.5) # , stratify=temp_labels
+train.to_csv("train.csv")
+test.to_csv("test.csv")
+valid.to_csv("valid.csv")
+
 ##############
-train, valid, test = TabularDataset.splits(path=source_folder, train='train.csv', validation='valid.csv', test='test.csv', format='CSV', fields=fields, skip_header=True)
+train, valid, test = TabularDataset.splits(train='train.csv', validation='valid.csv', test='test.csv', format='CSV', fields=fields, skip_header=True) # path=source_folder, # PROBLEM: type object 'TabularDataset' has no attribute 'name'
 ##############
 
 # Iterators

@@ -7,7 +7,7 @@ import shutil
 
 import scripts.mongoConnection as mc
 import tensorflow as tf
-import tensorflow_hub as hub
+import tensorflow_hub as hub # PROBLEM: cannot import name 'dense_features' from 'tensorflow.python.feature_column'
 #import tensorflow_text as text
 from official.nlp import optimization  # to create AdamW optmizer
 from sklearn.model_selection import train_test_split

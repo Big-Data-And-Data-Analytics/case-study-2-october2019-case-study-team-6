@@ -4,17 +4,15 @@
 
 import scripts.mongoConnection as mc
 import tensorflow_hub as hub
-#import bert
 from transformers import BertTokenizer
 import tensorflow as tf
 import random
 import math
-import pickle as pi
 from sklearn.preprocessing import LabelEncoder
-from keras.utils import plot_model
-import dill
-import weakref
+import numpy as np
 
+
+filepath_bert_model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/bert_model"
 
 # GPU check
 print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices("GPU")))
@@ -138,7 +136,6 @@ text_model = TEXT_MODEL(vocabulary_size=VOCAB_LENGTH,
                         model_output_classes=OUTPUT_CLASSES,
                         dropout_rate=DROPOUT_RATE)
 
-#plot_model(text_model, to_file='model.png', show_shapes=True)
 print("Model class instanciated")
 
 text_model.compile(loss="sparse_categorical_crossentropy", optimizer="adam", metrics=["sparse_categorical_accuracy"])
@@ -151,4 +148,25 @@ print("Model fitted")
 results = text_model.evaluate(test_data)
 print(results)
 
-dill.dump(text_model.history, open("bert_model.model", "wb"))
+# Save model
+text_model.save(filepath=filepath_bert_model)
+print("Model saved")
+
+# Load model
+model = tf.keras.models.load_model(filepath=filepath_bert_model)
+print("Model loaded")
+
+# Predict
+new_input = "I love the german football team"
+tokenized_new_input = [tokenize_comments(comment) for comment in new_input]
+
+new_input_same_length = [[comment, y[i], len(comment)]
+                 for i, comment in enumerate(tokenized_new_input)]
+
+random.shuffle(new_input_same_length)
+new_input_same_length.sort(key=lambda x: x[2])
+sorted_commentss_labels = [(comment_lab[0], comment_lab[1]) for comment_lab in new_input_same_length]
+processed_dataset = tf.data.Dataset.from_generator(lambda: sorted_commentss_labels, output_types=(tf.int32, tf.int32))
+batched_dataset = processed_dataset.padded_batch(BATCH_SIZE, padded_shapes=((None, ), ()))
+
+model.predict(np.array([new_input]))

@@ -13,10 +13,10 @@ batch_size = 6
           split = (tfds.Split.TRAIN, tfds.Split.TEST),
           as_supervised=True,
           with_info=True)
-print('info', ds_info)
+#print('info', ds_info)
 
-for review, label in tfds.as_numpy(ds_train.take(5)):
-    print('review', review.decode()[0:50], label)
+#for review, label in tfds.as_numpy(ds_train.take(5)):
+#    print('review', review.decode()[0:50], label)
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 

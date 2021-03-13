@@ -52,3 +52,4 @@ scripts/datapreparation/translation/__pycache__/*
 /scripts/chrome_plugin_test/
 /scripts/microservices/prediction/models_im/
 /scripts/microservices/prediction/models_ni/
+/scripts/model/bert_save

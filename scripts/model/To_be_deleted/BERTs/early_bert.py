@@ -3,7 +3,7 @@
 # TODO: Balancing!
 
 import scripts.mongoConnection as mc
-import tensorflow_hub as hub
+import tensorflow_hub as hub # PROBLEM: cannot import name 'dense_features' from 'tensorflow.python.feature_column'
 from transformers import BertTokenizer
 import tensorflow as tf
 import pandas as pd
