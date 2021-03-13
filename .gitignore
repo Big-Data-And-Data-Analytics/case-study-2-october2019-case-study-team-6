@@ -53,3 +53,5 @@ scripts/datapreparation/translation/__pycache__/*
 /scripts/microservices/prediction/models_im/
 /scripts/microservices/prediction/models_ni/
 /scripts/model/bert_save
+/scripts/model/*.png
+/scripts/model/logs_lstm
