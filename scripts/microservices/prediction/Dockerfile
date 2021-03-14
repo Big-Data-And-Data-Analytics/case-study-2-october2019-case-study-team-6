@@ -9,5 +9,5 @@ COPY models_im /models_im
 COPY models_ni /models_ni
 RUN pip install --upgrade pip
 RUN pip install -r requirements_api.txt
-EXPOSE 5000
+EXPOSE 5001
 CMD ["python", "model_api.py"]

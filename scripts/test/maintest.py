@@ -221,7 +221,7 @@ def sentiment():
     comment = getCollection('05_NationalIdentity_Translated', 'ni_comment_translated')
     sub_comment = getCollection('05_NationalIdentity_Translated', 'ni_subcomment_translated')
 
-    ##TODO Check if ran twice does data load?
+    ## TODO Check if ran twice does data load?
     sentiment = Sentiment()
     post_data = sentiment.apply_load_sentiment(post)
     insertCollection('06_NationalIdentity_Sentiment', 'sentiment_post_Collection', post_data)

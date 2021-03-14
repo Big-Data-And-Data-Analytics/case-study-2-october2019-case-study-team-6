@@ -6,7 +6,7 @@
     chrome.storage.local.set({text_payload: selected_Text});
 
     const req = new XMLHttpRequest();
-    const baseUrl = "http://localhost:5000/predict_id_motive";
+    const baseUrl = "http://localhost:5001/predict_id_motive";
 
     var data = {sentence: selected_Text, modelNumber: "0"};
     req.open(method="POST", url=baseUrl, true);

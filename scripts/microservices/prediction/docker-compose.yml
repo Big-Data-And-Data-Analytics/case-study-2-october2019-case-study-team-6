@@ -2,17 +2,17 @@ app:
   build: .
   command: python model_api.py
   ports:
-    - 5000:5000
+    - 5001:5001
   volumes:
     - .:/app
   links:
     - db
 db:
-  image: mongo:latest
+  image: prediction_db_2
   hostname: test_mongodb
   environment:
     - MONGO_INITDB_DATABASE=animal_db
   volumes:
     - ./init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
   ports:
-    - 27017:27017
+    - 27018:27017
