@@ -52,3 +52,8 @@ scripts/datapreparation/translation/__pycache__/*
 /scripts/chrome_plugin_test/
 /scripts/microservices/prediction/models_im/
 /scripts/microservices/prediction/models_ni/
+/scripts/model/LSTM_Multiclass.py
+/scripts/model/Multiclass_LSTM.ipynb
+/scripts/model/Multiclass_LSTM.txt
+/scripts/model/To_be_deleted/BERTs/somewhat_working_bert.py
+/scripts/test/tf_check.py
