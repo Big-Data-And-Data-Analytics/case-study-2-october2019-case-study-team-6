@@ -55,3 +55,4 @@ scripts/datapreparation/translation/__pycache__/*
 /scripts/model/bert_save
 /scripts/model/*.png
 /scripts/model/logs_lstm
+/scripts/*.json
