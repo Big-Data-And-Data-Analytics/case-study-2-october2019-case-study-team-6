@@ -12,7 +12,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, roc_auc_score, f1_score, precision_score, recall_score, plot_confusion_matrix
+from sklearn.metrics import accuracy_score, roc_auc_score, f1_score, precision_score, recall_score, plot_confusion_matrix, plot_roc_curve
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -262,6 +262,17 @@ class Model:
             probs = y_probas[:, 1]
             auc = roc_auc_score(y_true, probs, average=average, multi_class="ovr")
 
+            if save_cm == True:
+                plot_roc_curve(model, x_pred, y_test)
+                plt.title('Receiver Operating Characteristic')
+                plt.legend(loc = 'lower right')
+                plt.plot([0, 1], [0, 1],'r--')
+                plt.xlim([0, 1])
+                plt.ylim([0, 1])
+                plt.ylabel('True Positive Rate')
+                plt.xlabel('False Positive Rate')
+                plt.savefig(filepath, bbox_inches='tight', dpi=199)
+
         if use_onehot == False:
             disp = plot_confusion_matrix(model, x_pred, y_true, display_labels=self.my_tags, cmap=plt.cm.Blues, normalize=normalize_cm)
             disp.ax_.set_title("Normalized confusion matrix")
@@ -466,6 +477,7 @@ class Model:
                         "Precision": precision,
                         "Recall": recall,
                         "ROC_AUC": auc,
+                        "Master_Score(NoROC_AUC)": accuracy + f1 + precision + recall,
                         "Date": today,
                         "Timestamp": current_time
                         }
@@ -481,14 +493,14 @@ class Model:
                     total_models = total_models - 1
                     print(str(total_models) + " models left.")
 
-        if isfile(self.filepath_Eval + "Eval_Overview.csv"):
-            existing_eval_frame = pd.read_csv(self.filepath_Eval + "Eval_Overview.csv")
+        if isfile(self.filepath_Eval + "Eval_Overview_Ni.csv"):
+            existing_eval_frame = pd.read_csv(self.filepath_Eval + "Eval_Overview_Ni.csv", index_col=0)
             eval_frame = pd.concat([existing_eval_frame, self.eval_frame])
             eval_frame.reset_index(inplace=True)
-            eval_frame.to_csv(filepath_Eval + "Eval_Overview.csv")
+            eval_frame.to_csv(self.filepath_Eval + "Eval_Overview_Ni.csv", index=False)
         else:
             self.eval_frame.reset_index(inplace=True)
-            self.eval_frame.to_csv(filepath_Eval + "Eval_Overview.csv")                
+            self.eval_frame.to_csv(self.filepath_Eval + "Eval_Overview_Ni.csv", index=False)                
 
 
 if __name__ == "__main__":
@@ -498,16 +510,16 @@ if __name__ == "__main__":
     # filepath_Model = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test_Global_Seed_Notebook_MK/"
     # filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test_Global_Seed_Notebook_MK/"
 
-    filepath_NPZ = "C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study " \
-                   "I/02 Input_Data/03 Model/NPZs_ni/"
-    filepath_Model = "C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study " \
-                     "I/02 Input_Data/03 Model/Model_Test_NI_ss/"
-    filepath_Eval = "C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study " \
-                    "I/02 Input_Data/03 Model/Model_Eval_Test_NI_ss/"
+    # filepath_NPZ = "C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study " \
+    #                "I/02 Input_Data/03 Model/NPZs_ni/"
+    # filepath_Model = "C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study " \
+    #                  "I/02 Input_Data/03 Model/Model_Test_NI_ss/"
+    # filepath_Eval = "C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study " \
+    #                 "I/02 Input_Data/03 Model/Model_Eval_Test_NI_ss/"
 
-    # filepath_NPZ = "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/NPZs_ni/"
-    # filepath_Model = "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/Model_Test_NI_vmdhhh/"
-    # filepath_Eval = "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/Model_Eval_Test_NI_vmdhhh/"
+    filepath_NPZ = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs_ni/"
+    filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/models_in_final/"
+    filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/models_in_final_eval/"
 
     t0 = time()
 
@@ -523,7 +535,9 @@ if __name__ == "__main__":
         filepath_Eval = filepath_Eval
     )
 
-    modeller.train_models(use_onehot=True)
+    trainBools = [False,True]
+    for trainBool in trainBools:
+        modeller.train_models(use_onehot=trainBool)
 
     t1 = time()
     totalTime = t1-t0

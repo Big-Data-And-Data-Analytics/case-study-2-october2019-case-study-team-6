@@ -9,6 +9,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import Tokenizer
 
+filepath_lstm_model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/lstm_model"
 
 class NN_Model:
     def __init__(self, tensorboard, vocab_size=5000, embedding_dim=64, max_length=200, trunc_type='post',
@@ -135,6 +136,12 @@ plt.subplot(1,2,1)
 plot_graphs(history, 'accuracy')
 plt.subplot(1,2,2)
 plot_graphs(history, 'loss')
+
+# Save model
+model.save(filepath_lstm_model)
+
+# Load model
+model = tf.keras.models.load_model(filepath_lstm_model)
 
 input_sample = [
     "All teams did a great job, thats nice football to watch",
