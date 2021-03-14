@@ -4,17 +4,15 @@
 
 import scripts.mongoConnection as mc
 import tensorflow_hub as hub
-#import bert
 from transformers import BertTokenizer
 import tensorflow as tf
-import numpy as np
 import random
 import math
-import pickle as pi
-import datetime
 from sklearn.preprocessing import LabelEncoder
-from keras.utils import plot_model
+import numpy as np
 
+
+filepath_bert_model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/bert_model"
 
 # GPU check
 print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices("GPU")))
@@ -56,28 +54,37 @@ DNN_UNITS = 256
 OUTPUT_CLASSES = len(df["country"].unique())
 DROPOUT_RATE = 0.2
 NB_EPOCHS = 5
+
 print("Model parameters done")
+
 # Tokenize comments
 def tokenize_comments(comment):
     return tokenizer.convert_tokens_to_ids(tokenizer.tokenize(comment))
 tokenized_comments = [tokenize_comments(comment) for comment in df["onlyTextMotive"]]
+
 print("Comments tokenized")
+
 # Make comment length equal
 comments_with_len = [[comment, y[i], len(comment)]
                  for i, comment in enumerate(tokenized_comments)]
+
 print("Comment lenghts balanced")
+
 random.shuffle(comments_with_len)
 comments_with_len.sort(key=lambda x: x[2])
 sorted_commentss_labels = [(comment_lab[0], comment_lab[1]) for comment_lab in comments_with_len]
 processed_dataset = tf.data.Dataset.from_generator(lambda: sorted_commentss_labels, output_types=(tf.int32, tf.int32))
 batched_dataset = processed_dataset.padded_batch(BATCH_SIZE, padded_shapes=((None, ), ()))
+
 print("Preprocessing done")
+
 # Train test split
 TOTAL_BATCHES = math.ceil(len(sorted_commentss_labels) / BATCH_SIZE)
 TEST_BATCHES = TOTAL_BATCHES // 25
 batched_dataset.shuffle(TOTAL_BATCHES)
 test_data = batched_dataset.take(TEST_BATCHES)
 train_data = batched_dataset.skip(TEST_BATCHES)
+
 print("Train test split done")
 
 # Create model
@@ -121,6 +128,7 @@ class TEXT_MODEL(tf.keras.Model):
         return model_output
 
 print("Model function created")
+
 text_model = TEXT_MODEL(vocabulary_size=VOCAB_LENGTH,
                         embedding_dimensions=EMB_DIM,
                         cnn_filters=CNN_FILTERS,
@@ -128,15 +136,37 @@ text_model = TEXT_MODEL(vocabulary_size=VOCAB_LENGTH,
                         model_output_classes=OUTPUT_CLASSES,
                         dropout_rate=DROPOUT_RATE)
 
-plot_model(text_model, to_file='model.png', show_shapes=True)
 print("Model class instanciated")
 
 text_model.compile(loss="sparse_categorical_crossentropy", optimizer="adam", metrics=["sparse_categorical_accuracy"])
-log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+#log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+#tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
 text_model.fit(train_data, epochs=NB_EPOCHS, batch_size=BATCH_SIZE)
 print("Model fitted")
 
 results = text_model.evaluate(test_data)
 print(results)
+
+# Save model
+text_model.save(filepath=filepath_bert_model)
+print("Model saved")
+
+# Load model
+model = tf.keras.models.load_model(filepath=filepath_bert_model)
+print("Model loaded")
+
+# Predict
+new_input = "I love the german football team"
+tokenized_new_input = [tokenize_comments(comment) for comment in new_input]
+
+new_input_same_length = [[comment, y[i], len(comment)]
+                 for i, comment in enumerate(tokenized_new_input)]
+
+random.shuffle(new_input_same_length)
+new_input_same_length.sort(key=lambda x: x[2])
+sorted_commentss_labels = [(comment_lab[0], comment_lab[1]) for comment_lab in new_input_same_length]
+processed_dataset = tf.data.Dataset.from_generator(lambda: sorted_commentss_labels, output_types=(tf.int32, tf.int32))
+batched_dataset = processed_dataset.padded_batch(BATCH_SIZE, padded_shapes=((None, ), ()))
+
+model.predict(np.array([new_input]))

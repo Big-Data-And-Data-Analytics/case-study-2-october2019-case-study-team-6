@@ -122,7 +122,7 @@ train_loss_set = []
 epochs = 4
 
 # BERT training loop
-for _ in trange(epochs, desc="Epoch"):  
+for _ in trange(epochs, desc="Epoch"): # PROBLEM: Expected tensor for argument #1 'indices' to have scalar type Long; but got torch.cuda.IntTensor instead (while checking arguments for embedding)
   
   ## TRAINING
   

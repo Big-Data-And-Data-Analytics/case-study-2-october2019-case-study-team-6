@@ -12,7 +12,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, roc_auc_score, f1_score, precision_score, recall_score, plot_confusion_matrix
+from sklearn.metrics import accuracy_score, roc_auc_score, f1_score, precision_score, recall_score, plot_confusion_matrix, plot_roc_curve
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -29,9 +29,7 @@ class Model:
     """The Model class provides every function necessary for loading the prepared data, training and evaluating the model and finally predicting
     """    
 
-    my_tags = ["ALBANIA", "AUSTRIA", "BELGIUM", "CROATIA", "CZECH REPUBLIC", "ENGLAND", "FRANCE", "GERMANY", "HUNGARY", "ICELAND", 
-            "ITALY", "POLAND", "PORTUGAL", "REPUBLIC OF IRELAND", "ROMANIA", "RUSSIA", "SLOVAKIA", "SPAIN", "SWEDEN", "SWITZERLAND ", 
-            "TURKEY", "UKRAINE", "WALES"]
+    my_tags = ['belonging', 'meaning', 'efficacy', 'distinctivness', 'self esteem', 'continuity']
 
     def __init__(self, seed, n_cores, iterations, estimators, alpha, learning_rate, filepath_NPZ, filepath_Model, filepath_Eval):
         self.seed = seed
@@ -131,7 +129,7 @@ class Model:
         y = mc.getCollection(database, collection)
         y = y.drop(["_id", "id"], axis=1)
 
-        y_train_onehot = self.onehotencoder.fit_transform(y[['country']])
+        y_train_onehot = self.onehotencoder.fit_transform(y[['identityMotive']])
         y_train_onehot_ = pd.DataFrame(y_train_onehot[:, 0].tolist()).astype(str)
         return y_train_onehot_
 
@@ -148,7 +146,7 @@ class Model:
         y_test = mc.getCollection(database, collection)
         y_test = y_test.drop(["_id", "id"], axis=1)
 
-        y_test_onehot = self.onehotencoder.fit_transform(y_test[['country']])
+        y_test_onehot = self.onehotencoder.fit_transform(y_test[['identityMotive']])
         y_test_onehot_ = pd.DataFrame(y_test_onehot[:, 0].tolist()).astype(str)
         return y_test_onehot_
 
@@ -174,7 +172,7 @@ class Model:
             x_test_fp = self.filepath_NPZ + "X_test.npz"
             X_test = self.__import_X_test(x_test_fp)
 
-            fs = pi.load(open(self.filepath_NPZ + '/Feature_' + balancing_technique + 'fs_' + fs_function + '.tchq', 'rb'))
+            fs = pi.load(open(self.filepath_NPZ + 'Feature_' + balancing_technique + 'fs_' + fs_function + '.tchq', 'rb'))
             
             X_test = fs.transform(X_test)
         else:
@@ -261,6 +259,17 @@ class Model:
             y_probas = model.predict_proba(x_pred)
             probs = y_probas[:, 1]
             auc = roc_auc_score(y_true, probs, average=average, multi_class="ovr")
+            
+            if save_cm == True:
+                plot_roc_curve(model, x_pred, y_test)
+                plt.title('Receiver Operating Characteristic')
+                plt.legend(loc = 'lower right')
+                plt.plot([0, 1], [0, 1],'r--')
+                plt.xlim([0, 1])
+                plt.ylim([0, 1])
+                plt.ylabel('True Positive Rate')
+                plt.xlabel('False Positive Rate')
+                plt.savefig(filepath, bbox_inches='tight', dpi=199)
 
         if use_onehot == False:
             disp = plot_confusion_matrix(model, x_pred, y_true, display_labels=self.my_tags, cmap=plt.cm.Blues, normalize=normalize_cm)
@@ -280,7 +289,7 @@ class Model:
         :return: [description]
         :rtype: [type]
         """        
-        vocab_collection = mc.getCollection(db="09_TrainingData_Ni", col="CountVectorVocabulary")
+        vocab_collection = mc.getCollection(db="09_TrainingData", col="CountVectorVocabulary")
         vocab_list = vocab_collection['dict'].to_list()
         vocab = yaml.safe_load(vocab_list[0])
 
@@ -310,8 +319,8 @@ class Model:
             df = df.str.lower()
             df=df.replace(r'@', '', regex=True)
             df=df.replace(r'http\S+', '', regex=True).replace(r'http \S+', '', regex=True).replace(r'www\S+', '', regex=True)
-            df=df.str.replace('[^\w\s]','')
-            df=df.str.replace('\s\s+',' ')
+            df=df.str.replace('[^\w\s]','', regex=True)
+            df=df.str.replace('\s\s+',' ', regex=True)
             df = df.str.strip()
             df=df.apply(word_tokenize)
             df=df.apply(removeStopWords)
@@ -354,7 +363,7 @@ class Model:
                 mdl = pi.load(open(self.filepath_Model + modelFiles[val], 'rb'))
                 print('Model Loaded')
                 # Load Feature Data / Normal Data
-                if 'fs' in modelFiles[val]:
+                if "chi2" in modelFiles[val] or "f_classif" in modelFiles[val]:
                     print('Feature Data')
                     cnt = 0
                     for tech in balancing_techniques:
@@ -380,8 +389,8 @@ class Model:
                                 print(y_pred_validation)
                             else:
                                 # Load Feature Selection Object
-                                fs = pi.load(open(self.filepath_Model + 'Feature_' + balancing_techniques[cnt] + 'fs_chi2.tchq', 'rb'))
-                                print(self.filepath_Model + 'Feature_' + balancing_techniques[cnt] + 'fs_chi2.tchq')
+                                fs = pi.load(open(self.filepath_Model + 'Feature_' + balancing_techniques[cnt] + 'fs_f_classif.tchq', 'rb'))
+                                print(self.filepath_Model + 'Feature_' + balancing_techniques[cnt] + 'fs_f_classif.tchq')
                                 # Get New Data
                                 newData = loadNewDataForPrediction(vocab)
 
@@ -412,7 +421,7 @@ class Model:
             continueFlag = True
 
     def train_models(self, use_onehot):
-        """The train_models function is a wrapper function which executes everything at once. With that you can train all given models except one-hot. One-hot needs a separate train_models call.
+        """The train_models function is a wrapper function which executes everything at once. With that you can train all given models.
 
         :param use_onehot: Whether the one_hot encoding should be used, or not. If the value is true, then only a logistic regression model can be trained.
         :type use_onehot: bool
@@ -439,7 +448,7 @@ class Model:
                         feature_selection = True
 
                     X, X_test, y, y_test = self.import_train_test_data(
-                        database="09_TrainingData_Ni",
+                        database="09_TrainingData",
                         balancing_technique=balancingTechnique,
                         feature_selection=feature_selection,
                         fs_function=featureSelection,
@@ -466,6 +475,7 @@ class Model:
                         "Precision": precision,
                         "Recall": recall,
                         "ROC_AUC": auc,
+                        "Master_Score(NoROC_AUC)": accuracy + f1 + precision + recall,
                         "Date": today,
                         "Timestamp": current_time
                         }
@@ -481,36 +491,30 @@ class Model:
                     total_models = total_models - 1
                     print(str(total_models) + " models left.")
 
-        if isfile(self.filepath_Eval + "Eval_Overview.csv"):
-            existing_eval_frame = pd.read_csv(self.filepath_Eval + "Eval_Overview.csv")
+        if isfile(self.filepath_Eval + "Eval_Overview_Im.csv"):
+            existing_eval_frame = pd.read_csv(self.filepath_Eval + "Eval_Overview_Im.csv", index_col=0)
             eval_frame = pd.concat([existing_eval_frame, self.eval_frame])
             eval_frame.reset_index(inplace=True)
-            eval_frame.to_csv(filepath_Eval + "Eval_Overview.csv")
+            eval_frame.to_csv(self.filepath_Eval + "Eval_Overview_Im.csv", index=False)
         else:
             self.eval_frame.reset_index(inplace=True)
-            self.eval_frame.to_csv(filepath_Eval + "Eval_Overview.csv")                
+            self.eval_frame.to_csv(self.filepath_Eval + "Eval_Overview_Im.csv", index=False)
 
 
 if __name__ == "__main__":
 
     # Set paths
     # filepath_NPZ = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
-    # filepath_Model = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Models_Test_Global_Seed_Notebook_MK/"
-    # filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/Model_Eval_Test_Global_Seed_Notebook_MK/"
+    # filepath_Model = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting/"
+    # filepath_Eval = "C:/Users/maxim/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/ModelsForAPITesting_Eval/"
 
-    filepath_NPZ = "C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study " \
-                   "I/02 Input_Data/03 Model/NPZs_ni/"
-    filepath_Model = "C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study " \
-                     "I/02 Input_Data/03 Model/Model_Test_NI_ss/"
-    filepath_Eval = "C:/Users/shubham/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - 06 Case Study " \
-                    "I/02 Input_Data/03 Model/Model_Eval_Test_NI_ss/"
-
-    # filepath_NPZ = "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/NPZs_ni/"
-    # filepath_Model = "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/Model_Test_NI_vmdhhh/"
-    # filepath_Eval = "D:/SRH IT/Kinner, Maximilian (SRH Hochschule Heidelberg Student) - Case Study 1/02 Input_Data/03 Model/Model_Eval_Test_NI_vmdhhh/"
+    filepath_NPZ = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/NPZs/"
+    filepath_Model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/models_im_final/"
+    filepath_Eval = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/models_im_final_eval/"
 
     t0 = time()
 
+    # Define desired parameters, not all apply for every model
     modeller = Model(
         seed=69,
         n_cores=-1,
@@ -523,12 +527,13 @@ if __name__ == "__main__":
         filepath_Eval = filepath_Eval
     )
 
-    modeller.train_models(use_onehot=True)
+    trainBools = [True] # False,
+    for trainBool in trainBools:
+        modeller.train_models(use_onehot=trainBool)
 
     t1 = time()
     totalTime = t1-t0
     print(f'Modeling took that much time: {totalTime}')
 
-    # modeller.predict_model(
-    #     filepath_model=filepath_Model,
-    #     balancing_techniques=balancingTechniques)
+    # bal = ["NearMiss", "SMOTEENN", "SMOTETomek","SMOTE", "TomekLinks"]
+    # modeller.predict_model(balancing_techniques=bal)

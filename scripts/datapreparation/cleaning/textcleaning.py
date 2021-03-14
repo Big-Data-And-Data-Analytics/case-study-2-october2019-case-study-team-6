@@ -1,7 +1,7 @@
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
-from scripts.mongoConnection import getCollection, insertCollection
+from datapreparation.mongoConnection import getCollection, insertCollection
 
 class TextCleaning:
     """TextCleaning class represents a class for cleaning a dataframe column onlyText

@@ -2,7 +2,7 @@ import time
 
 from googletrans import Translator
 from langdetect import detect
-from scripts.mongoConnection import getCollection, insertCollection
+from datapreparation.mongoConnection import getCollection, insertCollection
 
 
 class Translation:

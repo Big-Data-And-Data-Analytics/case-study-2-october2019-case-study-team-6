@@ -3,7 +3,7 @@ import pickle as pi
 
 import pandas as pd
 import scipy as sci
-from scripts.mongoConnection import getCollection
+from datapreparation.mongoConnection import getCollection
 from sklearn.feature_selection import SelectKBest, chi2, f_classif
 
 ##TODO Rework naming convention to something more appealing and easier to work with
