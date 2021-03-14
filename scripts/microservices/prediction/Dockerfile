@@ -2,6 +2,7 @@ FROM python:3.8
 ADD mongoConnection.py /
 ADD model_api.py /
 ADD CountVectorVocabulary_Ni.json /
+ADD CountVectorVocabulary_Im.json /
 ADD requirements_api.txt /
 RUN mkdir models_ni
 RUN mkdir models_im

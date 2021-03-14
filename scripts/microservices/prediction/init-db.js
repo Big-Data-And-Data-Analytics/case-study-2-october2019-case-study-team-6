@@ -1,4 +1,4 @@
-db = db.getSiblingDB("09_TrainingData");
+db = db.getSiblingDB("testdb");
 db.CountVectorVocabulary.drop();
 
 db.CountVectorVocabulary.insert(

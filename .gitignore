@@ -55,9 +55,11 @@ scripts/datapreparation/translation/__pycache__/*
 /scripts/model/bert_save
 /scripts/model/*.png
 /scripts/model/logs_lstm
+/scripts/model/logs_BERT
 /scripts/*.json
 /scripts/model/LSTM_Multiclass.py
 /scripts/model/Multiclass_LSTM.ipynb
 /scripts/model/Multiclass_LSTM.txt
 /scripts/model/To_be_deleted/BERTs/somewhat_working_bert.py
 /scripts/test/tf_check.py
+/scripts/microservices/prediction/*.json

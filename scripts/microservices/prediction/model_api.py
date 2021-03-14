@@ -199,6 +199,24 @@ if __name__ == '__main__':
 
     load_Count_Vector_Vocab_Ni()
 
+    def load_Count_Vector_Vocab_Im():
+        client = MongoClient('test_mongodb', 27017)
+        db = client['09_TrainingData']
+        collection_currency = db['CountVectorVocabulary']
+
+        with open('CountVectorVocabulary_Im.json', encoding='utf-8') as f:
+            file_data = json.load(f)
+            jtopy = json.dumps(file_data)
+            # print(jtopy)
+            # jArray = json.dumps(odbcArray, default=json_util.default)
+
+        collection_currency.insert_one(file_data)
+        # collection_currency.insert_many(file_data)
+        client.close()
+
+
+    load_Count_Vector_Vocab_Im()
+
     predictNationalIdentity = Prediction("09_TrainingData_Ni", "CountVectorVocabulary")
     predictNationalIdentity.initFunction(filepath_Model=filepath_Model_NI)
 
@@ -255,7 +273,7 @@ if __name__ == '__main__':
         data['identity_motive'] = [str(data['identity_motive'])]
         data['national_identity'] = [str(data['national_identity'])]
         result = pd.DataFrame.from_dict(data)
-        mc.insertCollection("Extension_Database", "Pseudo_Encoded", result)
+        mc.insertCollection("Extension_Database", "Pseudo_Encoded", result, drop=False)
         response = str(data)
         return response
 
