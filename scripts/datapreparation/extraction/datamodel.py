@@ -1,5 +1,5 @@
 import pandas as pd
-from scripts.mongoConnection import getCollection, insertCollection
+from datapreparation.mongoConnection import getCollection, insertCollection
 
 class DataModel:
     """DataModel class provides functions to apply the datamodel on the given datasource and combines them into a unified shape

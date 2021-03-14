@@ -1,5 +1,5 @@
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from scripts.mongoConnection import getCollection, insertCollection
+from datapreparation.mongoConnection import getCollection, insertCollection
 
 
 class Sentiment:

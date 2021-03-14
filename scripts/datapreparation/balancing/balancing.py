@@ -8,7 +8,7 @@ import scipy
 from imblearn.combine import SMOTEENN, SMOTETomek
 from imblearn.over_sampling import ADASYN, SMOTE
 from imblearn.under_sampling import NearMiss, TomekLinks
-from scripts.mongoConnection import getCollection, insertCollection
+from datapreparation.mongoConnection import getCollection, insertCollection
 from pymongo import MongoClient
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split, StratifiedShuffleSplit

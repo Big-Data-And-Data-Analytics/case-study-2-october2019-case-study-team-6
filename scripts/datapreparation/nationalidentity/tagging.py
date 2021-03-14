@@ -1,6 +1,6 @@
 import re
 import emojis
-from scripts.mongoConnection import getCollection, insertCollection
+from datapreparation.mongoConnection import getCollection, insertCollection
 
 class NationalIdentityTagging:
     """NationalIdentityTagging class represents a class for finding national identity in the text

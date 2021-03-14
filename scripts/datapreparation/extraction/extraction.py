@@ -1,5 +1,5 @@
 import pandas as pd
-from scripts.mongoConnection import getCollection, insertCollection
+from datapreparation.mongoConnection import getCollection, insertCollection
 
 class ExtractTagHashtag:
     """ExtractTagHashtag class represents extraction of hashtags, taglists and text without hashtags and taglists i.e onlyText

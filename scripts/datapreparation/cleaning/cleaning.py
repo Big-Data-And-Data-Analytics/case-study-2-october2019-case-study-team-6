@@ -1,6 +1,10 @@
 import numpy as np
-from scripts.mongoConnection import getCollection, insertCollection
-
+from mongoConnection import getCollection, insertCollection
+from pymongo import MongoClient
+import json
+from bson.json_util import loads
+from flask import Flask
+app = Flask(__name__)
 class Cleaning:
     """Cleaning class provides functions for cleaning the data.
 
@@ -89,12 +93,26 @@ class Cleaning:
 
 if __name__ == "__main__":
 
-    data = getCollection(db="01_NationalIdentity_Crawled", col="youTube_Video_Comments_Raw")
+    def load_Count_Vector_Vocab_Ni():
+        client = MongoClient('test_mongodb', 27017)
+        db = client["01_NationalIdentity_Crawled"]
+        collection_currency = db["youTube_Video_Comments_Raw"]
+        file_data = [loads(line) for line in open('youTube_Video_Comments_Raw.json',  'r', encoding='utf-8')]
+        collection_currency.insert_many(file_data)
+        client.close()
 
-    cleaner = Cleaning(data)
+    load_Count_Vector_Vocab_Ni()
 
-    data = cleaner.remove_duplicates()
-    data = cleaner.remove_white_spaces("textOriginal")
-    data = cleaner.change_empty_tona("textOriginal")
+    @app.route('/clean', methods=['POST'])
+    def startCleaning():
+        data = getCollection(db="01_NationalIdentity_Crawled", col="youTube_Video_Comments_Raw")
 
-    insertCollection('01_NationalIdentity_Crawled', 'cleaned_data', data)
+        cleaner = Cleaning(data)
+
+        data = cleaner.remove_duplicates()
+        data = cleaner.remove_white_spaces("textOriginal")
+        data = cleaner.change_empty_tona("textOriginal")
+
+        insertCollection('01_NationalIdentity_Crawled', 'cleaned_data', data)
+        return "success"
+    app.run(host='0.0.0.0', port=5000)
