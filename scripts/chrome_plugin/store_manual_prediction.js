@@ -26,7 +26,7 @@
                 req.onreadystatechange = function() {
                     if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
                         // Also something could be here for status 200
-                        alert(this.responseText)
+                        // alert(this.responseText)
                     }
                 }
             });

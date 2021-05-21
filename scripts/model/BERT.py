@@ -10,8 +10,9 @@ import random
 import math
 from sklearn.preprocessing import LabelEncoder
 import numpy as np
+from tensorflow.keras.callbacks import TensorBoard
 
-
+tb = TensorBoard(log_dir="logs_BERT/{}".format("BERT_model"))
 filepath_bert_model = "D:/OneDrive - SRH IT/06 Case Study I/02 Input_Data/03 Model/bert_model"
 
 # GPU check
@@ -142,7 +143,7 @@ text_model.compile(loss="sparse_categorical_crossentropy", optimizer="adam", met
 #log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 #tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-text_model.fit(train_data, epochs=NB_EPOCHS, batch_size=BATCH_SIZE)
+text_model.fit(train_data, epochs=NB_EPOCHS, batch_size=BATCH_SIZE, callbacks=[tb])
 print("Model fitted")
 
 results = text_model.evaluate(test_data)
